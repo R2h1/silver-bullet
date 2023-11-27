@@ -3,12 +3,12 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Silver Bullet",
-  description: "Our userful handbook",
+  description: "前端修炼手册：也许，求知的道路上，未必就没有银色子弹",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'tab1', link: '/markdown-examples' }
     ],
 
     sidebar: [
@@ -22,7 +22,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/R2h1/silver-bullet' }
     ]
   }
 })

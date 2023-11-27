@@ -12,14 +12,14 @@ hero:
       link: /markdown-examples
     - theme: alt
       text: 在 github 上查看
-      link: /api-examples
+      link: https://github.com/R2h1/silver-bullet
 
 features:
-  - title: 计算机基础
+  - title: 🏆 计算机基础
     details: 数据结构，算法，网络，组成原理...
-  - title: 前端知识
-    details: JavaScript，TypeScript，Vue，React，NodeJS...
-  - title: 其他
+  - title: 🦾 前端知识
+    details:  JavaScript，TypeScript，Vue，React，NodeJS...
+  - title: 😍 其他
     details: 占个坑...
 ---
 

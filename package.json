@@ -1,8 +1,13 @@
 {
   "name": "silver-bullet",
   "version": "1.0.0",
-  "description": "前端修炼手册",
+  "description": "前端修炼手册：也许，求知的道路上，未必就没有银色子弹",
+  "type": "module",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/R2h1/silver-bullet.git"
+  },
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
