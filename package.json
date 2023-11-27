@@ -1,0 +1,19 @@
+{
+  "name": "silver-bullet",
+  "version": "1.0.0",
+  "description": "前端修炼手册",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [],
+  "author": " <example-user@example.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "vitepress": "1.0.0-rc.31",
+    "vue": "^3.3.9"
+  }
+}
