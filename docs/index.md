@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: 开始
-      link: /markdown-examples
+      link: /basics/data-structures-algorithms
     - theme: alt
       text: 在 github 上查看
       link: https://github.com/R2h1/silver-bullet
