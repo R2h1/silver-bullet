@@ -6,6 +6,9 @@ hero:
   name: Silver Bullet
   text: 前端修炼手册
   tagline: 也许，求知的道路上，未必就没有银色子弹
+  image:
+    src: /logo.png
+    alt: Silver Bullet
   actions:
     - theme: brand
       text: 开始

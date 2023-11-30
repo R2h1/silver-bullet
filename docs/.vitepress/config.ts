@@ -7,7 +7,16 @@ export default defineConfig({
   description: "前端修炼手册：也许，求知的道路上，未必就没有银色子弹",
   lastUpdated: true,
   cleanUrls: true,
+  markdown: {
+    math: true,
+    lineNumbers: true,
+    theme: {
+      light: "min-dark",
+      dark: "one-dark-pro",
+    },
+  },
   themeConfig: {
+    logo: '/logo.png',
     search: {
       provider: 'local',
       options: {
@@ -32,7 +41,7 @@ export default defineConfig({
         }
       }
     },
-    outline: [2, 3],
+    outline: [2, 4],
     nav: [
       { text: '计算机基础', link: '/basics/data-structures-algorithms' }
     ],
