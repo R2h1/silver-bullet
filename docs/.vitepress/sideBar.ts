@@ -1,13 +1,19 @@
 import { DefaultTheme } from "vitepress";
-export const sidebar: DefaultTheme.Sidebar = [
+export const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: '计算机基础',
-    collapsed: true,
+    collapsed: false,
     items: [
       { text: '数据结构与算法', link: '/basics/data-structures-algorithms' },
       { text: '网络', link: '/basics/internet' },
       { text: '操作系统', link: '/basics/os' },
       { text: '组成原理', link: '/basics/make-up-principle' },
+    ]
+  },
+  {
+    text: '设计模式',
+    items: [
+      { text: '前端常用设计模式', link: '/font-end/design-patterns' },
     ]
   }
 ];
