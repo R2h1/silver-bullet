@@ -135,10 +135,9 @@ git fetch：相同的目的，但工作方式略不同。 git fetch **从所�
 
 ## 撤销已 push 至远端的 commit
 
-方式一，删除或修复新提交中的错误文件，并将其推送到远程存储库：
+**方式一**，删除或修复新提交中的错误文件，并将其推送到远程存储库：
 > git add  
 > git commit -m 'message'  
 > git push origin main // 使用 --force可以强制退回低版本，否则会报错  
 
-方式二，可以使用 `git revert <name of bad commit>` 创建一个新的提交，撤销在错误提交中所做的所有更改。
-
+**方式二**，可以使用 `git revert <name of bad commit>` 创建一个新的提交，撤销在错误提交中所做的所有更改。
