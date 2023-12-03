@@ -103,7 +103,7 @@ Git 有 4 个区域：工作区（workspace）、index（暂存区）、reposito
 
 ### git config
 
-core.ignorecase：是否忽略大小写，默认情况下是 false，除了 git clone 和 git init 会在创建仓库时探测并适当地设置 core.ignoreCase 为 true。如果为 true，这个选项可以启用各种变通方法，使 Git 在不区分大小写的文件系统（如 FAT）上更好地工作。
+`git config core.ignorecase [boolean]`：是否忽略大小写，默认情况下是 false，除了 git clone 和 git init 会在创建仓库时探测并适当地设置 core.ignoreCase 为 true。如果为 true，这个选项可以启用各种变通方法，使 Git 在不区分大小写的文件系统（如 FAT）上更好地工作。
 
 ### git pull 和 git fetch
 
