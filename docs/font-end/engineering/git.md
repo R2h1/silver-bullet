@@ -52,7 +52,6 @@ Git 有 4 个区域：工作区（workspace）、index（暂存区）、reposito
 > 3. `git cherry-pick [commitId]` // 仅合并某分支的某一提交到当前分支(commitId,通过命令 git log 查看)，对于 cherry-pick 时会出现 commitId is a merge but no -m option was given，此时需要使用 git cherry-pick [commitId] -m 1 指定主线父编号为 1  
 > 4. `合并后检查依赖是否更新，若更新，需 npm install`
 
-
 ### 删除分支
 
 > - `git branch -d [branchName]` // 删除本地分支前先切换到另一个分支，然后成功删除的前提是所有更改都已 push,否则采用 -D 强制删除  
@@ -100,7 +99,7 @@ Git 有 4 个区域：工作区（workspace）、index（暂存区）、reposito
 
 ### git stash
 
-将**工作目录（修改后的跟踪文件和暂存的更改）**保存在一堆未完成的更改中并且可以随时重新应用这些更改。
+将工作目录（修改后的跟踪文件和暂存的更改）保存在一堆未完成的更改中并且可以随时重新应用这些更改。
 
 ### git config
 
