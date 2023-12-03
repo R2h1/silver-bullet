@@ -34,6 +34,11 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     collapsed: true,
     items: [
       { text: 'Git', link: '/font-end/engineering/git' },
+      { text: 'babel', link: '/font-end/engineering/babel' },
+      { text: 'eslint', link: '/font-end/engineering/eslint' },
+      { text: 'esbuild', link: '/font-end/engineering/esbuild' },
+      { text: 'pnpm', link: '/font-end/engineering/pnpm' },
+
     ]
   }
 ];
