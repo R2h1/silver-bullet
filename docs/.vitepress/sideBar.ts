@@ -15,5 +15,11 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     items: [
       { text: '前端常用设计模式', link: '/font-end/design-patterns' },
     ]
+  },
+  {
+    text: '混合开发',
+    items: [
+      { text: '跨平台', link: '/font-end/hybrid' },
+    ]
   }
 ];
