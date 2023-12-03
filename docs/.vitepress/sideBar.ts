@@ -2,7 +2,7 @@ import { DefaultTheme } from "vitepress";
 export const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: '计算机基础',
-    collapsed: false,
+    collapsed: true,
     items: [
       { text: '数据结构与算法', link: '/basics/data-structures-algorithms' },
       { text: '网络', link: '/basics/internet' },
@@ -26,6 +26,14 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     text: '前端数据治理与异常监控',
     items: [
       { text: '前端数据治理与异常监控', link: '/font-end/data-govern-exception-monitor' },
+    ]
+  },
+  {
+    text: '前端工程化',
+    link: '/font-end/engineering/index',
+    collapsed: true,
+    items: [
+      { text: 'Git', link: '/font-end/engineering/git' },
     ]
   }
 ];
