@@ -165,3 +165,991 @@ function minArray2(numbers: number[]): number {
   return numbers[left];
 }
 ```
+
+#### 3. 调整数组顺序使奇数位于偶数前面
+
+**题目描述**：输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分（**扩展**：并保证奇数和奇数，偶数和偶数之间的相对位置不变）。
+
+**分析**：目标是奇数在前，偶数在后。
+
+首先，可以使用一个额外数组，遍历两次原始数据，分别将奇偶元素放入其中，如此可以保证奇偶相对位置不变；
+
+其次，可以采用左右指针向中间移动，左指针偶数，右指针奇数，进行交换；否则左指针移动直到遇到偶数，右指针移动直到遇到奇数；不过无法保证奇偶相对位置不变；
+
+最后，可以采用快慢指针法，快指针向前搜索奇数，慢指针搜索偶数位置，不过这样不能保证偶的相对位置；
+
+**求解**：
+
+```typescript
+// 暴力解法(支持)
+function exchange1(nums: number[]): number[] {
+  const left: number[] = [];
+  const right: number[] = [];
+  for (let i = 0; i < nums.length; i++) {
+    const element = nums[i];
+    element & 1 ? left.push(element) : right.push(element);
+  }
+  return left.concat(right);
+}
+
+// 左右指针
+function exchange2(nums: number[]): number[] {
+  let left = 0;
+  let right = nums.length - 1;
+  while (left < right) {
+    if (!(nums[left] & 1) && nums[right] & 1) {
+      // 左边是偶数，右边是奇数，进行交换
+      [nums[left], nums[right]] = [nums[right], nums[left]];
+      left = left + 1;
+      right = right - 1;
+      continue;
+    }
+    while (nums[left] & 1 && left < right) {
+      // 左指针是奇数
+      left = left + 1;
+    }
+    while (!(nums[right] & 1) && left < right) {
+      // 右指针是偶数
+      right = right - 1;
+    }
+  }
+  return nums;
+}
+
+// 快慢指针
+function exchange3(nums: number[]): number[] {
+  let slow = 0;
+  let fast = 0;
+  while (fast < nums.length) {
+    if (nums[fast] & 1) {
+      // 快指针是奇数
+      slow !== fast && ([nums[slow], nums[fast]] = [nums[fast], nums[slow]]); // 排除自我交换
+      slow = slow + 1;
+    }
+    fast = fast + 1;
+  }
+  return nums;
+}
+```
+#### 4. 数组中出现次数超过一半的数字
+
+**题目描述**：数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。你可以假设数组是非空的，并且给定的数组总是存在多数元素，如果不存在，返回 NaN。
+
+**分析**：
+
+**排序计数**，首先对数组进行排序，遍历记录是否存在超过一半的数字，遇到不同的数字重置出现次数即可。
+
+**哈希计数**，使用哈希表记录所有数字出现的次数，当遇到超过一半的数字返回即可。
+
+**摩尔投票**，众数记为 +1，把其他数记为 -1，将它们全部加起来，如果最终的和大于 0，说明存在多数，否则不存在。[1,2,3,2,2,2,5,4,2] 遇到不一样的数字，对投票计数器进行 - 1，直到 count 为 0 刚好剔除，重新开始投票，不改变多数性质，比如遍历到 3 的时候 count 为 0，相当于剔除了 1,2, 从 [3,2,2,2,5,4,2] 重新开始。
+
+**求解**：
+
+```typescript
+// 排序后计数
+function majorityElement1(nums: number[]): number {
+  nums.sort();
+  const len = nums?.length;
+  let majority = nums[0];
+  let count = 0;
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (element === majority) {
+      count = count + 1;
+    } else {
+      count = 1;
+      majority = nums[i];
+    }
+    // 大于一半
+    if (count > len / 2) {
+      return majority;
+    }
+  }
+  return NaN;
+}
+
+// 哈希计数
+function majorityElement2(nums: number[]): number {
+  const len = nums?.length;
+  const counter: Record<number, number> = {};
+  for (let i = 0; i < len; i++) {
+    const count = counter[nums[i]];
+    const element = nums[i];
+    if (count) {
+      counter[element] = count + 1;
+    } else {
+      counter[element] = 1;
+    }
+    if (counter[element] > len / 2) {
+      return element;
+    }
+  }
+  return NaN;
+}
+
+// 摩尔投票法
+function majorityElement3(nums: number[]): number {
+  const len = nums?.length;
+  let majority = nums[0];
+  let count = 0;
+  // [1,2,3,2,2,2,5,4,2]  遇到不一样的数字，对投票计数器进行 - 1，直到 count 为 0 刚好剔除，重新开始投票，不改变多数性质，
+  // 比如遍历到 3 的时候 count 为 0，相当于剔除了 1,2, 从[3,2,2,2,5,4,2]重新开始；
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (count === 0) {
+      majority = element;
+    }
+    count = element === majority ? count + 1 : count - 1;
+  }
+  return count === 0 ? NaN : majority;
+}
+```
+
+#### 5. 连续子数组的最大和
+
+**题目描述**：输入一个整型数组，数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。要求时间复杂度为 O(n)。
+
+**分析**：
+
+**暴力法**，直接遍历两遍进行计算，记录所有连续子数组的和来更新最大值。
+
+**动态规划（剔除）法**，遍历一遍数组，计算到当前数字的子数组的和，如果比当前数字小，说明之前的连续子数组的和为负数，可将其剔除掉，此时记录和为当前数字。
+
+**求解**： 
+
+```typescript
+// 暴力法
+function maxSubArray1(nums: number[]): number {
+  const len = nums?.length;
+  let maxSum = nums[0];
+  for (let i = 0; i < len; i++) {
+    let sum = 0;
+    for (let j = i; j < len; j++) {
+      sum = sum + nums[j];
+      if (sum > maxSum) {
+        maxSum = sum;
+      }
+    }
+  }
+  return maxSum;
+}
+
+// 优化解法（动态规划）
+function maxSubArray2(nums: number[]): number {
+  const len = nums?.length;
+  let maxSum = nums[0];
+  let sum = 0;
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    sum = sum + element;
+    // 当前位置之前构成的连续子数组 subNums计算出来的和小于当前元素
+    // 说明 subNums 除当前元素的和为负数，可以剔除；
+    if (sum <= element) {
+      sum = element;
+    }
+    if (sum > maxSum) {
+      maxSum = sum;
+    }
+  }
+  return maxSum;
+}
+
+// 优化解法（动态规划）
+function maxSubArray3(nums: number[]): number {
+  let len = nums.length;
+  // 记录到当前位置的子数组的连续子数组的最大和
+  let maxSums: number[] = [];
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (i === 0) {
+      // 单元素的最大和为本身
+      maxSums.push(element);
+    } else if (maxSums[i - 1] <= 0) {
+      // 前一个最大值是非正数，最大值为当前值
+      maxSums.push(element);
+    } else {
+      // 否则最大值 为 前一个最大值 加上当前值
+      maxSums.push(maxSums[i - 1] + element);
+    }
+  }
+  return Math.max(...maxSums);
+}
+```
+
+#### 6. 把数组排成最小的数
+
+**题目描述**：输入一个非负整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。
+
+**分析**：
+
+**排序法**，因为对于任意两个数 x 与 y，对于拼接，若 xy > yx，说明 y 应该在 x 前面，反之 y 应该在 x 前面；而且若 xy < yx 且 yz < zy 且 xz < zx, 则 xyz 最小: 因为 xyz < yxz < yzx < zyx,  xyz < xzy < zxy < zyx; 因此，对[ x, y, z] 进行排序，保证 xy < yx 且 yz < zy 且 xz < zx 即可。
+
+**求解**：
+
+```typescript
+// sort + join
+function minNumber1(nums: number[]): string {
+  // sort 的比较函数，当返回值大于 0 时 b 在前， a 在后；小于 0 时 a 在前，b 在后
+  return nums
+    .sort((a, b) => {
+      const strA = String(a);
+      const strB = String(b);
+      return strA + strB > strB + strA ? 1 : -1;
+    })
+    .join('');
+}
+```
+
+#### 7. 数组的逆序对
+
+**题目描述**：在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数
+
+**分析**：
+
+**暴力法**，遍历数组元素，与其后的所有元素对比，满足逆序条件统计（超时）。
+
+**归并排序法**，使用归并排序，在排序过程中，当左子序列的当前元素大于右边子序列当前元素时，此时左子序列当前元素及其后均为逆序对。
+
+**求解**：
+
+```typescript
+// 暴力法(超时)
+function reversePairs1(nums: number[]): number {
+  let count = 0;
+  const len = nums?.length;
+  for (let i = 0; i < len; i++) {
+    const base = nums[i];
+    for (let j = i + 1; j < len; j++) {
+      const compare = nums[j];
+      if (compare < base) {
+        count = count + 1;
+      }
+    }
+  }
+  return count;
+}
+
+// 归并排序法
+function reversePairs2(nums: number[]): number {
+  const len = nums?.length;
+  const temp = new Array(len);
+  function getCount(left: number, right: number) {
+    if (left >= right) return 0;
+    let count = 0;
+    const mid = Math.floor((left + right) / 2); // (left + right) >> 1;
+    // 进行分解
+    count = getCount(left, mid) + getCount(mid + 1, right);
+    let low = left; // 左边有序子序列的起始位置
+    let hight = mid + 1; // 右边有序子序列的起始位置
+    // 先将左右子序列缓存起来，用于对比合并
+    for (let i = left; i <= right; i++) {
+      temp[i] = nums[i];
+    }
+    for (let i = left; i <= right; i++) {
+      if (temp[low] > temp[hight] && low <= mid && hight <= right) {
+        // 左边指向元素大于右边指向元素
+        nums[i] = temp[hight++];
+        count = count + mid - low + 1;
+      } else if (low > mid) {
+        // 左边遍历完，说明右边剩余元素均大于左边，直接拷贝 不形成逆序对
+        nums[i] = temp[hight++];
+      } else if (hight > right || temp[low] <= temp[hight]) {
+        // 右边遍历完，左边还剩余元素 或者 左边小于右边，不形成逆序对
+        nums[i] = temp[low++];
+      }
+    }
+    return count;
+  }
+  const count = getCount(0, len - 1);
+  return count;
+}
+```
+
+#### 8. 数字在排序数组的出现次数
+**题目描述**：统计一个数字在排序数组中出现的次数。
+
+**分析**：
+
+**indexOf + lastIndexOf**，找到排序数组中出现该数字的首尾下标，计算即可，需要使用indexOf 判断是否存在该数字。
+
+**遍历计数**，通过一次遍历设置一个标志flag，初始为 false，当和目标值相等置为true，再次不等于目标值时，即可跳出循环。
+
+**正则法**，使用join函数以#分割转换为字符串，在末尾新增一个 #，正则match匹配 ’目标数字#’的结果数组的长度即可。
+
+**二分法**，首先找到目标数字，然后向两边进行搜索即可。
+
+**求解**：
+
+```typescript
+// indexOf + lastIndexOf
+function search1(nums: number[], target: number): number {
+  const startIndex = nums?.indexOf(target);
+  const endIndex = nums?.lastIndexOf(target);
+  if (startIndex === -1) return 0;
+  return endIndex - startIndex + 1;
+}
+
+// 遍历计数
+function search2(nums: number[], target: number): number {
+  const len = nums?.length;
+  let count = 0;
+  // 是否是 target, 用于恰好大于target的时候退出循环；
+  let flag = false;
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (element === target) {
+      count = count + 1;
+      flag = true;
+    } else if (flag) {
+      break;
+    }
+  }
+  return count;
+}
+
+// 正则 + join
+function search3(nums: number[], target: number): number {
+  const reg = new RegExp(target + '#', 'g');
+  const numsStr = nums.join('#') + '#';
+  const count = numsStr.match(reg)?.length ?? 0;
+  return count;
+}
+
+// 二分法
+function search4(nums: number[], target: number): number {
+  const len = nums?.length;
+  let left = 0;
+  let right = len - 1;
+  let count = 0;
+  while (left <= right) {
+    let mid = Math.floor((left + right) / 2); // ( left + right ) >> 1
+    const element = nums[mid];
+    if (element > target) {
+      // 在 [mid + 1, right]
+      left = mid + 1;
+    } else if (element < target) {
+      // 在[left, mid - 1]
+      right = mid - 1;
+    } else {
+      // 在 [mid] 两侧
+      count = 0;
+      let low = mid;
+      let high = mid + 1;
+      while (low >= left) {
+        if (nums[low] === target) {
+          count = count + 1;
+        }
+        low = low - 1;
+      }
+      while (high <= right) {
+        if (nums[high] === target) {
+          count = count + 1;
+        }
+        high = high + 1;
+      }
+      break;
+    }
+  }
+  return count;
+}
+```
+
+#### 9. 数组中只出现一次的两个数字（其余出现均两次）
+
+**题目描述**：一个整型数组 nums 里除两个数字之外，其他数字都出现了两次。请写程序找出这两个只出现一次的数字。要求时间复杂度是O(n)，空间复杂度是O(1)。
+
+**分析**：
+
+**哈希计数**，首遍遍历在哈希表中统计所有数字的出现次数，二次遍历找到哈希表中只出现一次的两个数字即可。
+
+**indexOf + lastIndexOf**，遍历数组的元素，找到首次和最后一次出现下标相同的元素即可。
+
+**异或运算**，相同数组的异或结果为0，而任意数字和0的异或结果为本身，因此遍历数组计算所有元素的异或结果即为不同的两个元素的异或结果，该异或结果中为1的位可以用来区分这两个不同的数字。将异或结果与 1 依次进行按位与运算，找到任意位为 1 的 divider。再次遍历数组元素，利用divider 和每个元素与运算来进行分组异或得到最终结果。
+
+**求解**：
+
+```typescript
+// 哈希计数
+function singleNumbers1(nums: number[]): number[] {
+  const len = nums?.length;
+  // 进行计数
+  const countMap: Record<number, number> = {};
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    const count = countMap[element];
+    if (count) {
+      countMap[element] = count + 1;
+    } else {
+      countMap[element] = 1;
+    }
+  }
+  // 二次遍历找到出现次数为1的
+  const singles: number[] = [];
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (countMap[element] === 1) {
+      singles.push(element);
+    }
+  }
+  return singles;
+}
+
+// indexOf + lastIndexOf（耗时过长)
+function singleNumbers2(nums: number[]): number[] {
+  const len = nums?.length;
+  const singles: number[] = [];
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (nums.indexOf(element) === nums.lastIndexOf(element)) {
+      // 首次出现与最后一次出现的下标相同
+      singles.push(element);
+    }
+  }
+  return singles;
+}
+
+// 异或运算
+function singleNumbers3(nums: number[]): number[] {
+  const len = nums?.length;
+  // 对所有数字进行异或，得到这两个不同数字的异或结果
+  let singlesXor = 0;
+  for (let i = 0; i < len; i++) {
+    singlesXor = singlesXor ^ nums[i];
+  }
+  if (singlesXor === 0) return [];
+  // 将异或结果与 1 依次进行按位与运算，找到任意位为 1 的 divider
+  let divider = 1;
+  while ((singlesXor & divider) === 0) {
+    divider = divider << 1;
+  }
+  let first = 0;
+  let second = 0;
+  // 与 divider 进行与运算，进行分组,
+  // 相同数字在 divider 中 为 1的那一位 是相同的，肯定分在同一组
+  // 不同的那两个数字，由于异或结果 singleXor 在 divider 为 1 的位置也为 1，表示这个位置处两个数字必是不同的 0 和 1
+  // 如此一来，与 divider 与运算的结果必然不同而分在不同的组
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if ((element & divider) === 0) {
+      first = first ^ element;
+    } else {
+      second = second ^ element;
+    }
+  }
+  return [first, second];
+}
+```
+
+#### 10. 数组中重复的数字
+
+**题目描述**：在一个长度为 n 的数组 nums 里的所有数字都在 0～n-1 的范围内。数组中某些数字是重复的，但不知道有几个数字重复了，也不知道每个数字重复了几次。请找出数组中任意一个重复的数字。
+
+**分析**：
+
+**哈希计数**，统计元素出现次数，在统计的过程中，如果哈希表中已经存在该元素则说明重复。
+
+**indexOf + lastIndexOf**，遍历数组，找到首次出现和最后一次出现不同的元素。
+
+**数组原地交换**，数字范围在 0～n-1，且数组长度为 n, 说明不重复的数字均可以在等于下标的位置上，遍历数组将不等于下标的元素a与以该元素值a作为下标的元素值b进行对比，若相等，说明该元素值a重复，否则交换两个元素值再寻找以b为下标的元素值c进行对比，直到原a位置的元素等于下标。
+
+**集合**，遍历数组将集合中没有的元素放入集合中，若集合中已经存在该元素，说明重复。
+
+**求解**：
+
+```typescript
+// 哈希计数
+function findRepeatNumber1(nums: number[]): number {
+  const len = nums?.length;
+  // 进行计数
+  const countMap: Record<number, number> = {};
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    const count = countMap[element];
+    if (count) {
+      return element;
+    } else {
+      countMap[element] = 1;
+    }
+  }
+  return NaN;
+}
+
+// indexOf + lastIndexOf
+function findRepeatNumber2(nums: number[]): number {
+  const len = nums?.length;
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (nums.indexOf(element) !== nums.lastIndexOf(element)) {
+      return element;
+    }
+  }
+  return NaN;
+}
+
+// 数组原地交换
+function findRepeatNumber3(nums: number[]): number {
+  const len = nums?.length;
+  for (let i = 0; i < len; i++) {
+    // 如果 0 ~ n -1 的数字都只出现一次，那么排序后就会满足 element === i
+    // element !== i 说明可能是重复的数字，
+    while (nums[i] !== i) {
+      const element = nums[i];
+      const target = nums[element]; // 而当前数字应该存在的位置所对应的元素值
+      if (element === target) {
+        // 相等说明一定重复
+        return element;
+      } else {
+        // 不等，交换, 直到应该存在的位置所对应的元素值也放到正确位置
+        [nums[i], nums[element]] = [nums[element], nums[i]];
+      }
+    }
+  }
+  return NaN;
+}
+
+// 集合
+function findRepeatNumber4(nums: number[]): number {
+  const len = nums?.length;
+  const set = new Set();
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    if (set.has(element)) {
+      // 集合中存在该元素
+      return element;
+    } else {
+      // 不存在，则加进去
+      set.add(element);
+    }
+  }
+  return NaN;
+}
+```
+
+#### 11. 构建乘积数组
+
+**题目描述**：给定一个数组 A[0,1,…,n-1]，请构建一个数组 B[0,1,…,n-1]，其中 B[i] 的值是数组 A 中除了下标 i 以外的元素的积, 即 B[i]=A[0]×A[1]×…×A[i-1]×A[i+1]×…×A[n-1]。不能使用除法。
+
+**分析**：
+
+**暴力法**，直接两层循环遍历，内层循环计算累乘并排除当前元素（超时）。
+
+**两次遍历（前 -> 后 + 后 -> 前）法**，先遍历从前往后一次数组，计算当前元素之前的累乘放到目标数组对应位置；再从后往前遍历数组用一个变量存储计算当前元素之后的累乘，并将其与目标数组对应位置相乘即可。
+
+**求解**：
+
+```typescript
+// 暴力法(超时)
+function constructArr1(a: number[]): number[] {
+  const len = a?.length;
+  const b = new Array(len).fill(1);
+  for (let i = 0; i < len; i++) {
+    for (let j = 0; j < len; j++) {
+      if (i !== j) {
+        b[i] = b[i] * a[j];
+      }
+    }
+  }
+  return b;
+}
+
+// 两次遍历（前 -> 后 + 后 -> 前）法
+function constructArr2(a: number[]): number[] {
+  const len = a?.length;
+  const b = new Array(len).fill(1);
+  // 首次从前向后遍历，计算 i 之前的累积  b[i] = b[i-1] * a[i-1] （b[i-1]不包括 a[i-1])
+  for (let i = 1; i < len; i++) {
+    b[i] = b[i - 1] * a[i - 1];
+  }
+  let multiply = 1; // 用于存储 i 之后的累积
+  // 二次从后向前遍历，计算 i 之后的乘积 b[i] = b[i] * a[i+1] * a[i+2] *... * a[n - 1];
+  for (let i = len - 2; i >= 0; i--) {
+    multiply = multiply * a[i + 1];
+    b[i] = b[i] * multiply;
+  }
+  return b;
+}
+```
+
+#### 12. 顺时针打印矩阵
+
+**题目描述**：输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字。
+
+**分析**：
+
+**分层遍历**，每层按从左到右，从上到下，从右到左，从下到上进行遍历打印。从 0 层开始，每打印完一层行和列均减去 2，因此层数 * 2 应该同时小于行数与列数，注意打印到最后一层，如果只剩下一行，则不需要从右到左，同理，只剩下一列，则不需要从下到上。
+
+**移除首行 + 变相转置（向左翻转）**，先将矩阵的第一行打印，对剩下的矩阵进行向左翻转（变相转置），依次打印翻转后的第一行，直到矩阵为空。
+
+**求解**：
+
+```typescript
+// 按层遍历
+function spiralOrder1(matrix: number[][]): number[] {
+  const row = matrix?.length;
+  const col = matrix?.[0]?.length;
+  let layer = 0;
+  const printResult: number[] = [];
+  while (layer * 2 < row && layer * 2 < col) {
+    // 每遍历一次，行和列均减去了2，
+    const endRowIndex = row - 1 - layer;
+    const endColIndex = col - 1 - layer;
+    for (let j = layer; j <= endColIndex; j++) {
+      // 从左向右
+      printResult.push(matrix[layer][j]);
+    }
+    for (let i = layer + 1; i <= endRowIndex; i++) {
+      // 从上到下
+      printResult.push(matrix[i][endColIndex]);
+    }
+    if (layer < endRowIndex) {
+      // 排除只剩下一行，不需要从右到左
+      for (let i = endColIndex - 1; i >= layer; i--) {
+        // 从右到左
+        printResult.push(matrix[endRowIndex][i]);
+      }
+    }
+    if (layer < endColIndex) {
+      // 排除只剩下一列，不需要从下到上
+      for (let j = endRowIndex - 1; j > layer; j--) {
+        // 从下到上
+        printResult.push(matrix[j][layer]);
+      }
+    }
+    layer = layer + 1;
+  }
+  return printResult;
+}
+
+// 移除首行 + 变相转置（向左翻转）
+function spiralOrder2(matrix: number[][]): number[] {
+  const printResult: number[] = [];
+  function transpose(matrix: number[][]): number[][] {
+    const transposedMatrix: number[][] = [];
+    const row = matrix?.length;
+    const col = matrix?.[0]?.length;
+    for (let j = col - 1; j >= 0; j--) {
+      const tmp: number[] = [];
+      for (let i = 0; i < row; i++) {
+        tmp.push(matrix[i][j]);
+      }
+      transposedMatrix.push(tmp);
+    }
+    return transposedMatrix;
+  }
+  while (matrix.length) {
+    const firstRow = matrix.shift() as number[];
+    printResult.push(...firstRow); // 每次将第一行放入结果数组中
+    matrix = transpose(matrix); // 对矩阵进行变相转置（向左翻转）
+  }
+  return printResult;
+}
+```
+
+#### 13. 最小的 K 个数
+
+**题目描述**：输入整数数组 arr ，找出其中最小的 k 个数。例如，输入 4、5、1、6、2、7、3、8 这 8 个数字，则最小的 4 个数字是 1、2、3、4。
+
+**分析**：
+
+**排序法**，排序后取前 k 个。
+
+**分区法**，以 k 为界限，遍历后半部分元素，若当前元素大于前 k 个元素中的最大值 max ，当前元素替换掉最大值 max。
+
+**大根堆法**，维护一个 k 个大小的大根堆，现将前 k 个元素入堆，然后遍历其余元素，若当前元素小于堆顶，就将堆顶元素弹出，当前元素入堆即可（堆的实现参考 1.8.2 设计堆）。
+
+**求解**：
+
+```typescript
+// 排序法
+function getLeastNumbers1(arr: number[], k: number): number[] {
+  arr.sort((a, b) => a - b);
+  return arr.slice(0, k);
+}
+
+// 分区法
+function getLeastNumbers2(arr: number[], k: number): number[] {
+  const len = arr.length;
+  // 数组长度不大于 k，直接输出该数组
+  if (len <= k) return arr;
+  const indexOfMax = (arr: number[]): number => arr.reduce((prev, curr, i, a) => (curr > a[prev] ? i : prev), 0);
+  const help = arr.slice(0, k);
+  // k 个元素中最大元素的下标和值
+  let maxIndex = indexOfMax(help);
+  let max = help[maxIndex];
+  for (let i = k; i < len; i++) {
+    if (arr[i] < max) {
+      // 当前元素比堆中最大元素更小，替换掉前k个元素中的最大元素
+      help[maxIndex] = arr[i];
+      maxIndex = indexOfMax(help);
+      max = help[maxIndex];
+    }
+  }
+  return help;
+}
+
+// 大根堆法
+function getLeastNumbers3(arr: number[], k: number): number[] {
+  const len = arr.length;
+  // 数组长度不大于 k，直接输出该数组
+  if (len <= k) return arr;
+  if (k === 0) return [];
+  const res: number[] = [];
+  const heap = new Heap(); // 大根堆
+  for (let i = 0; i < len; i++) {
+    const element = arr[i];
+    if (i < k) {
+      heap.insert(element);
+    } else if (element < heap.top()) {
+      heap.delete();
+      heap.insert(element);
+    }
+  }
+  for (let i = 0; i < k; ++i) {
+    res.push(heap.delete());
+  }
+  return res;
+}
+```
+
+#### 14. 和为S的两个数字
+
+**题目描述**：输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。如果有多对数字的和等于s，则输出任意一对即可。
+
+**分析**：
+
+**哈希法（set，对象，map）**，一次遍历数组，哈希中若不存在目标值与当前元素的差值，则将其加入哈希，否则返回即可。
+
+**双指针法**，由于数组递增有序，可使用首尾指针向中间移动，如果相等则返回，否则分情况向中间移动指针——小于目标值移动首指针，否则移动右指针。
+
+**二分查找**，遍历元素，计算目标值与当前元素的差值，在该元素右侧二分查找是否存在即可。假如使用 indexOf （顺序遍历）进行查找会超时。
+
+**求解**：
+
+```typescript
+// 哈希表 或者 set
+function twoSum1(nums: number[], target: number): number[] {
+  const len = nums?.length;
+  const res: number[] = [];
+  // 递增排序的数组，不存在相同元素，哈希表存储（元素，下标）
+  const hash = new Map<number, number>(); // 可以使用 const hash = {} const set = new Set<number>();
+  // 遍历元素，找到和为 target 的元素
+  // i < len 考虑到 nums 非数组或长度小于2 的情况
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    const sub = target - element;
+    // 由于遍历时加入存储中的是 i 之前的元素，自然排出当前元素。
+    if (hash.has(sub)) {
+      // 可以使用 set.has(sub) 或  hash[sub] !== undefined (考虑到差值是0)
+      res.push(element, sub);
+      return res;
+    }
+    // 设置为(数组元素， i)
+    hash.set(element, i); // 可以 集合 set.add(element);  或者 对象 hash[element] = i;
+  }
+  return res;
+}
+
+// 双指针
+function twoSum3(nums: number[], target: number): number[] {
+  const res: number[] = [];
+  let left = 0;
+  let right = nums?.length - 1; // 长度只访问一次，没必要缓存
+  // 递增排序，计算首尾指针指向元素之和，如果相等则返回，否则分情况向中间移动指针
+  // left < right 可以考虑到 nums 非数组或长度小于2 的情况
+  while (left < right) {
+    const leftNum = nums[left];
+    const rightNum = nums[right];
+    const sum = leftNum + rightNum;
+    if (sum === target) {
+      res.push(leftNum, rightNum);
+      break;
+    } else if (sum < target) {
+      // 小于目标值，说明需要增加加数的值，移动左指针
+      left = left + 1;
+    } else {
+      // 大于目标值，说明需要减少加数的值，移动右指针
+      right = right - 1;
+    }
+  }
+  return res;
+}
+
+// 二分查找差值
+function twoSum4(nums: number[], target: number): number[] {
+  const len = nums?.length;
+  const res: number[] = [];
+
+  function binarySearch(left: number, right: number, target: number) {
+    while (left <= right) {
+      let mid = Math.floor((left + right) / 2);
+      if (nums[mid] > target) {
+        right = mid - 1;
+      } else if (nums[mid] < target) {
+        left = mid + 1;
+      } else {
+        return mid;
+      }
+    }
+    return -1;
+  }
+
+  // i < len 考虑到 nums 非数组或长度小于2 的情况
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    const sub = target - nums[i];
+    if (binarySearch(i + 1, len - 1, sub) !== -1) {
+      // 在当前元素右侧寻找即可
+      res.push(element, sub);
+      return res;
+    }
+  }
+  return res;
+}
+
+// 遍历 + indexOf (超时，因为 indexOf 是 O（n）)
+function twoSum5(nums: number[], target: number): number[] {
+  const len = nums?.length;
+  const res: number[] = [];
+  // i < len 考虑到 nums 非数组或长度小于2 的情况
+  for (let i = 0; i < len; i++) {
+    const element = nums[i];
+    const sub = target - nums[i];
+    const indexOfSub = nums.indexOf(sub);
+    if (![-1, i].includes(indexOfSub)) {
+      // 存在且不等于当前下标
+      res.push(element, sub);
+      return res;
+    }
+  }
+  return res;
+}
+```
+
+#### 15. 扑克牌中的顺子
+
+**题目描述**：从若干副扑克牌中随机抽 5 张牌，判断是不是一个顺子，即这 5 张牌是不是连续的。2～10 为数字本身，A 为 1，J 为 11，Q 为 12，K 为 13，而大、小王为 0 ，可以看成任意数字。A 不能视为 14。
+
+**分析**：需要保证 除 0 以外的最大值与最小值差值需要小于 5 且不能有非 0 以外的重复元素。
+
+**Set +遍历**，遍历数组，遇到 0 跳过，若 Set 中存在元素，不是顺子，否则加入集合中，求集合中的最大值最小值之差。
+
+**排序 + 遍历**，排序后遍历数组，统计大小王的个数即0的个数，计算最大值（最后一个元素）与最小值（第一个非 0 元素）之差。
+
+**遍历**，遍历统计 0 的个数，超过3个0 说明一定是顺子，若当前元素不是0，更新最大最小值，若最大值与最小值差值大于等于 5 或者后续元素存在重复与当前元素相同，则不是顺子。 
+
+**求解**：
+
+```typescript
+// 排序 + 遍历
+function isStraight1(nums: number[]): boolean {
+  const len = nums?.length;
+  nums.sort((a, b) => a - b);
+  const max = nums[len - 1];
+  // 记录大小王的数量
+  let joker = 0;
+  for (let i = 0; i < len; i++) {
+    const current = nums[i];
+    const next = nums[i + 1];
+    if (current === 0) {
+      // 计算大小王的个数
+      joker = joker + 1;
+    } else if (current === next) {
+      // 重复且非0, 不是顺子
+      return false;
+    }
+  }
+  const min = nums[joker];
+  return max - min < 5; // 最差情况是全为 0 或者 4个 0 或者 少于4 个 0时差值不能大余5
+}
+
+// set + 遍历
+function isStraight2(nums: number[]): boolean {
+  const len = nums?.length;
+  const set = new Set<number>();
+  for (let i = 0; i < len; i++) {
+    const current = nums[i];
+    if (current === 0) continue;
+    // 重复
+    if (set.has(current)) return false;
+    set.add(current);
+  }
+  return Math.max(...set) - Math.min(...set) < 5;
+}
+
+// 只遍历
+function isStraight3(nums: number[]): boolean {
+  const len = nums?.length;
+  let joker = 0;
+  let max = 0;
+  let min = 14;
+  for (let i = 0; i < len; i++) {
+    const current = nums[i];
+    if (current === 0) {
+      joker = joker + 1;
+      if (joker > 3) return true;
+    } else {
+      max = Math.max(current, max);
+      min = Math.min(current, min);
+      // 非0重复 或者 最大最小值之差大于等于5
+      if (nums.lastIndexOf(current) > i || max - min >= 5) return false;
+    }
+  }
+  return true;
+}
+```
+
+#### 16. 滑动窗口的最大值
+
+**题目描述**：给定一个数组 nums 和滑动窗口的大小 k，请找出所有滑动窗口里的最大值。
+
+**分析**：
+
+**遍历**，依次遍历每个滑动窗口，其中最后一个窗口的起始下标为 len - k，使用 Math.max 计算每个窗口的最大值即可（可能超时）。
+
+**单调递减双端队列**，维护一个初始为空的单调递减队列，其值为滑动窗口中元素的下标；首先，如果队头下标在滑动窗口之外，则对头出队；否则将当前元素与队尾元素不断比较大小，若当前元素更大，则队尾出队，而后再将当前元素下标加入队列。最后当遍历到 k - 1 时，开始获取队头元素作为当前滑动窗口的最大值。
+
+**求解**：
+
+```typescript
+// 遍历
+function maxSlidingWindow1(nums: number[], k: number): number[] {
+  const len = nums?.length;
+  if (len === 0 || k < 1) return []; // 滑动窗口小于1 或 数组为空
+  if (k === 1) return nums; // 滑动窗口等于1
+  if (k >= len) return [Math.max(...nums)]; // 滑动窗口大于等于数组长度
+  const res: number[] = [];
+  for (let i = 0; i <= len - k; i++) {
+    const window = nums.slice(i, i + k);
+    res.push(Math.max(...window));
+  }
+  return res;
+}
+
+// 单掉队列(双端队列)
+function maxSlidingWindow2(nums: number[], k: number): number[] {
+  const len = nums?.length;
+  if (len === 0 || k < 1) return []; // 滑动窗口小于1 或 数组为空
+  if (k === 1) return nums; // 滑动窗口等于1
+  if (k >= len) return [Math.max(...nums)]; // 滑动窗口大于等于数组长度
+  const res: number[] = [];
+  // 单调递减队列，存放的数组元素下标
+  const queue: number[] = [];
+  for (let i = 0; i < len; i++) {
+    // 对头元素如果不是滑动窗口之内的需要弹出 （滑动窗口范围是 [i - k + 1, i] => queue[0] < i - k + 1 => queue[0] <= i - k)
+    while (queue.length && queue[0] <= i - k) {
+      queue.shift();
+    }
+    const element = nums[i];
+    // 将队尾小于当前值的弹出，保证单调性
+    while (queue.length && nums[queue[queue.length - 1]] <= element) {
+      queue.pop();
+    }
+    queue.push(i); // 加入当前元素的下标
+    if (i >= k - 1) {
+      // 当遍历到 k - 1，加入最大元素(队头)
+      res.push(nums[queue[0]]);
+    }
+  }
+  return res;
+}
+```
