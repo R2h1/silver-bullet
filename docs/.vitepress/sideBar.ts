@@ -21,5 +21,11 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     items: [
       { text: '跨平台', link: '/font-end/hybrid' },
     ]
+  },
+  {
+    text: '前端数据治理与异常监控',
+    items: [
+      { text: '前端数据治理与异常监控', link: '/font-end/data-govern-exception-monitor' },
+    ]
   }
 ];
