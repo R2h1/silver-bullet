@@ -6,7 +6,8 @@
  *      两次循环法，倒数第k个节点，即顺数第length - k + 1 个节点，由于是单链表，没有链表长度信息，因此第一步遍历链表，计算出链表长度。第二步，遍历链表到第length - k + 1个节点（index = length - k），需要遍历n + n - k +1步
  *      快慢指针法，快指针先走k步，然后快慢指针以相同的速度移动，直到快指针到null，只需要遍历n步（因为快指针走了n步）
  */
-import { LinkNode } from '../设计链表/linkList';
+// #region docs
+import LinkNode from '../设计链表/linkNode';
 
 // 两次遍历
 function getKthFromEnd<T extends number>(head: LinkNode<T> | null, k: number): LinkNode<T> | null {
@@ -15,13 +16,13 @@ function getKthFromEnd<T extends number>(head: LinkNode<T> | null, k: number): L
   let size = 0;
   while (node !== null) {
     node = node.next;
-    size = size + 1;
+    size += 1;
   }
   // 倒数第 k 个 节点，对应于正数第 size - k + 1 个节点，即 index = size - k
   const index = size - k;
   if (index < 0) return null;
   node = head;
-  for (let i = 1; i <= index; i++) {
+  for (let i = 1; i <= index; i += 1) {
     node = node?.next as LinkNode<T>;
   }
   return node;
@@ -38,7 +39,7 @@ function getKthFromEnd2<T extends number>(head: LinkNode<T> | null, k: number): 
       return null;
     }
     fast = fast.next;
-    i = i + 1;
+    i += 1;
   }
   while (fast !== null) {
     // 快指针走到 null 的时候，慢指针即为倒数第 k 个 节点
@@ -47,3 +48,4 @@ function getKthFromEnd2<T extends number>(head: LinkNode<T> | null, k: number): 
   }
   return slow;
 }
+// #endregion docs

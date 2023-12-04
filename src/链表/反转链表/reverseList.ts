@@ -4,8 +4,8 @@
  *  分析：
  *      原地反转，定义前驱节点，当前节点，遍历链表，然后缓存后驱节点，将当前节点链接到前驱节点，然后先更新前驱节点为当前节点，再更新当前节点为后驱节点，直到遍历结束返回前驱节点即可。
  */
-
-import { LinkNode } from '../设计链表/linkList';
+// #region docs
+import LinkNode from '../设计链表/linkNode';
 
 // 原地反转
 function reverseList1<T extends number>(head: LinkNode<T> | null): LinkNode<T> | null {
@@ -36,3 +36,4 @@ function reverseList2<T extends number>(head: LinkNode<T> | null): LinkNode<T> |
   head.next = null;
   return newHead;
 }
+// #endregion docs

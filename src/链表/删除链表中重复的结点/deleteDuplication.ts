@@ -8,7 +8,8 @@
  *          对于重复节点不保留的情况，考虑到头节点可能重复，在链表前添加一个虚节点，从该节点开始遍历，当next节点和 next.next节点不为空时，若next节点和next.next节点的值相等，记录该值，不断将当前节点的next指向为next.next节点，直到next节点值不等于该值或next为空
  *
  */
-import { LinkNode } from '../设计链表/linkList';
+// #region docs
+import LinkNode from '../设计链表/linkNode';
 
 // 保留重复节点
 function deleteDuplicates1(head: LinkNode<number> | null): LinkNode<number> | null {
@@ -29,7 +30,7 @@ function deleteDuplicates2(head: LinkNode<number> | null): LinkNode<number> | nu
   let node = dummy;
   while (node.next !== null && node.next.next !== null) {
     if (node.next.val === node.next.next.val) {
-      const val = node.next.val;
+      const { val } = node.next;
       while (node.next !== null && node.next.val === val) {
         node.next = node.next.next;
       }
@@ -39,3 +40,4 @@ function deleteDuplicates2(head: LinkNode<number> | null): LinkNode<number> | nu
   }
   return dummy.next;
 }
+// #endregion docs

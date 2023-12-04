@@ -6,7 +6,8 @@
  *      也就可能存在一个长度差 diff，通过遍历两个链表的长度可以求出diff，让长的链表先遍历diff个节点，以此开始的两个链表的长度相同，那么当遍历到相同节点即第一个公共节点。
  *
  */
-import { LinkNode } from '../设计链表/linkList';
+// #region docs
+import LinkNode from '../设计链表/linkNode';
 
 // 长短diff遍历法
 function getIntersectionNode(headA: LinkNode<number> | null, headB: LinkNode<number> | null): LinkNode<number> | null {
@@ -16,7 +17,7 @@ function getIntersectionNode(headA: LinkNode<number> | null, headB: LinkNode<num
     let size = 0;
     while (node !== null) {
       node = node.next;
-      size = size + 1;
+      size += 1;
     }
     return size;
   }
@@ -27,7 +28,7 @@ function getIntersectionNode(headA: LinkNode<number> | null, headB: LinkNode<num
   let long = lenA > lenB ? headA : headB;
   const diff = Math.abs(lenA - lenB);
   // 长链表先走 diff 步
-  for (let i = 0; i < diff && long !== null; i++) {
+  for (let i = 0; i < diff && long !== null; i += 1) {
     long = long.next;
   }
   while (short !== null && long !== null && short !== long) {
@@ -36,3 +37,4 @@ function getIntersectionNode(headA: LinkNode<number> | null, headB: LinkNode<num
   }
   return short;
 }
+// #endregion docs

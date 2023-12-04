@@ -5,7 +5,8 @@
  *      递归，两个有序链表的合并结果等于头部值较小的一个节点与两个链表剩下节点的合并结果进行链接，边界条件是其中一个链表为空，则直接返回另一个链表即可。
  *      迭代，首先，若其中一个链表为空，则直接返回另一个链表即可，否则构建一个虚拟头结点新链表，双指针分别遍历两个链表，将较小的节点链接到新链表，并移动该较小节点所在指针，直到其中一个链表遍历结束。
  */
-import { LinkNode } from '../设计链表/linkList';
+// #region docs
+import LinkNode from '../设计链表/linkNode';
 
 // 递归
 function mergeTwoLists<T extends number>(l1: LinkNode<T> | null, l2: LinkNode<T> | null): LinkNode<T> | null {
@@ -50,3 +51,4 @@ function mergeTwoLists1<T extends number>(l1: LinkNode<T> | null, l2: LinkNode<T
 
   return preHead.next;
 }
+// #endregion docs
