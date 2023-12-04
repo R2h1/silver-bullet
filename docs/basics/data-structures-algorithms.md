@@ -1273,7 +1273,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\左旋字符串\reverseLeftWords.ts#docs
+<<< ../../src/字符串/左旋字符串/reverseLeftWords.ts#docs
 
 #### 5. 翻转单词顺序
 
@@ -1287,7 +1287,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\翻转单词顺序\reversWords.ts#docs
+<<< ../../src/字符串/翻转单词顺序/reversWords.ts#docs
 
 #### 6. 把字符串转换成数字
 
@@ -1299,7 +1299,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\把字符串转换成整数\strToInt.ts#docs
+<<< ../../src/字符串/把字符串转换成整数/strToInt.ts#docs
 
 #### 7. 正则表达匹配
 
@@ -1318,7 +1318,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\正则表达式匹配\isMatch.ts#docs
+<<< ../../src/字符串/正则表达式匹配/isMatch.ts#docs
 
 #### 8. 表示数值的字符串
 
@@ -1335,7 +1335,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\表示数值的字符串\isNumber.ts#docs
+<<< ../../src/字符串/表示数值的字符串/isNumber.ts#docs
 
 #### 9. 字符串中重复次数最多的字符
 
@@ -1347,7 +1347,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\字符串中重复次数最多的字符\mostRepeatedChar.ts#docs
+<<< ../../src/字符串/字符串中重复次数最多的字符/mostRepeatedChar.ts#docs
 
 #### 10. Hex颜色值转 rgb
 
@@ -1357,7 +1357,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\16进制颜色转rgb\hex2rgb.ts#docs
+<<< ../../src/字符串/16进制颜色转rgb/hex2rgb.ts#docs
 
 #### 11. 无重复字符的最长子串
 
@@ -1369,7 +1369,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\无重复字符的最长子串\lengthOfLongestSubstring.ts#docs
+<<< ../../src/字符串/无重复字符的最长子串/lengthOfLongestSubstring.ts#docs
 
 #### 11. 千分位分隔数字
 
@@ -1383,7 +1383,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\字符串\千分位分隔数字\splitNum.ts#docs
+<<< ../../src/字符串/千分位分隔数字/splitNum.ts#docs
 
 ## 链表
 
@@ -1401,9 +1401,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\设计链表\linkList.ts#docs[linkList.ts]
+<<< ../../src/链表/设计链表/linkList.ts#docs[linkList.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1421,9 +1421,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\从尾到头打印链表\reversePrint.ts#docs[reversePrint.ts]
+<<< ../../src/链表/从尾到头打印链表/reversePrint.ts#docs[reversePrint.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1442,9 +1442,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\链表中倒数第k个节点\getKthFromEnd.ts#docs[getKthFromEnd.ts]
+<<< ../../src/链表/链表中倒数第k个节点/getKthFromEnd.ts#docs[getKthFromEnd.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1462,9 +1462,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\反转链表\reverseList.ts#docs[reverseList.ts]
+<<< ../../src/链表/反转链表/reverseList.ts#docs[reverseList.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1482,9 +1482,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\合并两个排序的链表\mergeTwoLists.ts#docs[mergeTwoLists.ts]
+<<< ../../src/链表/合并两个排序的链表/mergeTwoLists.ts#docs[mergeTwoLists.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1502,9 +1502,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\复杂链表的复制\copyRandomList.ts#docs[copyRandomList.ts]
+<<< ../../src/链表/复杂链表的复制/copyRandomList.ts#docs[copyRandomList.ts]
 
-<<< ../../src\链表\设计链表\randomLinkNode.ts#docs[randomLinkNode.ts]
+<<< ../../src/链表/设计链表/randomLinkNode.ts#docs[randomLinkNode.ts]
 
 :::
 
@@ -1522,9 +1522,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\删除链表中重复的结点\deleteDuplication.ts#docs[copyRandomList.ts]
+<<< ../../src/链表/删除链表中重复的结点/deleteDuplication.ts#docs[copyRandomList.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1540,9 +1540,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\两个链表的第一个公共节点\findFirstCommonNode.ts#docs[findFirstCommonNode.ts]
+<<< ../../src/链表/两个链表的第一个公共节点/findFirstCommonNode.ts#docs[findFirstCommonNode.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1560,9 +1560,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\链表\链表中环的入口节点\detectCycle.ts#docs[detectCycle.ts]
+<<< ../../src/链表/链表中环的入口节点/detectCycle.ts#docs[detectCycle.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1588,15 +1588,15 @@ function replaceSpace3(s: string): string {
 
 #### 1. 数组实现栈
 
-<<< ../../src\栈\设计实现栈\arrayStack.ts#docs[arrayStack.ts]
+<<< ../../src/栈/设计实现栈/arrayStack.ts#docs[arrayStack.ts]
 
 #### 2. 链表实现栈
 
 ::: code-group
 
-<<< ../../src\栈\设计实现栈\linkStack.ts#docs[linkStack.ts]
+<<< ../../src/栈/设计实现栈/linkStack.ts#docs[linkStack.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1612,7 +1612,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\栈\包含min函数的栈\minStack.ts#docs[minStack.ts]
+<<< ../../src/栈/包含min函数的栈/minStack.ts#docs[minStack.ts]
 
 #### 2. 栈的压入、弹出序列
 
@@ -1624,7 +1624,7 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\栈\栈的压入、弹出序列\validateStackSequences.ts#docs[validateStackSequences.ts]
+<<< ../../src/栈/栈的压入、弹出序列/validateStackSequences.ts#docs[validateStackSequences.ts]
 
 ## 队列
 
@@ -1650,13 +1650,13 @@ function replaceSpace3(s: string): string {
 
 数组实现，使用shift出队时每次都要移动队列元素，效率不高。改进方案是可以**队列初始化时就需要规定队列长度**，通过判断队尾是否有空间，有就让元素一直入队，直到队尾没有空间位置，然后进行整体进行一次搬移，这样优化了入队的效率，平均时间复杂度还是 O(1)。
 
-<<< ../../src\队列\设计实现队列\arrayQueue.ts#docs[arrayQueue.ts]
+<<< ../../src/队列/设计实现队列/arrayQueue.ts#docs[arrayQueue.ts]
 
 #### 2.循环队列
 
 数组实现，初始化需指定队列容量，留一个空位，队空条件 head = tail，队满条件 head =( tail + 1) % capacity，队列元素个数 (tail - head + capacity) % capacity。
 
-<<< ../../src\队列\设计实现队列\arrayLoopQueue.ts#docs[arrayLoopQueue.ts]
+<<< ../../src/队列/设计实现队列/arrayLoopQueue.ts#docs[arrayLoopQueue.ts]
 
 #### 3.链式队列
 
@@ -1664,9 +1664,9 @@ function replaceSpace3(s: string): string {
 
 ::: code-group
 
-<<< ../../src\队列\设计实现队列\linkQueue.ts#docs[linkQueue.ts]
+<<< ../../src/队列/设计实现队列/linkQueue.ts#docs[linkQueue.ts]
 
-<<< ../../src\链表\设计链表\linkNode.ts#docs[linkNode.ts]
+<<< ../../src/链表/设计链表/linkNode.ts#docs[linkNode.ts]
 
 :::
 
@@ -1684,4 +1684,4 @@ function replaceSpace3(s: string): string {
 
 **求解**：
 
-<<< ../../src\队列\用两个栈实现队列\cQueue.ts#docs[cQueue.ts.ts]
+<<< ../../src/队列/用两个栈实现队列/cQueue.ts#docs[cQueue.ts.ts]
