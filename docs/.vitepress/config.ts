@@ -11,7 +11,7 @@ export default defineConfig({
     math: true,
     lineNumbers: true,
     theme: {
-      light: "dark-plus",
+      light: "light-plus",
       dark: "dark-plus",
     },
   },
