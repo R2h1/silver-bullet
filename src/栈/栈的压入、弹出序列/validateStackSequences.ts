@@ -7,7 +7,7 @@
  */
 // #region docs
 // 辅助栈模拟法
-function validateStackSequences(pushed: number[], popped: number[]): boolean {
+export default function validateStackSequences(pushed: number[], popped: number[]): boolean {
   const stack: number[] = [];
   const size = pushed.length;
   // 弹出序列当前应该弹出元素的下标
