@@ -13,15 +13,15 @@
  *      如果大于arr[i][j]，向右走（超过列边界退出，找不到），
  *      如果小于arr[i][j]向上走（超过行边界退出，找不到）。
  */
-
+// #region docs
 /** 暴力解法 */
 function findNumberIn2DArray1(matrix: number[][], target: number): boolean {
   const row = matrix?.length;
   const col = matrix?.[0]?.length;
   // 二位数组为空
   if (!row || !col) return false;
-  for (let i = 0; i < row; i++) {
-    for (let j = 0; j < col; j++) {
+  for (let i = 0; i < row; i += 1) {
+    for (let j = 0; j < col; j += 1) {
       const element = matrix[i][j];
       if (element === target) return true;
       // 当前一维数组大了
@@ -46,11 +46,12 @@ function findNumberIn2DArray2(matrix: number[][], target: number): boolean {
     if (element === target) return true;
     // 当前行已经都比目标元素大
     if (element > target) {
-      i--;
+      i -= 1;
     } else {
       // 当前行不大于目标元素
-      j++;
+      j += 1;
     }
   }
   return false;
 }
+// #endregion docs

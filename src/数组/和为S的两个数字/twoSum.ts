@@ -6,7 +6,7 @@
  *      双指针法，由于数组递增有序，可使用首尾指针向中间移动，如果相等则返回，否则分情况向中间移动指针——小于目标值移动首指针，否则移动右指针。
  *      二分查找，遍历元素，计算目标值与当前元素的差值，在该元素右侧二分查找是否存在即可。假如使用 indexOf （顺序遍历）进行查找会超时。
  */
-
+// #region docs
 // 哈希表 或者 set
 function twoSum1(nums: number[], target: number): number[] {
   const len = nums?.length;
@@ -15,7 +15,7 @@ function twoSum1(nums: number[], target: number): number[] {
   const hash = new Map<number, number>(); // 可以使用 const hash = {} const set = new Set<number>();
   // 遍历元素，找到和为 target 的元素
   // i < len 考虑到 nums 非数组或长度小于2 的情况
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     const element = nums[i];
     const sub = target - element;
     // 由于遍历时加入存储中的是 i 之前的元素，自然排出当前元素。
@@ -34,7 +34,7 @@ function twoSum1(nums: number[], target: number): number[] {
 function twoSum3(nums: number[], target: number): number[] {
   const res: number[] = [];
   let left = 0;
-  let right = nums?.length - 1; // 长度只访问一次，没必要缓存
+  let right = nums.length - 1; // 长度只访问一次，没必要缓存
   // 递增排序，计算首尾指针指向元素之和，如果相等则返回，否则分情况向中间移动指针
   // left < right 可以考虑到 nums 非数组或长度小于2 的情况
   while (left < right) {
@@ -46,10 +46,10 @@ function twoSum3(nums: number[], target: number): number[] {
       break;
     } else if (sum < target) {
       // 小于目标值，说明需要增加加数的值，移动左指针
-      left = left + 1;
+      left += 1;
     } else {
       // 大于目标值，说明需要减少加数的值，移动右指针
-      right = right - 1;
+      right -= 1;
     }
   }
   return res;
@@ -62,7 +62,7 @@ function twoSum4(nums: number[], target: number): number[] {
 
   function binarySearch(left: number, right: number, target: number) {
     while (left <= right) {
-      let mid = Math.floor((left + right) / 2);
+      const mid = Math.floor((left + right) / 2);
       if (nums[mid] > target) {
         right = mid - 1;
       } else if (nums[mid] < target) {
@@ -75,7 +75,7 @@ function twoSum4(nums: number[], target: number): number[] {
   }
 
   // i < len 考虑到 nums 非数组或长度小于2 的情况
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     const element = nums[i];
     const sub = target - nums[i];
     if (binarySearch(i + 1, len - 1, sub) !== -1) {
@@ -92,7 +92,7 @@ function twoSum5(nums: number[], target: number): number[] {
   const len = nums?.length;
   const res: number[] = [];
   // i < len 考虑到 nums 非数组或长度小于2 的情况
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     const element = nums[i];
     const sub = target - nums[i];
     const indexOfSub = nums.indexOf(sub);
@@ -104,3 +104,4 @@ function twoSum5(nums: number[], target: number): number[] {
   }
   return res;
 }
+// #endregion docs

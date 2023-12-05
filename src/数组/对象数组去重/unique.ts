@@ -2,8 +2,8 @@
  * 题目描述：
  *     实现数组元素的去重（两个属性相同的对象也认为是重复的）
  */
-
-export function unique(array: unknown[]) {
+// #region docs
+function unique(array: unknown[]) {
   if (!Array.isArray(array)) {
     throw new TypeError(`params must be a array, but you give a ${typeof array}`);
   }
@@ -30,3 +30,4 @@ export function unique(array: unknown[]) {
   }
   return result;
 }
+// #endregion docs

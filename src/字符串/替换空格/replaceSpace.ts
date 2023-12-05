@@ -15,7 +15,7 @@
  *               c. str[i] 非空格即将str[i++]放入newStrArr[j++]; str[i]是空格，将’%20’三个字符依次放入newStrArr[j++]
  *               d. 数组变成字符串newStrArr.join('')。从过程看，方法和数组map类似。
  */
-
+// #region docs
 // 正则表达式
 function replaceSpace1(s: string): string {
   return s.replace(/ /g /* new RegExp(' ', 'g') */, '%20');
@@ -40,3 +40,4 @@ function replaceSpace3(s: string): string {
     })
     .join('');
 }
+// #endregion docs

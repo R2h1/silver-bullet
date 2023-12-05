@@ -6,15 +6,15 @@
  *      暴力法，直接遍历两遍进行计算，记录所有连续子数组的和来更新最大值。
  *      动态规划（剔除）法，遍历一遍数组，计算到当前数字的子数组的和，如果比当前数字小，说明之前的连续子数组的和为负数，可将其剔除掉，此时记录和为当前数字。
  */
-
+// #region docs
 // 暴力法
 function maxSubArray1(nums: number[]): number {
   const len = nums?.length;
   let maxSum = nums[0];
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     let sum = 0;
-    for (let j = i; j < len; j++) {
-      sum = sum + nums[j];
+    for (let j = i; j < len; j += 1) {
+      sum += nums[j];
       if (sum > maxSum) {
         maxSum = sum;
       }
@@ -28,9 +28,9 @@ function maxSubArray2(nums: number[]): number {
   const len = nums?.length;
   let maxSum = nums[0];
   let sum = 0;
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     const element = nums[i];
-    sum = sum + element;
+    sum += element;
     // 当前位置之前构成的连续子数组 subNums计算出来的和小于当前元素
     // 说明 subNums 除当前元素的和为负数，可以剔除；
     if (sum <= element) {
@@ -45,10 +45,10 @@ function maxSubArray2(nums: number[]): number {
 
 // 优化解法（动态规划）
 function maxSubArray3(nums: number[]): number {
-  let len = nums.length;
+  const len = nums.length;
   // 记录到当前位置的子数组的连续子数组的最大和
-  let maxSums: number[] = [];
-  for (let i = 0; i < len; i++) {
+  const maxSums: number[] = [];
+  for (let i = 0; i < len; i += 1) {
     const element = nums[i];
     if (i === 0) {
       // 单元素的最大和为本身
@@ -63,3 +63,4 @@ function maxSubArray3(nums: number[]): number {
   }
   return Math.max(...maxSums);
 }
+// #endregion docs

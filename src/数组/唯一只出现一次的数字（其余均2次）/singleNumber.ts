@@ -9,7 +9,7 @@
  * 分析：
  *     位运算法，任何数和 0 做异或运算，结果仍然是原来的数；任何数和其自身做异或运算，结果是 0；异或运算满足交换律和结合律。因此数组中的全部元素的异或运算结果即为数组中只出现一次的数字。
  */
-
+// #region docs
 /**
  * @param nums 数字数组
  * @example
@@ -17,11 +17,7 @@
  *  singleNumber([1]) // 1;
  *  singleNumber([4,1,2,1,2]) // 4;
  */
-export function singleNumber(nums: number[]): number {
-  // return nums.reduce((acc, cur) => acc ^ cur, 0);
-  let res = 0;
-  for (let num of nums) {
-    res ^= num;
-  }
-  return res;
+function singleNumber(nums: number[]): number {
+  return nums.reduce((acc, cur) => acc ^ cur, 0);
 }
+// #endregion docs

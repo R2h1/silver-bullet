@@ -5,17 +5,17 @@
  *      暴力法，遍历数组元素，与其后的所有元素对比，满足逆序条件统计（超时）。
  *      归并排序法，使用归并排序，在排序过程中，当左子序列的当前元素大于右边子序列当前元素时，此时左子序列当前元素及其后均为逆序对。
  */
-
+// #region docs
 // 暴力法(超时)
 function reversePairs1(nums: number[]): number {
   let count = 0;
   const len = nums?.length;
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     const base = nums[i];
-    for (let j = i + 1; j < len; j++) {
+    for (let j = i + 1; j < len; j += 1) {
       const compare = nums[j];
       if (compare < base) {
-        count = count + 1;
+        count += 1;
       }
     }
   }
@@ -35,10 +35,10 @@ function reversePairs2(nums: number[]): number {
     let low = left; // 左边有序子序列的起始位置
     let hight = mid + 1; // 右边有序子序列的起始位置
     // 先将左右子序列缓存起来，用于对比合并
-    for (let i = left; i <= right; i++) {
+    for (let i = left; i <= right; i += 1) {
       temp[i] = nums[i];
     }
-    for (let i = left; i <= right; i++) {
+    for (let i = left; i <= right; i += 1) {
       if (temp[low] > temp[hight] && low <= mid && hight <= right) {
         // 左边指向元素大于右边指向元素
         nums[i] = temp[hight++];
@@ -56,3 +56,4 @@ function reversePairs2(nums: number[]): number {
   const count = getCount(0, len - 1);
   return count;
 }
+// #endregion docs

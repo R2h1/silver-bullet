@@ -8,7 +8,7 @@
  *                该异或结果中为1的位可以用来区分这两个不同的数字。将异或结果依次从低位到高位进行与运算找到任意一个为1的位divider，
  *                再次遍历数组元素，利用divider 和每个元素与运算来进行分组异或得到最终结果。
  */
-
+// #region docs
 // 哈希计数
 function singleNumbers1(nums: number[]): number[] {
   const len = nums?.length;
@@ -54,13 +54,13 @@ function singleNumbers3(nums: number[]): number[] {
   // 对所有数字进行异或，得到这两个不同数字的异或结果
   let singlesXor = 0;
   for (let i = 0; i < len; i++) {
-    singlesXor = singlesXor ^ nums[i];
+    singlesXor ^= nums[i];
   }
   if (singlesXor === 0) return [];
   // 将异或结果与 1 依次进行按位与运算，找到任意位为 1 的 divider
   let divider = 1;
   while ((singlesXor & divider) === 0) {
-    divider = divider << 1;
+    divider <<= 1;
   }
   let first = 0;
   let second = 0;
@@ -71,10 +71,11 @@ function singleNumbers3(nums: number[]): number[] {
   for (let i = 0; i < len; i++) {
     const element = nums[i];
     if ((element & divider) === 0) {
-      first = first ^ element;
+      first ^= element;
     } else {
-      second = second ^ element;
+      second ^= element;
     }
   }
   return [first, second];
 }
+// #endregion docs

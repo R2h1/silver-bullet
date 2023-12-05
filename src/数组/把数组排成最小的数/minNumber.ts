@@ -5,7 +5,7 @@
  *      排序法，因为对于任意两个数 x 与 y， 若 xy > yx，说明 y应该在 x 前面，反之 y 应该在 x 前面；
  *             而且若 xy < yx 且 yz < zy 且 xz < zx, 则 xyz 最小: 因为 xyz < yxz < yzx < zyx,  xyz < xzy < zxy < zyx;
  */
-
+// #region docs
 // sort + join
 function minNumber1(nums: number[]): string {
   // sort 的比较函数，当返回值大于 0 时 b 在前， a在后；小于 0 时 a 在前，b 在后
@@ -17,3 +17,4 @@ function minNumber1(nums: number[]): string {
     })
     .join('');
 }
+// #endregion docs
