@@ -41,9 +41,9 @@ export default defineConfig({
         }
       }
     },
-    outline: [2, 4],
+    outline: [1, 4],
     nav: [
-      { text: '计算机基础', link: '/basics/data-structures-algorithms' },
+      { text: '计算机基础', link: '/basics/data-structures-algorithms/index' },
       { text: '前端工程化', link: '/font-end/engineering/index' }
     ],
     sidebar,

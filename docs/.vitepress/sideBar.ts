@@ -2,9 +2,20 @@ import { DefaultTheme } from "vitepress";
 export const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: '计算机基础',
-    collapsed: true,
+    collapsed: false,
     items: [
-      { text: '数据结构与算法', link: '/basics/data-structures-algorithms' },
+      { 
+        text: '数据结构与算法',
+        collapsed: true,
+        link: '/basics/data-structures-algorithms/index',
+        items: [
+          { text: '数组和字符串', link: '/basics/data-structures-algorithms/array-string' },
+          { text: '链表', link: '/basics/data-structures-algorithms/linkList' },
+          { text: '栈和队列', link: '/basics/data-structures-algorithms/stack-queue' }, 
+          { text: '树和图', link: '/basics/data-structures-algorithms/tree-graph' },
+          { text: '堆和散列表', link: '/basics/data-structures-algorithms/heap-hash' },
+        ]
+      },
       { text: '网络', link: '/basics/internet' },
       { text: '操作系统', link: '/basics/os' },
       { text: '组成原理', link: '/basics/make-up-principle' },
