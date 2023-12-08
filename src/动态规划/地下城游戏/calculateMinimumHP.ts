@@ -5,8 +5,8 @@
  * 为了尽快解救公主，骑士决定每次只 向右 或 向下 移动一步。
  * 返回确保骑士能够拯救到公主所需的最低初始健康点数。
  * 注意：任何房间都可能对骑士的健康点数造成威胁，也可能增加骑士的健康点数，包括骑士进入的左上角房间以及公主被监禁的右下角房间。
- * m == dungeon.length
- * n == dungeon[i].length
+ * m = dungeon.length
+ * n = dungeon[i].length
  * 1 <= m, n <= 200
  * -1000 <= dungeon[i][j] <= 1000
  * @param dungeon
@@ -21,7 +21,7 @@ import isMatrix from '../最小路径和/isMatrix';
 function calculateMinimumHP(dungeon: number[][]): number {
   // 动态规划问题，状态转移方程：
   // dp[i][j] = Math.max(1, Math.min(dp[i][j + 1], dp[i + 1][j]) - dungeon[i][j]); i < m - 1; j < n - 1; 因为需要满足 dp[i][j] ≥ 1 且 dp[i][j] + dungeon[i][j] >= Math.min(dp[i][j + 1], dp[i + 1][j])
-  // dp[i][j] = Math.max⁡(1, dp[i][j+1] − dungeon[i][j])；i = m - 1; j < n - 1; 因为需要满足 dp[i][j] ≥ 1 且 dp[i][j] + dungeon[i][j] ≥ dp[i][j+1]：表示进入第i行第j列后健康点数dp[i][j] + dungeon[i][j]需要不小于进入下一个格子之前的最低健康点数dp[i][j+1])
+  // dp[i][j] = Math.max⁡(1, dp[i][j+1] − dungeon[i][j])；i = m - 1; j < n - 1; 因为需要满足 dp[i][j] ≥ 1 且 dp[i][j] + dungeon[i][j] ≥ dp[i][j+1]：表示进入第i行第j列后健康点数dp[i][j] + dungeon[i][j]需要不小于进入下一个格子之前的最低健康点数dp[i][j+1]
   // dp[i][j] = Math.max⁡(1, dp[i + 1][j] − dungeon[i][j])；i < m - 1; j = n - 1; 因为需要满足 dp[i][j] ≥ 1 且 dp[i][j] + dungeon[i][j] ≥ dp[i+1][j];
   // dp[m − 1][n − 1] = Math.max(1, 1 - dungeon[m - 1][n - 1]); 因为需要满足 dp[m−1][n−1] ≥ 1 且 dp[m−1][n−1] + dungeon[m−1][n−1] ≥ 1
 
@@ -49,4 +49,4 @@ function calculateMinimumHP(dungeon: number[][]): number {
   }
   return minimumHps[0][0];
 }
-// #region docs
+// #endregion docs

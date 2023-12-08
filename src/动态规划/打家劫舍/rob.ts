@@ -5,13 +5,15 @@
  * 给定一个代表每个房屋存放金额的非负整数数组，计算你不触动警报装置的情况下 ，一夜之内能够偷窃到的最高金额。
  * 1 <= nums.length <= 100
  * 0 <= nums[i] <= 400
+ */
+// #region docs
+/**
  * @param nums 代表每个房屋存放金额的非负整数数组
  * @returns 一夜之内能够偷窃到的最高金额
  * @example
  *   rob([1,2,3,1]); // 4
  *   rob([2,7,9,3,1]); // 12
  */
-// #region docs
 function rob(nums: number[]): number {
   // 动态规划问题，状态转移方程：
   // dp[i] = Math.max(nums[i] + dp[i - 2], dp[i - 1]);
@@ -37,4 +39,4 @@ function rob(nums: number[]): number {
   }
   return maxRobMoney[len - 1];
 }
-// #region docs
+// #endregion docs
