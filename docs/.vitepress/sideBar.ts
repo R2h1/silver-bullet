@@ -14,6 +14,8 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
           { text: '栈和队列', link: '/basics/data-structures-algorithms/stack-queue' }, 
           { text: '树和图', link: '/basics/data-structures-algorithms/tree-graph' },
           { text: '堆和散列表', link: '/basics/data-structures-algorithms/heap-hash' },
+          { text: '查找和排序', link: '/basics/data-structures-algorithms/search-sort' },
+          { text: '动态规划和数学', link: '/basics/data-structures-algorithms/dp-math' },
         ]
       },
       { text: '网络', link: '/basics/internet' },
@@ -49,7 +51,6 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
       { text: 'eslint', link: '/font-end/engineering/eslint' },
       { text: 'esbuild', link: '/font-end/engineering/esbuild' },
       { text: 'pnpm', link: '/font-end/engineering/pnpm' },
-
     ]
   }
 ];
