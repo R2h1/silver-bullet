@@ -43,7 +43,7 @@ WebView 可以简单理解为页面里的 iframe 。原生 app 与 WebView 的�
 
 WebView 可以对 url 请求、页面加载、渲染、页面交互进行强大的处理。webview 去加载 url 并不像是 浏览器加载 url 的过程，webview 存在一个初始化的过程。为了提升 init 时间，通常做法是 app 启动时初始化一个隐藏的 webview 等待使用，当用户点击需要加载URL，直接使用这个 webview 来加载，从而减少 webview init 初始化时间。弊端就是带来了额外的内存开销。
 
-![](../public/font-end/hybrid-1.png)
+![](../public/front-end/hybrid-1.png)
 
 ## Web 渲染
 
@@ -55,11 +55,11 @@ Web 渲染方案的有如下特点：
 
 ### h5 + JSBridge + WebView
 
-![](../public/font-end/hybrid-2.png)
+![](../public/front-end/hybrid-2.png)
 
 <font color='red'>Web 渲染本质上是依托原生应用的内嵌浏览器控件 WebView 去渲染 H5 页面，并在原生应用中定义可供 H5 页面访问原生部分能力的接口 JSBridge，从而实现 H5 和 Native 双向通信，也进一步扩展 H5 端侧能力。</font>因此，H5 App 的渲染流水线和 Web 页面渲染相一致。从 WebView 初始化到 H5 页面最终渲染的过程如下：
 
-![](../public/font-end/hybrid-3.png)
+![](../public/front-end/hybrid-3.png)
 
 <font color='red'>因此，Web 渲染性能上也存在首屏渲染优化问题，而且，还多出一个WebView 初始化的问题（可以通过 APP 启动的时候初始化一个常驻的隐藏WebView来处理）。</font>
 
@@ -69,11 +69,11 @@ Web 渲染方案的有如下特点：
 
 在这基础上业内又提出 **h5 容器的技术解决方案**，h5 容器提供丰富的内置 JSAPI，增强版的 WebView 控件以及插件机制等能力，对原始版本的方案做了进一步功能高内聚和模块低耦合。
 
-![](../public/font-end/hybrid-4.png)
+![](../public/front-end/hybrid-4.png)
 
 **Apache Cordova** 是一个开源的移动开发框架。它允许您使用标准 Web 技术 - HTML5、CSS3 和 JavaScript 进行跨平台开发。应用程序在针对每个平台的包装器内执行，并依靠符合标准的 API 绑定来访问每个设备的功能，例如传感器、数据、网络状态等。**该框架的实现原理就是基于 H5 容器 Web 渲染技术**。
 
-![](../public/font-end/hybrid-5.png)
+![](../public/front-end/hybrid-5.png)
 
 Cordova 应用程序由几部分组成：
 1. Web App：应用程序代码的实现地方，采用的是 Web 技术，应用运行在原生控件 WebView 中。
@@ -87,11 +87,11 @@ Cordova 应用程序由几部分组成：
 
 小程序的渲染层和逻辑层分别由两个线程管理，渲染层采用 WebView 进行页面渲染（iOS 使用 UIWebView/WKWebView，Android 使用 WebView），小程序的多页面也由多 WebView 接管。逻辑层从 WebView 分离，使用 JavaScript 引擎（iOS 使用 JavaScriptCore，Android 使用 V8）单独开启一个 Worker 线程去执行 JavaScript 代码。逻辑层和渲染层之间的通信经由 Native 层中转，网络 IO 也通过 Native 层进行转发：
 
-![](../public/font-end/hybrid-6.png)
+![](../public/front-end/hybrid-6.png)
 
 小程序采用的是多 WebView + 双线程模型。由多 WebView 构成的视图层为页面性能赋予更加接近原生的用户体验，单个 WebView 承载更加轻量的页面渲染任务（左侧为原始web渲染，右侧为小程序）：
 
-![](../public/font-end/hybrid-7.png)
+![](../public/front-end/hybrid-7.png)
 
 JavaScript 被单独抽离在 Worker 线程，限制了直接操作页面的能力（无法直接操作 DOM），也就被约束在微信小程序的规范下。
 
@@ -103,7 +103,7 @@ JavaScript 被单独抽离在 Worker 线程，限制了直接操作页面的能�
 
 原生渲染的基本思路是在 UI 层采用前端框架，然后通过 JavaScript 引擎解析 JS 代码，JS 代码通过 Bridge 层调用原生组件和能力，最终，UI 的渲染通过 JSBridge 由原生控件直接接管，从而获得性能和体验的提升。代表的框架是 React Native，其整体架构图如下：
 
-![](../public/font-end/hybrid-8.png)
+![](../public/front-end/hybrid-8.png)
 
 1. <font color='red'>React 层：利用 React 框架进行 UI 的数据描述，开发者使用 Class Component 或 Functional Component 进行页面开发，框架内部将会把页面描述转化为 ReactElement 这一代表的虚拟 DOM 的数据结构，用于运行时的 Diff 对比和消息收发等。</font>
 2. <font color='red'>[JS Bundle 中间产物]：RN 通过 metro 打包功能直接将整个 RN 应用打包为一个 JSBundle，通过 Bridge 层在 RN 应用初始化时加载整个 JS 包进来。</font>
@@ -112,7 +112,7 @@ JavaScript 被单独抽离在 Worker 线程，限制了直接操作页面的能�
 
 视图层的渲染通过 UIManager 调 createView/updateView 等方法，基于 Yoga 布局引擎创建对应的 shadowView；逻辑层中涉及原生能力调用的部分通过 RCTBridge 对象转发到相应的原生接口。 Native 接收到 Bridge 层的消息，进行视图的更新或是功能处理。
 
-![](../public/font-end/hybrid-9.png)
+![](../public/front-end/hybrid-9.png)
 
 整个 RN 的线程模型：
 1. Main 线程（UI 线程）：应用的主线程，进行初始化和处理原生控件的绘制。初始化的内容包括加载 JSBundle、初始化 Native Modules 等原生能力模块、创建 JSCore/Hermes JavaScript 引擎。
@@ -126,25 +126,25 @@ JavaScript 被单独抽离在 Worker 线程，限制了直接操作页面的能�
 
 安卓 app UI 结构：
 
-![](../public/font-end/hybrid-12.png)
+![](../public/front-end/hybrid-12.png)
 
 安卓是多个 Activity 进行切换，而 React Native 是同一个Activity中多个 RN page 进行切换：
 
-![](../public/font-end/hybrid-13.png)
+![](../public/front-end/hybrid-13.png)
 
 安卓原生弹窗是 Dialog 组件实现，RN 中弹窗是 Modal（对应于原生的是Window组件）：
 
-![](../public/font-end/hybrid-14.png)
+![](../public/front-end/hybrid-14.png)
 
 RN 和原生组件对应：
 
-![](../public/font-end/hybrid-15.png)
+![](../public/front-end/hybrid-15.png)
 
 ## 自建渲染引擎渲染(Flutter)
 
 <font color='red'>自建渲染引擎渲染通过自建渲染引擎方式，直接从底层渲染上实现 UI 的绘制，代表的框架是 Flutter，</font>其架构设计如下:
 
-![](../public/font-end/hybrid-10.png)
+![](../public/front-end/hybrid-10.png)
 
 1. Dart App 层：以 Widget 为基本视图描述单元，构建起 UI 体系；
 2. Flutter Framework 层：内置基础的 Flutter 组件，并根据不同平台的视觉风格体系，封装 Material 和 Cupertino 两套 UI 库供上层使用；
@@ -155,7 +155,7 @@ Flutter 在打包的时候，将 Dart 业务代码和 Flutter Engine 代码基�
 
 Flutter App 的线程模型：
 
-![](../public/font-end/hybrid-11.png)
+![](../public/front-end/hybrid-11.png)
 
 1. Platform 线程：主线程，由 Native 创建。负责平台 vsync 信号的回调注册，即当接收到从显示设备的 vsync 信号后，Platform 线程驱动 UI 线程的执行。
 2. UI 线程：负责响应 vsync 信号，执行 Dart 层代码，驱动渲染管线的运行，将 Widget Tree 生成 Layer Tree 并提交给 GPU 线程做进一步处理。

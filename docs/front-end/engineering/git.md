@@ -1,6 +1,6 @@
 # Git
 
-![](../../public/font-end/engineering/git-1.png)
+![](../../public/front-end/engineering/git-1.png)
 
 使用 Git，可以轻松跟踪代码历史记录，查看谁做了哪些更改，并作为一个团队协作编写代码。由于整个 Git 历史记录都存储在共享存储库中，因此 Git 可以防止旧版本的无意覆盖。
 
@@ -122,7 +122,7 @@ git fetch：相同的目的，但工作方式略不同。 git fetch **从所�
 2. **`git rebase <baseBranch> [<currentBranch>]`** 会从两个分支的共同祖先开始提取待变基分支上`<currentBranch>` 的修改，然后将待变基分支 `<currentBranch>` 指向基分支 `<baseBranch>` 的最新提交即新基底，最后将刚才提取的修改逐个和新基底处理冲突（`git add .` => `git rebase --continue`）并应用到新基底后面（哈希值也不一样）。rebase 后 commit 记录就变为线性。如果基分支 `<baseBranch>` 上没有新提交，那么就还是用原来的基，rebase 操作相当于无效，此时和 git merge 就基本没区别，差异只在于 git merge 会多一条记录 Merge 操作的提交记录。而且 git rebase 后 git push 需要添加 --force 进行强制推送。rebase 变基操作最适合的是本地开发分支合并到远端对应多人开发分支之前对本地开发分支进行变基，缺点是分支图杂乱，优点是可以实际的看出来合并的提交历史。
 3. **`git rebase -i [startPoint] [endPoint]` 合并当前分支的多个commit记录**，前开后闭即`([startPoint]，[endPoint]]`，且应该谨慎使用 `[endPoint]`，省略表示从`[startPoint]`的下一个一直到最后一个，但如果指定 `[starPoint]`, 则表示 `[endPoint]` 后面的 commit 全部不要了。进入 Interact 交互界面后，将 `[startPoint]` 的下一个之后需要合并的连续的 commit 之前的 pick 改成 s，然后进入 commit 信息修改界面，将需要被合并的 commit 信息使用#注释即可。**注意事项：只对尚未推送或未分享给别人的本地修改执行rebase变基操作，清理历史，从不对已推送至别处的提交执行变基操作。**
 
-![](../../public/font-end/engineering/git-2.png)
+![](../../public/front-end/engineering/git-2.png)
 
 ### git cherry-pick
 

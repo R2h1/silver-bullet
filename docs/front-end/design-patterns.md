@@ -145,7 +145,7 @@ document.body.addEvenListener('click', function() {
 
 ### 观察者模式和发布-订阅模式
 
-![](../public/font-end/design-patterns-1.png)
+![](../public/front-end/design-patterns-1.png)
 
 在**观察者模式**中，观察者 Observer 需要直接订阅目标事件 Subject；在目标发出内容改变的事件后，直接接收事件并作出响应，比如 addEventListener 绑定事件。
 

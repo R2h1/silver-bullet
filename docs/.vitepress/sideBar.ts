@@ -26,31 +26,39 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: '设计模式',
     items: [
-      { text: '前端常用设计模式', link: '/font-end/design-patterns' },
+      { text: '前端常用设计模式', link: '/front-end/design-patterns' },
+    ]
+  },
+  {
+    text: '前端框架',
+    link: '/front-end/frame/index',
+    collapsed: true,
+    items: [
+      
     ]
   },
   {
     text: '混合开发',
     items: [
-      { text: '跨平台', link: '/font-end/hybrid' },
+      { text: '跨平台', link: '/front-end/hybrid' },
     ]
   },
   {
     text: '前端数据治理与异常监控',
     items: [
-      { text: '前端数据治理与异常监控', link: '/font-end/data-govern-exception-monitor' },
+      { text: '前端数据治理与异常监控', link: '/front-end/data-govern-exception-monitor' },
     ]
   },
   {
     text: '前端工程化',
-    link: '/font-end/engineering/index',
+    link: '/front-end/engineering/index',
     collapsed: true,
     items: [
-      { text: 'Git', link: '/font-end/engineering/git' },
-      { text: 'babel', link: '/font-end/engineering/babel' },
-      { text: 'eslint', link: '/font-end/engineering/eslint' },
-      { text: 'esbuild', link: '/font-end/engineering/esbuild' },
-      { text: 'pnpm', link: '/font-end/engineering/pnpm' },
+      { text: 'Git', link: '/front-end/engineering/git' },
+      { text: 'babel', link: '/front-end/engineering/babel' },
+      { text: 'eslint', link: '/front-end/engineering/eslint' },
+      { text: 'esbuild', link: '/front-end/engineering/esbuild' },
+      { text: 'pnpm', link: '/front-end/engineering/pnpm' },
     ]
   }
 ];
