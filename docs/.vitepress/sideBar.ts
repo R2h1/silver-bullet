@@ -38,6 +38,16 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     ]
   },
   {
+    text: '浏览器',
+    link: '/front-end/browser',
+    items: []
+  },
+  {
+    text: '微前端',
+    link: '/front-end/micro-front-end',
+    items: []
+  },
+  {
     text: '混合开发',
     items: [
       { text: '跨平台', link: '/front-end/hybrid' },
