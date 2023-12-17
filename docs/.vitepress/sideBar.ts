@@ -18,7 +18,13 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
           { text: '动态规划和数学', link: '/basics/data-structures-algorithms/dp-math' },
         ]
       },
-      { text: '网络', link: '/basics/internet' },
+      { 
+        text: '网络', 
+        link: '/basics/internet', 
+        items: [
+          { text: 'HTTP', link: '/basics/http' }
+        ] 
+      },
       { text: '操作系统', link: '/basics/os' },
       { text: '组成原理', link: '/basics/make-up-principle' },
     ]
