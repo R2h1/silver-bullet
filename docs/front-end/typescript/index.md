@@ -998,8 +998,13 @@ TypeScript 编译器源文件位于 src/compiler 目录下，关键部分包括�
 
 5. **Emitter 发射器**（emitter.ts）：检查器 + AST输出JavaScript代码。程序Program 提供emit 函数，它主要将功能委托给 emitter.ts中的 function emitFiles(resolver: EmitResolver, host: EmitHost, targetSourceFile?: SourceFile): EmitResult 函数。emitWorker给发射器提供一个 EmitResolver。 EmitResolver 由程序的 TypeChecker 提供，是来自 createChecker 的本地函数的子集。emitJavaScript函数主要设置了一批本地变量和函数（这些函数构成 emitter.ts 的大部分内容），接着交给本地函数 emitSourceFile 发射文本，其中initializeEmitterWithSourceMaps函数是emitJavaScript 的本地函数，initalizeEmitterWithSourceMap 的底部覆盖了部分已定义的本地函数，意味着大部分的发射器代码不关心 SourceMap，它们以相同的方式使用这些（带或不带 SourceMap 的）本地函数。emitSourceFile 函数设置 currentSourceFile 然后交给本地函数 emit 去处理。emit函数处理注释和实际 JavaScript 的发射。实际 JavaScript 的发射是 emitJavaScriptWorker 函数的工作。emitJavaScriptWorker通过简单地调用相应的 emitXXX 函数来完成递归。发射器相关调用栈：
 
-```typescript
-```
+    ```typescript
+    Program.emit ->
+      `emitWorker` （在 program.ts 中的 createProgram） ->
+        `emitFiles` （emitter.ts 中的函数）
+          emitFile(jsFilePath, targetSourceFile) ->
+            emitJavaScript(jsFilePath, targetSourceFile);
+    ```
     另一个发射器declarationEmitter.ts用于为 TypeScript 源文件（.ts） 创建声明文件（.d.ts）。
 6. **core.ts** ：TypeScript 编译器使用的核心工具集。let objectAllocator: ObjectAllocator 是一个定义为全局单例的变量。提供以下定义：
     1. getNodeConstructor；
