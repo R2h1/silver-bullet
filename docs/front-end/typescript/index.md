@@ -426,3 +426,597 @@ UML类图中，单个类分为三个区域（类名、属性、方法）。对�
 
 优先选择第一种方案。保持声明文件与源码在一起，使用时就不需要额外增加单独的声明文件库的依赖了，而且也能保证声明文件的版本与源码的版本保持一致。仅当在给别人的仓库添加类型声明文件，但原作者不愿意合并 pull request 时，才需要使用第二种方案，将声明文件发布到 @types 下。
 
+## 内置对象
+
+JavaScript 中有很多内置对象，它们可以直接在 TypeScript 中当做定义好了的类型。 
+
+内置对象是指根据标准在全局作用域（Global）上存在的对象。这里的标准是指 ECMAScript 和其他环境（比如 DOM）的标准。ECMAScript 标准提供的内置对象有：Boolean、Error、Date、RegExp 等；DOM 和 BOM 提供的内置对象有：Document、HTMLElement、Event、NodeList 等。这些对象的定义文件在 TypeScript 核心库的定义文件中。
+
+TypeScript 核心库的定义文件中定义了所有浏览器环境需要用到的类型，并且是预置在 TypeScript 中的。注意，TypeScript 核心库的定义中不包含 Node.js 部分。Node.js 不是内置对象的一部分，如果想用 TypeScript 写 Node.js，则需要引入第三方声明文件@types/node。
+
+## 类型兼容性
+
+类型兼容性用于确定一个类型是否能赋值给其他类型。比如，string 类型与 number 类型不兼容。
+1. 安全性：TypeScirpt类型系统设计比较方便，它允许有一些不正确的行为。比如，任何类型都能被赋值给any。类型安全：保证成员始终可用（即只能子类型（范围小的）赋值给父类型（范围大的），函数则是判定具体参数、返回值是否满足此规则）。
+2. 结构化：TypeScript 对象是一种结构类型，这意味着只要结构匹配，名称无关紧要，即成员类型是兼容的则它们就是兼容的。允许动态创建对象，并且如果它能被推断，该对象仍然具有安全性，比如类型推论时，对象中额外属性是允许的。
+3. 变体：对一个简单类型 Base 和 Child 来说，如果 Child 是 Base 的子类，Child 的实例能被赋值给 Base 类型的变量。这是多态性。在由 Base 和 Child 组合的复杂类型的类型兼容性中，它取决于相同场景下的 Base 与 Child 的变体：
+    1. 协变（Covariant）：只在同一个方向；
+    2. 逆变（Contravariant）：只在相反的方向；
+    3. 双向协变（Bivariant）：包括同一个方向和不同方向；
+    4. 不变（Invariant）：如果类型不完全相同，则它们是不兼容的。
+
+**我们在协变与逆变中约定**：
+1. **A ≼ B** 意味着 A 是 B 的子类型。子类型通常是可传递的。
+2. **A → B** 指的是以 A 为参数类型，以 B 为返回值类型的函数类型。假设 f 是一个以 Dog → Dog 为参数的函数即f : (Dog → Dog) → String。Dog -> Dog安全的子类型可以是 Animal -> Greyhound。首先，f 可能会以任何狗的品种来作为参数调用，而所有的狗都是动物。其次，它可能会假设结果是一条狗，而所有的灰狗都是狗。即(Animal → Greyhound) ≼ (Dog → Dog)。返回值类型，灰狗是狗的子类型。但参数类型则是相反的：动物是狗的父类！允许一个函数类型中，返回值类型是协变的，而参数类型是逆变的。返回值类型是协变的，意思是 A ≼B 就意味着 (T → A) ≼ (T → B) 。参数类型是逆变的，意思是 A ≼B 就意味着 (B → T) ≼ (A → T) 。在 TypeScript 中，参数类型是双向协变的，即既是协变又是逆变的，而这并不安全。但是现在可以在 TypeScript 2.6+ 版本中通过 --strictFunctionTypes 或 --strict 标记设置为true来修复这个问题。可以允许不变的列表（immutable）在它的参数类型上是协变的，但是对于可变的列表（mutable），其参数类型则必须是不变的（invariant），既不是协变也不是逆变。
+3. **x : A** 意味着 x 的类型为 A。
+
+## 类型推论/类型断言/类型保护
+
+### 类型推论
+
+**类型推论**：TypeScript 会在没有明确的指定类型的时候推测出一个类型。如果没有明确的指定类型，那么 TypeScript 会依照类型推论（Type Inference）（又称类型推断、类型判断）的规则推断出一个类型。如果定义的时候没有赋值，不管之后有没有赋值，都会被推断成 any 类型而完全不被类型检查。
+1. 如果类型不能被赋值推断出来，类型也将不会流入函数参数中。
+2. **编译选项 noImplicitAny** 告诉编译器，当无法推断变量的类型或者只能推断为一个隐式的 any 类型时抛出编译错误，通过显式添加 :any 的类型注解或者更正确的类型注解来帮助 TypeScript 推断类型而不是抛出错误。
+
+## 类型断言
+
+**类型断言**（Type Assertion）可以用来手动指定一个值的类型。语法是 **<类型>值** 或 **值 as 类型**，在 tsx 语法中必须使用后一种即**值 as 类型**，因为前者会与 JSX 的语法存在歧义。前者是在需要断言的变量前加上 `<Type>` 即可。类型断言不是类型转换，断言成一个联合类型中不存在的类型是不允许的。类型断言的常见用途有：
+1. **将一个联合类型断言为其中一个类型**。需要注意的是，类型断言只能够「欺骗」TypeScript 编译器，无法避免运行时的错误，反而滥用类型断言可能会导致运行时错误。总之，使用类型断言时一定要格外小心，尽量避免断言后调用方法或引用深层属性，以减少不必要的运行时错误。
+2. **将一个父类断言为更加具体的子类**。特别是当某一个类型不是一个真正的类，而只是一个 TypeScript 的接口（interface），接口是一个类型，不是一个真正的值，它在编译结果中会被删除，当然就无法使用 instanceof 来做运行时判断。
+3. **将任何一个类型断言为 any**，因为在 any 类型的变量上，访问任何属性都是允许的。需要注意的是，将一个变量断言为 any 可以说是解决 TypeScript 中类型问题的最后一个手段。它极有可能掩盖了真正的类型错误，所以如果不是非常确定，就不要使用 as any，也可以使用类型扩展的方式解决。总之，一方面不能滥用 as any，另一方面也不要完全否定它的作用，我们需要在类型的严格性和开发的便利性之间掌握平衡。
+4. **将 any 断言为一个具体的类型**。在日常的开发中，我们不可避免的需要处理 any 类型的变量，可能是由于第三方库未能定义好自己的类型，也有可能是历史遗留的或其他人编写的烂代码，还可能是受到 TypeScript 类型系统的限制而无法精确定义类型的场景。通过类型断言及时的把 any 断言为精确的类型，亡羊补牢，才能使代码向着高可维护性的目标发展，提高代码的可维护性。
+
+**类型断言的限制**：并不是任何一个类型都可以被断言为任何另一个类型。具体来说，要使得 A 能够被断言为 B，只需要 A 兼容 B 或 B 兼容 A 即可（当 A 类型是 B类型的子集，或者 B 类型是 A 类型的子集时，A 能被成功断言成 B）。TypeScript 是结构类型系统，类型之间的对比只会比较它们最终的结构，而会忽略它们定义时的关系。
+
+**双重断言**：通过任何类型都可以被断言为 any和any 可以被断言为任何类型，我们知道，通过双重断言（as any as type）可以打破类型断言的限制，将任何一个类型断言为任何另一个类型。双重断言十有八九是非常错误的，它很可能会导致运行时错误，除非迫不得已，千万别用双重断言。
+类型断言vs 类型转换：类型断言只会影响 TypeScript 编译时的类型，类型断言语句在编译结果中会被删除。类型断言不是类型转换，它不会真的影响到变量的类型，因为后者通常意味着某种运行时的支持。若要进行类型转换，需要直接调用类型转换的方法。
+
+**类型断言 vs 类型声明**：类型断言是被认为有害的，即使断言使得更容易的从遗留项目中迁移（甚至将其他代码粘贴复制到项目中），因此应该小心谨慎的使用类型断言而是使用类型声明注解。类型声明是比类型断言更加严格的，最好优先使用类型声明，这也比类型断言的 as 语法更加优雅。类型1断言为类型2，只需要满足类型1兼容类型2或类型2兼容类型1即可；但类型1赋值给类型2，需要满足类型2兼容类型1。
+
+**类型断言 vs 泛型**：通过给返回any类型的函数添加了一个泛型 `<T>`，可以更加规范的实现对改函数返回值的约束，这也同时去除掉了代码中的 any，是最优的一个解决方案。
+
+### 类型保护
+
+**类型保护**允许使用更小范围下的对象类型。对于联合类型的变量，是无法法知道编译时的具体类型的。JavaScript 中常用的方式是检查成员是否存在，但是 TypeScript 中联合类型只有访问联合类型中共同拥有的成员（即辨析联合类型）。而TypeScript 的类型保护机制：一次判断，整个作用域/所有分支有效。类型保护（Type Guards）就是一些表达式，会在运行时检查以确保在某个作用域内的类型：
+1. **typeof 类型保护**：用于判断变量是哪种原始类型。typeof 类型保护只有两种形式能被识别（typename 必须为 number、string、boolean 或 symbol 类型，但是 TypeScript 并不会阻止与其他字符串字面量比较而且不会把那些表达式识别为类型保护）：
+    1. typeof val === 'typename'；
+    2. typeof val !== 'typename'。
+2. **instanceof 类型保护**：主要用于判断是否是一个类的实例对象或继承实例对象。instanceof 类型保护是通过构造函数来细化类型，其右侧要求是一个构造函数，TypeScript 将细化为：
+    1. 此构造函数的 prototype 属性的类型，如果它的类型不为 any；
+    2. 构造签名所返回类型的联合。
+3. **in 类型保护**：检查一个对象上是否存在一个属性。
+4. **字面量类型保护**：用字面量类型属性来辨析联合结构类型。
+5. **自定义类型保护**：typeof 和 instanceof 类型保护能够满足一般场景，对于一些更加特殊的场景（比如区分不同的普通对象时），可以通过创建用户自定义的类型保护函数，即返回值类型为someArgumentName is SomeType 的函数自定义类型保护。编译器通过类型谓词 someArgumentName is SomeType 得知，如果函数返回 true，则someArgumentName就是SomeType类型。
+
+自定义类型保护(利用类型谓词 is)：
+```typescript
+const isNumber: (value: any) => value is number;
+let foo: string | number = 1;
+if (isNumber(foo)) {
+  foo.toFixed(2);
+} else {
+  foo.toUpperCase();
+}
+```
+
+## 联合类型/交叉类型
+
+### 联合类型
+
+**联合类型**（**Union Types**）表示取值可以为多种类型中的一种，使用|分隔每个类型。联合类型是对参与类型对应的值取并集。当 TypeScript 不确定一个联合类型的变量到底是哪个类型的时候，只能访问此联合类型的所有类型里共有的属性或方法。联合类型与其他类型进行运算时，是分别进行元素的。联合类型的变量在被赋值的时候，会根据类型推论的规则推断出其中一个类型。在 TypeScript 中，具有判别属性的类型联合通常称为辨析联合类型。如果使用类型保护风格的检查（==、===、!=、!==）或者使用具有判断性的属性，TypeScript 将认为使用的对象类型一定是拥有特殊字面量的，并且它会自动把类型范围变小。
+1. 在辨析联合类型时，可能需要在判定的情况外添加一个更额外的检查来捕获错误（比如将辨析后收缩的剩余类型（即never）赋值给never类型的变量），如果同时还使用 strictNullChecks 选项，那么应该返回never类型的变量，否则 TypeScript 可能会推断返回值为 undefined。Redux的Action和reducer函数正是使用辨析联合类型的示例，与 TypeScript 一起使用可以有效的防止拼写错误，并且能提高重构和书写文档化代码的能力。
+
+never 进行详细检查：
+```typescript
+interface Square {
+  kind: 'square';
+}
+
+interface Rectangle {
+  kind: 'rectangle';
+}
+
+// 有人仅仅是添加了 'Circle' 类型
+interface Circle {
+  kind: 'circle'; 
+}
+type Shape = Square | Rectangle | Circle;
+
+function area(s: Shape) {
+  if (s.kind === 'square') {
+    return s.size * s.size;
+  }
+  if (s.kind === 'rectangle') {
+    return s.width * s.height;
+  }
+  const _exhaustiveCheck: never = s; // Error: 'Circle' 不能被赋值给 'never'
+}
+
+function area(s: Shape) {
+  if (s.kind === 'square') {
+    return s.size * s.size;
+  }
+  if (s.kind === 'rectangle') {
+    return s.width * s.height;
+  }
+  if (s.kind === 'circle') {
+    return Math.PI * s.radius ** 2;
+  }
+  const _exhaustiveCheck: never = s; // ok
+}
+```
+
+
+### 交叉类型
+
+**交叉类型**（Intersection Types）是将多个类型叠加合并组成新的类型，是对这些类型对应的值取交集：使用&交叉合并多个非基本类型，新类型包含了所有被合并类型的所有属性；然而对于基本类型之间使用&交叉类型则是取交集 (string & (string | number) = string)。在混入（Mixins）或其他不适合典型面向对象模型的地方存在交叉类型的使用。交叉类型可能出现属性类型冲突，则该属性类型为属性类型的交叉类型（比如，string & number = never），导致组成类型（string或number）均不能赋值给交叉属性类型。此时解决办法时将类型变量断言为any，这样类型变量的属性都是any，赋值就不会报编译错。
+
+## 类型别名/声明合并
+
+### 类型别名
+
+**类型别名**：使用 type 创建类型别名，类型别名用来给一个类型起个新名字，类型别名常用于联合类型。
+
+### 声明合并
+
+**声明合并**：如果定义了两个相同名字的函数、接口或类，那么它们会合并成一个类型。
+1. 函数声明合并: 使用重载定义多个函数类型。
+2. 接口声明合并：接口中的属性在合并时会简单的合并到一个接口。被合并的接口中的同一属性的类型必须是相同的。接口中方法的合并，与函数声明合并一样。
+3. 类合并：类的合并与接口的合并规则一致。
+4. 除此之外，声明文件中的全局变量类型也可以不冲突的合并起来，比如 declare namespace和declare function声明的同名变量。
+
+## 泛型
+
+设计泛型的关键目的是在成员（成员可以是**类的实例成员**、**类的方法**、**函数参数**、**函数返回值**）之间提供有意义的约束。比如约束队列出队类型和入队类型一样，又比如约束反转数组reverse 函数中传入参数类型与函数返回值类型相同。
+
+泛型（Generics）是指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性。
+1. 在函数名后添加了 `<T>`，其中 T 用来指代任意输入的类型，在后面参数、返回值以及函数体中即可以使用类型T。调用时可以在函数名后手动指定，或者让类型推论自动推断出来。
+2. 仅使用一次的泛型并不比一个类型断言来的安全。`declare function some<T>(name: string): T` 中泛型 T 只在函数返回值中使用，它相当于类型断言 `declare function some(name: string): any; some('something') as TypeOfParamsSomething;` 比如，一个用于加载 json 返回值函数，它返回任何传入类型的Promise。
+
+```typescript
+const getJson = <T>(config: {
+  url: string; 
+  headers?: {
+    [key: string]: string;
+  } 
+}): Promise<T> => {
+  const fetchConfig = {
+    method: 'GET',
+    Accept: 'application/json',
+    'Content-type': 'application/json',
+    ...(config.headers || {})
+  };
+  return fetch(config.url, fetchConfig).then<T>((rsp) => rsp.json());
+}
+```
+
+3. 定义泛型的时候，可以一次定义多个类型参数 `<T, K, U>`。如果在参数里不止一个泛型，则应该使用一个更语义化名称，如 TKey 和 TValue （通常情况下，以 T 作为泛型的前缀，在其他语言如 C++ 里，也被称为模板）。
+4. 在函数内部使用泛型变量（被赋予泛型类型的变量）的时候，由于事先不知道它是哪种类型，所以不能随意的操作它的属性或方法。此时，可以对泛型进行约束，只允许该函数传入那些包含对应属性的变量，即泛型约束。比如T extends SomeType，SomeType是包含属性的类型。而且如果调用该函数传入的对应参数不包含对应属性，那么在编译阶段就会报错。多个泛型类型参数之间也可以互相约束 `<T extends U, U>`，即要求 T 继承 U，这样就保证了 U 上不会出现 T 中不存在的字段。
+5. 泛型接口：可以使用含有泛型的接口来定义函数的形状，注意，在使用泛型接口的时候做类型注解时，需要确定定义泛型的类型。
+6. 泛型类：与泛型接口类似，泛型也可以用于类的类型定义中。
+
+TypeScript 2.3+ 可以为泛型中的类型参数指定默认类型（`<T = SomeType>`）。当使用泛型时没有在代码中直接指定类型参数，从实际值参数中也无法推测出时，这个默认类型就会起作用。
+
+### 配合 axios 使用
+
+通常情况下会把后端返回数据格式单独放入一个接口 interface 里：
+
+```typescript
+interface ResponseData<T = any> {
+  /**
+   * 状态码
+   * @type { number }
+   */
+  code: number;
+
+  /**
+   * 数据
+   * @type { T }
+   */
+  result: T;
+
+  /**
+   * 消息
+   * @type { string }
+   */
+  message: string;
+}
+
+function getUser<T>() {
+  return axios.get<ResponseData<T>>('/some-path')
+    .then((res) => res.data)
+    .catch(err => console.error(err));
+}
+
+interface User {
+  name: string;
+  age: number;
+}
+
+async function test() {
+  // user 被推断出为
+  // {
+  //   code: number,
+  //   result: { name: string; age: number },
+  //   message: string
+  // }
+  const user = await getUser<User>();
+}
+```
+
+### 内置泛型
+
+可选泛型 `Partial<T>` 将类型T所有的属性设置为可选的。它的返回类型表示输入类型的所有子类型。
+
+只读泛型 `Readonly<T>` 将类型T所有的浅属性设置为只读 readonly，也就是说构造出的类型的属性不能被再次赋值。
+
+键值泛型 `Record<K, T>` 构造一个类型，其属性名的类型为 K，属性值的类型为 T。可用来将某个类型K的属性映射到另一个类型T上。
+
+挑选属性泛型 `Pick<T, K>` 从类型 T 中挑选部分属性 K 来构造类型。
+
+剔除属性泛型 `Exclude<T, U>` 从类型 T 中剔除所有可以赋值给 U 的属性来构造新类型。
+
+提取属性泛型 `Extract<T, U>` 从类型 T 中提取所有可以赋值给 U 的类型来构造新类型。
+
+`Omit<T, K>` 通过从 T 中选取所有属性然后删除传入的属性 K 来构造新类型。
+
+剔除空属性泛型 `NonNullable<T>` 从类型 T 中剔除 null 和 undefined来构造新类型。
+
+返回值类型泛型 `ReturnType<T>` 由函数类型 T 的返回值类型构造一个类型。
+
+实例泛型 `InstanceType<T>` 由构造函数类型 T 的实例类型构造一个类型。
+
+必须泛型 `Required<T>` 构造一个类型，使类型 T 的所有属性为必须 required。
+
+`Parameters<T>` 构造一个关于函数类型 T 的参数类型的元组类型。
+
+`ConstructorParameters<T>` 提取构造函数类型的所有参数类型，它会生成构造函数所具有的所有参数类型的元组类型（如果 T 不是函数，则不返回）。
+
+`ThisType<T>` 通过 ThisType 可以在对象字面量中键入 this，并提供通过上下文类型控制 this 类型的便捷方式。它只有在--noImplicitThis 的选项为true才有效。在对象字面量方法中的 this 类型，将由以下决定：
+1. 如果这个方法显式指定了 this 参数，那么 this 具有该参数的类型。
+2. 否则，如果方法由带 this 参数的签名进行上下文键入，那么 this 具有该参数的类型。
+3. 否则，如果 --noImplicitThis 选项已经启用，并且对象字面量中包含由 `ThisType<T>` 键入的上下文类型，那么 this 的类型为 T。
+4. 否则，如果 --noImplicitThis 选项已经启用，并且对象字面量中不包含由 `ThisType<T>` 键入的上下文类型，那么 this 的类型为该上下文类型。
+5. 否则，如果 --noImplicitThis 选项已经启用，this 具有该对象字面量的类型。
+6. 否则，this 的类型为 any。
+
+通过 API 转换参数的形式来生成 this 的值的情景下，可以通过创建一个新的 `ThisType<T>` 标记接口，可用于在上下文中表明转换后的类型。尤其是当字面量中的上下文类型为 `ThisType<T>` 或者是包含   `ThisType<T>` 的交集时，显得尤为有效，对象字面量方法中 this 的类型即为 T。`ThisType<T>` 的接口，在 lib.d.ts 只是被声明为空的接口，除了可以在对象字面量上下文中可以被识别以外，该接口的作用等同于任意空接口。
+
+## 索引类型/映射类型
+
+### 索引类型
+
+**索引类型**（**Index Types**）的使用让编译器能够检查使用了动态属性名的类型。
+1. **索引类型的查询操作符为 `keyof T`**。对于任何类型查询操作符 `keyof T`，假设 T 是一个类型，那么 `keyof T` 产生的类型是 T 的属性名称字符串字面量类型构成的联合类型。和直接使用联合类型的区别在于，可以动态的根据类型T的改变自动改变。索引类型的查询操作符 keyof T：
+```typescript
+interface Person {
+  name: string;
+  age: number;
+  address: string;
+}
+type PersonKeyUnion = keyof T; // name | age | address;
+```
+2. **索引访问操作符 `T[K]`**，表示类型T 的属性 K 的类型。可以在普通的上下文中使用 `T[K]`，只要确保类型变量 `K extends keyof T`。
+3. **索引签名**：TypeScript 的索引签名必须是 string 或者 number，此外 Symbol 也是有效的。索引签名的名称（如：`{ [key: string]: SomeType}` 里的 key）除了可读性外，并没有任何意义。声明一个索引签名时，所有明确的成员都必须符合索引签名。索引签名[key in UnionType]可以通过映射类型来使索引字符串k为联合类型 UnionType 中的一员。number类型的索引也支持：`{ [index: number]: SomeType }`。对于对象类型的索引签名，JavaScript 会隐式调用 toString 方法，而在 TypeScript需要显式调用toString，否则会抛出错误。**尽量不要把字符串索引签名与确定属性名称混合使用，因为如果属性名称中有拼写错误将不会被捕获到，应该将索引签名在一个确定属性名称里嵌套**。嵌套索引签名：
+    ```typescript
+    interface NestedCSS {
+      color?: string;
+      nest?: {
+        [selector: string]: NestedCSS;
+      };
+    }
+    ```
+    1. 如果类型 T 带有字符串索引签名，那么 keyof T 为 string | number 类型。因为可以同时拥有string 和 number 类型的索引签名。
+    2. 如果类型 T 带有数字索引签名，那么 keyof T 为 number 类型。
+    3. 如果类型 T 带有索引签名，那么 T[K] 为索引签名的类型。
+
+### 映射类型
+
+```typescript
+// 将原有类型所有属性转为可选的
+type Partial<T> = {
+  [P in keyOf T]: T[P];
+}
+// 将原有类型所有属性转为只读的
+type Readonly<T> = {
+  readonly [P in keyOf T]: T[P];
+}
+// 从原来类型中选取部分属性形成新类型
+type Pick<T, K extends keyof T> = {
+  [P in K]: T[P];
+}
+// 新类型是 K 为属性，T 类型为值得类型
+type Recode<K extends string, T> = {
+  [P in K]: T;
+}
+```
+
+**映射类型**（**Mapped Types**）可以基于旧类型创建新类型。比如将现有类型转换为可选的或将现有类型转换为只读的，其实现中[P in keyof T]类型变量 P会把字符串字面量联合类型keyof T 的每个字符串都映射为属性。Readonly，Partial 和 Pick 是同态的，即属性列表是 keyof T 且结果类型是 T[P] 的变体，因为这类转换是同态的，映射只作用于 T 的属性而没有其他的。编译器知道在添加任何新属性之前可以拷贝所有存在的属性修饰符，但 Record是非同态的，因为 Record 并不需要输入类型来拷贝属性，非同态类型本质上会创建新的属性，因此它们不会从它处拷贝属性修饰符。
+
+由映射类型进行推断，即拆包（注意这个拆包推断只适用于同态的映射类型。如果映射类型不是同态的，那么需要给拆包函数一个明确的类型参数）：
+
+```typescript
+function unproxify<T>(t: Proxify<T>): T {
+  let result = {} as T;
+  for (const k in t) {
+    result[k] = t[k].get()
+  }
+  return result;
+}
+let originalProps = unproxify(proxyProps);
+```
+
+## 条件类型/This 类型
+
+### 条件类型
+
+**条件类型**（**Conditional Types**）用于表达非均匀类型映射（non-uniform type mapping），能够根据类型兼容关系（即条件）从两个类型中选出一个。T extends U ? X : Y语义类似于三目运算符，若 T 是 U 的子类型，则为 X 类型，否则就是 Y 类型。另外，还有一种情况是条件的真假无法确定（无法确定 T 是不是 U 的子类型），此时为 X | Y 类型。另外，如果 T 或 U 含有类型变量，就要等到类型变量都有对应的具体类型后才能得出条件类型的结果。
+
+可分配条件类型（distributive conditional type）中被检查的类型是个裸类型参数（naked type parameter）。其特殊之处在于满足分配律，即(A | B | C) extends U ? X : Y等价于(A extends U ? X : Y) | (B extends U ? X : Y) | (C extends U ? X : Y)。此外，在 T extends U ? X : Y 中，X 中出现的 T 都具有 U 类型约束。
+
+在条件类型的 extends 子句中，可以通过 infer 声明引入一个将被推断的类型变量。
+
+TypeScript 内置的常用的条件类型有：
+
+```typeScript
+// 从 T 中去掉属于 U 的子类型的部分
+type Exclude<T, U> = T extends U ? never : T;
+// 从 T 中筛选出属于 U 的子类型的部分
+type Extract<T, U> = T extends U ? T : never;
+// 取出函数类型的返回类型：如果存在重载，就取最后一个签名（按照惯例，最后一个通常是宽泛的）进行推断
+type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any;
+// 取出构造函数类型的实例类型
+type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R ? R : any;
+```
+
+## This 类型
+
+**This 类型**（**This Types**）表示所属类或接口的子类型（称之为有界多态性 F-bounded polymorphism）。具体地，TypeScript 中的 This 类型分为两类：
+1. 类/接口（的成员方法）中的 this 类型；JavaScript运行时 this 指向当前类实例或其子类实例，即this 的类型并不是固定的，取决于其调用上下文。而this 类型表现为所属类/接口的子类型，即this 类型就是 this 值的类型，其实现原理，就是把类/接口看作是具有隐式类型参数 this 的泛型，并加上其所在类/接口相关的类型约束。具体地，this 类型在实现上相当于 `A<this extends A<A>>`，类中 this 值的类型就是泛型参数 this。除了当前类/接口的上下文，this 的类型就是 `A<this: A>`，类型兼容性等与泛型一致。所以，this 类型就像一个带有类派生关系约束的隐式类型参数。
+2. 普通函数中的 this 类型。不同于类或接口中的 this 类型通常隐式发挥作用，函数中的 this 类型大都通过现式声明来约束函数体中 this 值的类型。把 this 显式地作为函数的（第一个）参数，从而限定其类型，像普通参数一样进行类型检查。特殊地，匿名函数（lambda）的 this 无法手动限定其类型。
+
+**This 类型的应用场景**：
+1. 流式接口：this 类型让流式接口（fluent interface）变得很容易描述。所谓的流式接口（设计层面），可以简单理解为链式调用（实现层面）。简言之，流式接口是 OOP 中的一种 API 设计方式，通过链式方法调用让源码具有可读性。
+2. 描述this的类型：普通函数中的 this 类型允许我们像描述普通参数一样限定 this 的类型，尤其是会调用函数场景。
+3. 追踪上下文类型：有了 this 类型，bind、call、apply 等场景也能正确维持类型约束，要求当前函数 this 与传入的目标对象类型一致，让其中的错误暴露出来（需要开启 strictBindCallApply 选项）。
+
+## 从 JavaScript 迁移
+
+所有的 JavaScript 代码都是有效的 TypeScript 代码。这意味着，如果让 TypeScript 编译器编译 TypeScript 里的 JavaScript 代码，编译后的结果将会与原始的 JavaScript 代码一模一样。也就是说，把文件扩展名从 .js 改成 .ts 将不会造成任何负面的影响。一般来说，将 JavaScript 代码迁移至 TypeScript 包括以下步骤：
+1. 添加一个 tsconfig.json 文件；
+2. 把文件扩展名从 .js 改成 .ts，开始使用 any 来减少错误；使用any来减少错误是危险的，但是它允许将注意力转移到新 TypeScript 代码错误上，因为此时的重点是在逐步更新旧代码库的同时，用 TypeScript 编写新代码。当进行下一步前，最好要留下 // TODO 的注释。
+3. 开始在 TypeScript 中写代码，尽可能的减少 any 的使用；
+4. 回到旧代码，开始添加类型注解，并修复已识别的错误；
+5. 为第三方 JavaScript 代码定义环境声明。可以创建一个针对于特定库的声明文件（.d.ts）或去DefinitelyTyped 仓库中寻找是否有对应的声明文件。
+
+在 TypeScript 中，甚至可以允许导入任何文件（.css/.html），只需要在 global.d.ts 中declare `module '*.css'` 或 `declare module '*.html'`。
+
+## 异常处理和错误提示
+
+内置错误类型包括Error类和以下继承自Error类的：
+1. RangeError：当数字类型变量或者参数超出其有效范围时，出现 RangeError 的错误提示。
+2. ReferenceError：当引用无效时，会出现 ReferenceError 的错误提示。
+3. SyntaxError：当解析无效 JavaScript 代码时，会出现 SyntaxError 的错误提示。
+4. TypeError：变量或者参数不是有效类型时，会出现 TypeError 的错误提示。
+5. URIError：当传入无效参数至 encodeURI() 和 decodeURI() 时，会出现 URIError 的错误提示。
+
+除非想要使用非常通用（try/catch）的方式处理错误，否则不要抛出错误。抛出错误时使用内置错误类型能自动跟踪堆栈的属性构建以及生成位置。相比之下，原始字符串会导致极差的调试体验，并且在分析日志时，将会变得错综复杂。
+
+TypeScript 错误信息提示分为两类：简洁和详细。简洁的错误信息包括编译器描述的错误号以及对应基本信息。详细的错误信息是为了指导使用者知道为什么一些错误会发生。IDE 通常会在详细的错误提示之后显示简洁版本。常见错误代码：
+1. TS2304：Cannot find name “”；可能在使用第三方的库，但是并没有 declare 的声明。需要明确的声明使用的任何变量。
+2. TS2307：Cannot find module “”；可能把第三方的库作为模块使用，但没有对应的环境声明文件。
+3. TS1148：Cannot compile modules unless the '--module' flag provided；
+4. 捕获不能有类型注解的简短变量：比如try...catch中的e，需要在catch块内对e使用类型保护。
+5. 接口 ElementClass 不能同时扩展类型别名 Component 和 Component：当在编译上下文中同时含有两个 react.d.ts（@types/react/index.d.ts）会发生。	
+    1. 删除 node_modules 和任何 package-lock（或者 yarn lock），然后再一次 npm install；
+    2. 如果这不能工作，查找无效的模块（所使用的所有用到了 react.d.ts 模块应该作为 peerDependency 而不是作为 dependency 使用），并且把这个报告给相关模块。
+
+## JSX
+
+**JSX的规则**：
+1. 只能返回一个根元素：多个 JSX 标签必须要用一个父元素或者 Fragment 来包裹，因为JSX 虽然看起来很像 HTML，但在底层其实被转化为了 JavaScript 对象，不能在一个函数中返回多个对象，除非用一个数组把他们包装起来。
+2. JSX 要求标签必须正确闭合。
+3. 使用驼峰式命名法给大部分属性命名：JSX 最终会被转化为 JavaScript，而 JSX 中的属性也会变成 JavaScript 对象中的键值对。在组件中，经常会遇到需要用变量的方式读取这些属性。但 JavaScript 对变量的命名有限制。例如，变量名称不能包含 - 符号或者像 class 这样的保留字。但是，由于历史原因，aria-* 和 data-* 属性应该以带 - 符号的 HTML 格式书写。
+
+TypeScript 支持 JSX 转换和代码分析。JSX允许用户在 JavaScript 中书写类似于 HTML 的视图，因此可以：
+1. 使用相同代码，既能检查JavaScript，同时能检查 HTML 视图层部分。
+2. 让视图层了解运行时的上下文（加强传统 MVC 中的控制器与视图连接）。
+3. 复用 JavaScript 设计模式维护 HTML 部分，例如用Array.prototype.map 创建新元素。
+
+这能够减少错误的可能性，并且能增加用户界面的可维护性。JSX 的主要消费者是React。使用TypeScript开始开发 React 的应用的重点：
+1. 使用文件后缀 .tsx（替代 .ts）；
+2. 在 tsconfig.json 配置文件的 compilerOptions 里设置选项 "jsx": "react"；
+3. 在项目里为 JSX 和 React 安装声明文件：npm i -D @types/react @types/react-dom；
+4. 导入 react 到.tsx 文件（import * as React from 'react'）。
+
+React 不但能渲染 HTML 标签（首字母小写，原理是`React.createElement('div')`）也能渲染 React 组件（首字母大写，原理是 `React.createElement(MyComponent)`）。
+1. HTML 标签的类型是 `JSX.IntrinsicElements.div`。
+2. 函数式组件类型是 `React.FunctionComponent`。
+3. 类组件类型是 `React.Component<Props,State>`。
+4. 组件实例的类型是 `React.ReactElement<T>` 。
+5. 可渲染内容的类型是类型 `React.ReactNode`。
+6. 对于泛型组件，组件内部定义 `<T>` 时，需要在泛型参数里使用 extends 即 `<T extends SomeType>` 来提示编译器，这是个泛型。
+
+```typescript
+// 一个泛型组件
+type SelectProps<T> = { items: T[] };
+class Select<T> extends React.Component<SelectProps<T>, any> {}
+
+// 使用
+const Form = () => <Select<string> items={['a', 'b']} />;
+```
+
+7. ref的类型应该使用 ref 和 null 的联合类型。
+
+TypeScript 使得能够以类型安全的方式，在 React 中使用 JSX 之外的其他东西。可自定义的点如下（适用于高级 UI 框架的作者）：
+1. 可以使用 "jsx":"preserve" 选项来禁用 React 的样式触发。这意味着，JSX 将按原样被触发，然后可以使用自定义转化器来转化 JSX 部分。
+2. 使用 JSX 全局模块：
+    1. 可以通过定制 JSX.IntrinsicElements 的接口成员来控制哪些 HTML 标签是可用的，以及如何对其进行类型检查；
+    2. 当在组件中使用时：
+        1. 可以通过自定义默认的 `interface ElementClass extends React.Component<any, any> { }` 声明文件来控制哪个 class 必须由组件继承；
+        2. 可以通过自定义 declare module JSX { interface ElementAttributesProperty { props: {} } } 声明文件来控制使用的哪个属性（property）来检查特性（attribute）（默认是 props）。
+3. 通过 `--jsxFactory <JSX factory Name>` 与 `--jsx react`，能不同于默认 React 的方式使用 JSX 工厂函数（默认工厂函数名称是createElement）。
+
+
+## TypeScript 编译原理
+
+TypeScript 编译器源文件位于 src/compiler 目录下，关键部分包括：
+1. **Scanner 扫描器**（scanner.ts）：SourceCode（源码）转化为Token流；解析器根据需要使用 initializeState 函数准备该扫描器。为避免重复创建扫描器造成的开销，parser.ts 中创建单例扫描器。调用 scan 后，扫描器更新其局部状态（扫描位置，当前 token 详情等）。扫描器提供工具函数获取当前扫描器状态，scanner.getStartPos()获取即将扫描的token的开始位置。即便 TypeScript 解析器有单例扫描器，仍可以使用ts.createScanner 创建独立的扫描器，然后用 setText/setTextPos 随意扫描文件的不同位置。
+2. **Parser 解析器**（parser.ts）：控制扫描器将源码转化为Token 流，再转化为AST（抽象语法树）；Node节点是抽象语法树（AST） 的基本构造块。语法上，通常 Node 表示非末端（non-terminals）节点。但是，有些末端节点，如：标识符和字面量也会保留在树中。AST 节点文档由两个关键部分构成，一是节点的 SyntaxKind 常量枚举（const enum），用于标识 AST 中的类型；二是其接口，即实例化 AST 时节点提供的 API。工具函数 ts.forEachChild，可以用来访问 AST 任一节点的所有子节点。interface Node 的关键成员：
+    1. TextRange 标识该节点在源文件中的起止位置。
+    2. parent?: Node 当前节点（在 AST 中）的父节点。
+    3. 标志（flags）和修饰符（modifiers）。
+
+    ```typescript
+    // 常量枚举
+    // 但编译时需要使用 --preserveConstEnums 编译标志，以便枚举在运行时仍可用。
+    export const enum SyntaxKind {
+      Unknown,
+      EndOfFileToken,
+      SingleLineCommentTrivia,
+      // ... 更多
+    }
+    
+    // 将枚举成员转化为可读的字符串
+    export function syntaxKindToName(kind: ts.SyntaxKind) {
+      return (<any>ts).SyntaxKind[kind];
+    }
+    
+    // 访问 AST 任一节点的所有子节点
+    // 该函数不会为所有子节点调用 visitNode（例如：SyntaxKind.SemicolonToken）。
+    export function forEachChild<T>(
+      node: Node, 
+      cbNode: (node: Node) => T, 
+      cbNodeArray?: (nodes: Node[]) => T
+    ): T {
+      if (!node) {
+        return;
+      }
+      switch (node.kind) {
+        case SyntaxKind.BinaryExpression:
+            return visitNode(cbNode, (<BinaryExpression>node).left) ||
+                visitNode(cbNode, (<BinaryExpression>node).operatorToken) ||
+                visitNode(cbNode, (<BinaryExpression>node).right);
+        case SyntaxKind.IfStatement:
+            return visitNode(cbNode, (<IfStatement>node).expression) ||
+                visitNode(cbNode, (<IfStatement>node).thenStatement) ||
+                visitNode(cbNode, (<IfStatement>node).elseStatement);
+
+        // .... 更多
+    }
+
+    // 获得某 AST 节点的所有子节点
+    function printAllChildren(node: ts.Node, depth = 0) {
+      console.log(
+        new Array(depth + 1).join('----'), 
+        ts.syntaxKindToName(node.kind), 
+        node.pos, 
+        node.end
+      );
+      depth += 1;
+      node.getChildren().forEach(c => printAllChildren(c, depth));
+    }
+    ```
+
+    解析器实现原理是单例模式（其原因类似扫描器，如果能重新初始化就不重新构建）。实际实现成 namespace Parser，包含解析器的各种状态变量和单例扫描器（const scanner）。该扫描器由解析器函数管理。解析器由程序间接驱动，简化的调用栈：
+
+    ```typescript
+    程序 ->
+      CompilerHost.getSourceFile ->
+        (全局函数 parser.ts).createSourceFile ->
+          Parser.parseSourceFile
+    ```
+
+    parseSourceFile 不仅准备好解析器的状态，还调用 initializeState 准备好扫描器的状态。然后使用 parseSourceFileWorker 继续解析源代码。
+
+    parseSourceFileWorker函数先创建一个 SourceFile AST 节点，然后从 parseStatements 函数开始解析源代码。一旦返回结果，就用额外信息（例如 nodeCount, identifierCount等） 完善 SourceFile 节点。parseStatements根据扫描器返回的当前 token 来切换（调用相应的 parseXXX 函数），例如：如果当前 token 是一个 SemicolonToken（分号标记），就会调用 parseEmptyStatement 为空语句创建一个 AST 节点。
+
+    解析器有一系列 parseXXX 函数用来创建相应类型为XXX的节点，通常在相应类型的节点出现时被（其他解析器函数）调用。该过程的典型示例是解析空语句（例如 ;;;;;;）时要用的 parseEmptyStatement() 函数，其中包括 3 个关键函数 createNode, parseExpected 和 finishNode：
+    1. createNode：解析器函数 function createNode(kind: SyntaxKind, pos?: number): Node 负责创建节点，设置传入的 SyntaxKind（语法类别），和初始位置（默认使用当前扫描器状态提供的位置信息）。
+    2. parseExpected：解析器的 parseExpected 函数 function parseExpected(kind: SyntaxKind, diagnosticMessage?: DiagnosticMessage): boolean 会检查解析器状态中的当前 token 是否与指定的 SyntaxKind 匹配。如果不匹配，则会向传入的 diagnosticMessage（诊断消息）报告，未传入则创建某种通用形式 xxx expected。该函数内部用 parseErrorAtPosition 函数（使用扫描位置）提供良好的错误报告。
+    3. finishNode：解析器的 finishNode 函数 `function finishNode<T extends Node>(node: T, end?: number): T` 设置节点的 end 位置，并添加一些有用的信息，例如上下文标志（parserContextFlags）以及解析该节点前出现的错误（如果有错的话，就不能在增量解析中重用此 AST 节点）。
+3. **Binder 绑定器**（binder.ts）：AST转化为Symbols（符号）；大多数的 JavaScript 转译器（transpiler）相比TypeScript 几乎没提供代码分析的方法，缺失TypeScript 的语义系统。为了协助（检查器执行）类型检查，绑定器将源码的各部分连接成一个相关的类型系统，供检查器使用。绑定器的主要职责是创建符号（Symbols）。符号将 AST 中的声明节点与相同实体的其他声明相连。符号是绑定的结果，是 TypeScript 语义系统的主要构造块。符号的构造器定义在 core.ts（绑定器实际上通过 objectAllocator.getSymbolConstructor 来获取构造器）。SymbolFlags 符号标志是个标志枚举，用于识别额外的符号类别（例如：变量作用域标志 FunctionScopedVariable 或 BlockScopedVariable 等。实际上，绑定器被检查器在内部调用，而检查器又被程序调用。简化的调用栈如下：
+    
+    ```typescript
+    program.getTypeChecker ->
+      ts.createTypeChecker（检查器中）->
+        initializeTypeChecker（检查器中） ->
+            for each SourceFile `ts.bindSourceFile`（绑定器中）
+            // followed by
+            for each SourceFile `ts.mergeSymbolTable`（检查器中）
+    ```
+    bindSourceFile 和 mergeSymbolTable 是两个关键的绑定器函数：
+    1. bindSourceFile：主要是检查 file.locals 是否定义，如果没有则交给（本地函数） bind 来处理。注意：locals 定义在节点上，其类型为 SymbolTable。SourceFile 也是一个节点（事实上是 AST 中的根节点）。TypeScript 编译器大量使用本地函数。本地函数很可能使用来自父函数的变量（通过闭包捕获）。
+    2. bind 是 bindSourceFile 中的一个本地函数，它或它调用的函数会设置 symbolCount 和 classifiableNames 等状态，然后将其存在返回的 SourceFile 中。bind 能处理任一节点（不只是 SourceFile），它做的第一件事是分配 node.parent（如果 parent 变量已设置，绑定器在 bindChildren 函数的处理中仍会再次设置），然后交给 bindWorker。最后调用 bindChildren进行递归绑定（该函数简单地将绑定器的状态（如：parent）存入函数本地变量中，接着在每个子节点上调用 bind，然后再将状态转存回绑定器中）。
+    3. bindWorker函数依据 node.kind（SyntaxKind类型）进行切换，并将工作委托给合适的 bindXXX 函数（通用的模式和工具函数，也定义在binder.ts中）。例如：如果该节点是 SourceFile 则（最终且仅当节点是外部文件模块时）调用 bindAnonymousDeclaration。常用的有 createSymbol 函数，它简单地更新 symbolCount（一个 bindSourceFile 的本地变量），并使用指定的参数创建符号。
+    
+    addDeclarationToSymbol函数用于绑定 SourceFile 节点到源文件符号（外部模块的情况下）。创建一个从 AST 节点到符号的链接（node.symbol），并将节点添加为该符号的一个声明（interface Declaration）。
+    
+    AST 的节点可以被当作容器。这决定了节点及相关符号的 SymbolTables 的类别。容器是个抽象概念（没有相关的数据结构），由ContainerFlags 枚举等决定。函数 getContainerFlags（位于 binder.ts） 驱动此标志，该函数只在绑定器函数 bindChildren 中调用，会根据 getContainerFlags 的运行结果将节点设为 container 和（或） blockScopedContainer。
+    
+    符号表（SymbolTable）是 Map 实现的，符号表通过绑定进行初始化。编译器中实用的符号表，节点上是locals?: SymbolTable；符号上是members?: SymbolTable和exports?: SymbolTable。符号表使用符号来填充，主要是通过调用declareSymbol( symbolTable: SymbolTable, parent: Symbol, node: Declaration, includes: SymbolFlags, excludes: SymbolFlags ): Symbol来进行。
+    
+    **绑定器中的绑定错误**被添加到源文件的 bindDiagnostics 列表中。
+4. **Checker 检查器**（checker.ts）：利用AST +符号进行类型验证；符号和 AST 是检查器用来验证源代码语义的。检查器是由程序（program）初始化。检查器是整个编译器中最大的部分。检查器的相关调用栈如下：
+
+    ```typescript
+    program.getTypeChecker ->
+      ts.createTypeChecker（检查器中）->
+        initializeTypeChecker（检查器中） ->
+            for each SourceFile `ts.bindSourceFile`（绑定器中）
+            // 接着
+            for each SourceFile `ts.mergeSymbolTable`（检查器中）
+    ```
+
+    真正的类型检查会在调用getDiagnostics时才发生。该函数被调用时（比如由 Program.emit 请求），检查器返回一个EmitResolver（由程序调用检查器的 getEmitResolver 函数得到），EmitResolver 是 createTypeChecker 的一个本地函数的集合。
+
+    ```typescript
+    program.emit ->
+      emitWorker (program local) ->
+        createTypeChecker.getEmitResolver ->
+            // 第一次调用下面的几个 createTypeChecker 的本地函数
+            call getDiagnostics ->
+                getDiagnosticsWorker ->
+                    checkSourceFile
+
+            // 接着
+            return resolver
+            // 通过对本地函数 createResolver() 的调用，resolver 已在 createTypeChecker 中初始化。
+    ```
+
+    全局命名空间合并由initializeTypeChecker 中初始化全局符号表，基本上是将所有的 global 符号合并到 let globals: SymbolTable = {} 符号表中（位于 createTypeChecker 中）。 mergeSymbolTable 主要调用 mergeSymbol 函数。
+    检查器使用本地的 error 函数报告错误：
+
+    ```typescript
+    function error(location: Node, message: DiagnosticMessage, arg0?: any, arg1?: any, arg2?: any): void {
+      let diagnostic = location
+        ? createDiagnosticForNode(location, message, arg0, arg1, arg2)
+        : createCompilerDiagnostic(message, arg0, arg1, arg2);
+      diagnostics.add(diagnostic);
+    }
+    ```
+
+5. **Emitter 发射器**（emitter.ts）：检查器 + AST输出JavaScript代码。程序Program 提供emit 函数，它主要将功能委托给 emitter.ts中的 function emitFiles(resolver: EmitResolver, host: EmitHost, targetSourceFile?: SourceFile): EmitResult 函数。emitWorker给发射器提供一个 EmitResolver。 EmitResolver 由程序的 TypeChecker 提供，是来自 createChecker 的本地函数的子集。emitJavaScript函数主要设置了一批本地变量和函数（这些函数构成 emitter.ts 的大部分内容），接着交给本地函数 emitSourceFile 发射文本，其中initializeEmitterWithSourceMaps函数是emitJavaScript 的本地函数，initalizeEmitterWithSourceMap 的底部覆盖了部分已定义的本地函数，意味着大部分的发射器代码不关心 SourceMap，它们以相同的方式使用这些（带或不带 SourceMap 的）本地函数。emitSourceFile 函数设置 currentSourceFile 然后交给本地函数 emit 去处理。emit函数处理注释和实际 JavaScript 的发射。实际 JavaScript 的发射是 emitJavaScriptWorker 函数的工作。emitJavaScriptWorker通过简单地调用相应的 emitXXX 函数来完成递归。发射器相关调用栈：
+
+```typescript
+```
+    另一个发射器declarationEmitter.ts用于为 TypeScript 源文件（.ts） 创建声明文件（.d.ts）。
+6. **core.ts** ：TypeScript 编译器使用的核心工具集。let objectAllocator: ObjectAllocator 是一个定义为全局单例的变量。提供以下定义：
+    1. getNodeConstructor；
+    2. getSymbolConstructor；
+    3. getTypeConstructor；
+    4. getSignatureConstructor（签名是索引，调用和构造签名）。
+7. **types.ts**：包含整个编译器中使用的关键数据结构和接口，关键部分有:
+    1. SyntaxKind AST 节点类型通过 SyntaxKind 枚举进行识别；
+    2. TypeChecker 类型检查器提供此接口；
+    3. CompilerHost 用于程序（Program）和系统之间的交互；
+    4. Node AST 节点。
+8. **system.ts**：可以将其视为操作环境（OE, Operating Environment）；TypeScript 编译器与操作系统的所有交互均通过 System 接口进行。接口及其实现（WScript 和 Node）均定义在system.ts中。
+9. **program.ts**：编译上下文在 TypeScript 编译器中被视为一个 Program，它包含 SourceFile 和编译选项。CompilerHost 是与操作环境（OE, Operating Enviornment）进行交互的机制。用 CompilerHost 作中间层的原因是可以让接口对 Program 的需求进行细粒度的调整，而无需考虑操作环境的需求。程序的getSourceFiles API（getSourceFiles(): SourceFile[]）用于获取SourceFile 。得到的每个元素均是一棵抽象语法树的根节点（称做 SourceFile）。
+10. **AST杂项**（**Trivia**）：杂项是指源文本中对正常理解代码不太重要的部分，例如：空白，注释，冲突标记。为了保持轻量，杂项不会存储在 AST 中。
+    1. 通常，token拥有它后面同一行到下一个token之前的所有杂项；该行之后的注释都与下个的token相关。
+    2. 对于文件中的前导（leading）和结束（ending）注释：源文件中的第一个 token 拥有所有开始的杂项；而文件最后的一些列杂项则附加到文件结束符上，该 token 长度为 0。
+    
+    节点存在 "token start" 和 "full start" 位置，Token Start即文件中一个 token 的文本开始的位置。Full Start是指扫描器从上一个重要 token 之后开始扫描的位置，要注意，full start 甚至会包含前一节点拥有的杂项。AST 节点有 getStart 和 getFullStart API 用于获取以上两种位置。节点的注释通过以下函数获取：
+    1. ts.getLeadingCommentRanges：给定源文本及其位置，返回给定位置后第一个换行符到 token 本身之间的注释范围（可能需要结合 ts.Node.getFullStart 使用）。
+    2. ts.getTrailingCommentRanges	给定源文本及其位置，返回给定位置后第一个换行符之前的注释范围（可能需要结合 ts.Node.getEnd 使用）。
