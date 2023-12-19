@@ -296,3 +296,133 @@ React的this.setState通常是使用对象字面量进行调用，它是Freshnes
 interface 的几乎所有功能都在type 中可用，主要区别在于类型创建后无法更改，而接口始终可扩展。接口只能用于声明对象的形状，而不是重命名基本类型/联合类型/交叉类型。类型别名不得参与 在声明合并中，但接口可以。命名联合类型的类型别名无法被实现/扩展。
 
 ![](../../public/front-end/typescript/1.png)
+
+
+## 类
+
+TypeScript 除了实现了所有 ES6 中的类的功能以外，还添加了一些新的用法。类的相关概念：
+1. 类(Class)：定义了一件事物的抽象特点，包含它的属性和方法。
+2. 对象（Object）：类的实例，通过 new 生成。
+3. **面向对象（OOP）的三大特性：封装、继承、多态**。
+    1. 封装（Encapsulation）：将对数据的操作细节隐藏起来，只暴露对外的接口。外界调用端不需要（也不可能）知道细节，就能通过对外提供的接口来访问该对象，同时也保证了外界无法任意更改对象内部的数据。
+    2. 继承（Inheritance）：子类继承父类，子类除了拥有父类的所有特性外，还有一些更具体的特性。继承可以描述类与类之间的关系。子类重写父类的成员时类型需要和父类匹配。
+    3. 多态（Polymorphism）：由继承而产生了相关的不同的类，对同一个方法可以有不同的响应。比如 Cat 和 Dog 都继承自 Animal，但是分别实现了自己的 eat 方法。此时针对某一个实例，无需了解它是 Cat 还是 Dog，就可以直接调用 eat 方法，程序会自动判断出来应该如何执行eat。
+4. 存取器（getter & setter）：用以改变属性的读取和赋值行为。
+5. 修饰符（Modifiers）：修饰符是一些关键字，用于限定成员或类型的性质。比如 public 表示公有属性或方法。
+6. 抽象类（Abstract Class）：抽象类是供其他类继承的基类，抽象类不允许被实例化。抽象类中的抽象方法必须在子类中被实现。
+7. 接口（Interfaces）：不同类之间公有的属性或方法，可以抽象成一个接口。**接口可以被类实现（implements）**，希望在类中使用必须要被遵循的接口（类）或别人定义的对象结构时使用，implements关键字限制了类实例的结构。一个类只能继承自另一个类，但是可以实现多个接口。
+
+ES6 中，使用 class 定义类，使用 constructor 定义构造函数。通过 new 生成新实例的时候，会自动调用构造函数。使用 extends 关键字实现继承，子类中使用 super 关键字来调用父类的构造函数和方法。使用 getter 和 setter 可以改变属性的赋值和读取行为。使用 static 修饰符修饰的方法称为静态方法，它们不需要实例化，而是直接通过类来调用。
+
+ES6 中实例的属性只能通过构造函数中的 this.xxx 来定义，ES7 中可以直接在类里面定义。ES7 提案中，可以使用 static 定义一个静态属性。
+
+在 TypeScript 中，可以使用三种访问修饰符（Access Modifiers），分别是 public、private 和 protected：
+1. public 修饰的属性或方法是公有的，可以在任何地方被访问到，默认所有的属性和方法都是 public 的。
+2. private 修饰的属性或方法是私有的，不能在声明它的类的外部访问，即实例中无法访问，在子类中也无法访问。需要注意的是，TypeScript 编译之后的代码中，并没有限制 private 属性在外部的可访问性。**当构造函数修饰为 private 时，该类不允许被继承或实例化**。
+3. protected 修饰的属性或方法是受保护的，它和 private 类似，区别是它在子类中也是允许被访问的，即子类实例中也无法访问。protected修饰构造函数时，该类只允许继承。
+4. readonly指定一个类的属性为只读，然后在声明时或者构造函数中进行初始化。
+5. 修饰符 public、修饰符 private 和修饰符 protected 以及 readonly，还可以使用在构造函数参数中，等同于类中定义该属性同时给该属性赋值，使代码更简洁。只读属性关键字readonly，只允许出现在属性声明或索引签名或构造函数中。注意如果 readonly 和其他访问修饰符同时存在的话，需要写在其后面：
+
+```typescript
+class Animal {
+  // public readonly name: string
+  public constructor(public readonly name) {
+    // this.name = name;
+  }
+}
+```
+
+abstract 用于定义抽象类和其中的抽象方法。首先，抽象类是不允许被实例化的，否则会编译抛出错误。其次，抽象类中的抽象方法必须被子类实现，否则也会编译抛出错误。需要注意的是，即使TypeScript 的编译结果中，仍然会存在这个抽象类，但这个抽象类中没有抽象方法。
+
+类名可以作为类型注解（:TypeAnnotation），因为它既处于类型声明空间，也位于变量声明空间。然而，使用var/let/const 声明新变量赋值为已有类名，只是复制该类到变量声明空间，新变量不能再作为类型注解使用。正确的方式是使用 import 关键字，import NewClassName = ClassName。
+
+TypeScript（和 JavaScript）类只能严格的单继承。混合（mixins）是以基类作为输入和一个继承该基类的派生类作为输出的函数，实现多重继承：
+
+```typescript
+type Constructor<T = {}> = new (...args: any[]) => T;
+
+function Activatable<TBase extends Constructor>(Base: TBase) {
+  return class extends Base {
+    isActivated = false;
+    activate() {
+      this.isActivated = true;
+    }
+    deactivate() {
+      this.isActivated = false;
+    }
+  };
+}
+```
+
+### UML 类图
+
+**统一建模语言(Unified Modeling Language，UML)**是一种为面向对象系统的产品进行说明、可视化和编制文档的的一种标准语言，UML是面向对象设计的建模工具，独立于任何具体程序设计语言。
+
+类图表示类、接口和它们之间的协作关系。类的属性、操作中的可见性使用+、#、－分别表示 public、protected、private。static 静态属性和方法添加下划线表示。类之间的关系有：
+1. 关联（即A是B的属性，实线非心箭头指向A，线上可添加n:m表示数量对应关系），可细化为：
+    1. 聚合：整体A包含部分B，部分可以脱离整体而单独存在；空心菱形开始实线非心箭头指向B。
+    2. 组合：整体A包含部分B，部分不可以脱离整体；实心菱形开始实线非心箭头指向B。
+    3. 依赖：不是属性关系，而是函数参数B或返回值B。虚线非心箭头指向B。
+2. 泛化（即继承）：实线空闲箭头指向父类。
+3. 实现（即实现接口）：虚线空心箭头指向接口。
+
+UML类图中，单个类分为三个区域（类名、属性、方法）。对于接口，需要在类名前添加`<<Interface>>`，而且接口属性和方法放在同一区域。
+
+## 声明文件
+
+### 关于声明文件
+
+通常会把声明语句放到一个单独的文件（声明文件必需以 .d.ts 为后缀）中，这就是声明文件，也就是环境声明。当使用第三方库时需要引用它的声明文件，才能获得对应的代码补全、接口提示等功能。TypeScript会解析项目中所有的 *.ts 文件，当然也包含以 .d.ts 结尾的文件，前提根据tsconfig.json 中的 files、include 和 exclude 配置确保包含声明文件。通常是通过使用 @types 统一管理第三方库的声明文件。声明语句用于编译时的检查，在编译结果中会被删除。声明文件的类型可以直接使用而不需要手动导入。
+
+### 书写声明文件
+
+库的使用场景主要有：
+1. **全局变量：通过 `<script>` 标签或npm安装引入第三方库，注入全局变量**。使用全局变量的声明文件时，如果是以 npm install @types/xxx --save-dev 安装的，则不需要任何配置。如果是将声明文件直接存放于当前项目中，则建议和其他源码一起放到 src 目录下（或者对应的源码目录下）。需要注意的是，声明语句中只能定义类型，切勿在声明语句中定义具体的实现。声明语句用于编译时的检查，在编译结果中会被删除。全局变量的声明文件主要语法有：
+    1. declare var/let/const 声明全局变量，其中declare var与declare let没什么区别，而declare const 声明定义的全局变量是常量，通常全局变量都是禁止修改的常量，因此大部分情况使用的是declare const。
+    2. declare function 声明全局方法/函数的类型。在函数类型的声明语句中，支持函数重载。
+    3. declare class 声明全局类的类型。
+    4. declare enum 声明全局枚举类型，也称作外部枚举（Ambient Enums）。
+    5. declare namespace 声明（含有子属性的）全局对象。namespace 是TypeScript早期时为了解决模块化而创造的关键字，中文称为命名空间。由于历史遗留原因，在早期还没有 ES6 的时候，TypeScript提供了一种模块化方案，使用 module 关键字表示内部模块。但由于后来 ES6 也使用了 module 关键字，TypeScript 为了兼容 ES6，使用 namespace 替代了原来的 module，更名为命名空间。随着 ES6 的广泛应用，不建议再使用TypeScript中的 namespace模块化方案，而推荐使用 ES6 的模块化方案了。namespace 模块化方案被淘汰了，但是在声明文件中，declare namespace 还是比较常用的，它用来表示全局变量是一个对象，包含很多子属性。注意，在 declare namespace 内部，直接使用 function来声明函数，而不是使用 declare function。类似的，也直接使用 const, class, enum 等语句。如果对象拥有深层的层级，则需要用嵌套的 namespace 而不是declare namespace来声明深层的属性的类型。假如 declare namespace声明的全局对象下仅有一个属性prop，则可以不需要嵌套 namespace，而是直接 declare namespace globalObject.prop 内部去声明prop的子属性。
+    6. interface 和 type 声明全局类型。暴露在声明文件中最外层的 interface 或 type 会作为全局类型作用于整个项目中，应该尽可能的减少这种全局变量或全局类型的数量，而最好将它们放到declare namespace 下，而在使用时需要加上declare namespace声明的全局对象前缀。
+2. **npm 包：通过 import foo from 'foo' 导入，符合 ES6 模块规范**。在尝试给一个 npm 包创建声明文件之前，需要先看看它的声明文件是否已经存在。一般来说，npm 包的声明文件可能存在于两个地方：
+    1. 与该 npm 包绑定在一起。判断依据是 package.json 中有 types 字段，或者有一个 index.d.ts 声明文件。这种模式不需要额外安装其他包，是最为推荐的。
+    2. 发布到 @types 里。只需要尝试安装一下对应的 @types 包就知道是否存在该声明文件，安装命令是 `npm install @types/[some] --save-dev`。这种模式一般是由于 npm 包的维护者没有提供声明文件，所以只能由其他人将声明文件发布到 @types 里了。@types 支持全局和模块类型定义。@types支持全局和模块类型定义，全局即默认情况下，TypeScript 会自动包含支持全局使用的任何声明定义；模块指可以像import导入模块那样被使用。全局类型定义可通过编译选项 ’compilerOptions’: { ‘types’: [] } 进行配置，只允许使用types对应的 @types 包，即使安装其他声明文件，其他声明文件的全局变量也不会泄漏到项目代码中，直到将它们添加到types选项里。
+    
+    假如以上两种方式都没有找到对应的声明文件，那么就需要自己为它写声明文件了。由于是通过 import 语句导入的模块，所以声明文件存放的位置也有所约束，一般有两种方案：
+    1. 创建一个 `node_modules/@types/[some]/index.d.ts` 文件，存放对应模块的声明文件。这种方式不需要额外的配置，但是 node_modules 目录不稳定，代码也没有被保存到仓库中，无法回溯版本，有不小心被删除的风险，故不太建议用这种方案，一般只用作临时测试。
+    2. 创建一个 types 目录，专门用来管理自己写的声明文件，将对应模块的声明文件放到 `types/[some]/index.d.ts` 中。这种方式需要配置下 tsconfig.json 中的 paths 和 baseUrl 字段。如此配置后，通过 import 导入对应模块的时候，也会去 types 目录下寻找对应的模块的声明文件了。
+    
+    注意 module 配置可以有很多种选项，不同的选项会影响模块的导入导出模式。最常用的是 commonjs。不管采用了以上两种方式中的哪一种，都强烈建议将书写好的声明文件（通过给第三方库发 pull request，或者直接提交到 @types 里）发布到开源社区中。
+    
+    npm 包的声明文件主要有以下几种语法： 
+    1. **export 导出变量**。export 的语法与普通的 ts 中的语法类似，区别仅在于声明文件中禁止定义具体的实现。也可以使用 declare 先声明多个变量，最后再用 export 一次性导出，注意，与全局变量的声明文件类似，interface 前是不需要 declare 的。npm 包的声明文件与全局变量的声明文件有很大区别。在 npm 包的声明文件中，使用 declare 不再会声明一个全局变量，而只会在当前文件中声明一个局部变量。只有在声明文件中使用 export 导出，然后在使用方 import 导入后，才会应用到这些类型声明。
+    2. **export namespace 导出（含有子属性的）对象**。与 declare namespace 类似，export namespace 用来导出一个拥有子属性的对象。
+    3. **export default ES6 默认导出**。 在 ES6 模块系统中，使用 export default 可以导出一个默认值，使用方可以用 import some from 'some' 而不是 import { some } from 'some' 来导入这个默认值。在类型声明文件中，export default 用来导出默认值的类型。注意，只有 function、class 和 interface 可以直接默认导出，其他的变量需要先定义出来再默认导出。默认导出一般会将导出语句放在整个声明文件的最前面。
+    4. **export = commonjs 导出模块**。在 commonjs 规范中，用module.export 或export.some = some方式来导出一个模块。在 ts 中，针对这种模块导出，有多种方式可以导入，第一种方式是 const ... = require。第二种方式是 import ... from，注意针对整体导出module.export，需要使用 import * as 来导入。第三种方式是 import ... require，这也是 ts 官方推荐的方式。对于这种使用 commonjs 规范的库，假如要为它写类型声明文件的话，就需要使用到 **export =** 语法。使用了export =就不能再使用export 单个导出。export = 不仅可以用在声明文件中，也可以用在普通的 ts 文件中。实际上，import ... require 和 export = 都是 ts 为了兼容 AMD 规范和 commonjs 规范而创立的新语法。虽然由于很多第三方库是 commonjs 规范的，但相比与 export =，我们更推荐使用 ES6 标准的 export default 和 export。
+3. **UMD 库：既可以通过 `<script>` 标签引入，又可以通过 import 导入**。相比于 npm 包的类型声明文件，我们需要额外声明一个全局变量，ts 提供了一个新语法 export as namespace实现这种方式。一般使用 export as namespace 时，都是先有了 npm 包的声明文件，再基于它添加一条 export as namespace 语句，即可将声明好的一个变量声明为全局变量。export as namespace也可以与 export default 一起使用。
+4. **直接扩展全局变量：通过 `<script>` 标签引入后，改变一个全局变量的结构**。有的第三方库扩展了一个全局变量，可是此全局变量的类型却没有相应的更新过来，就会导致 ts 编译错误，此时就需要利用声明合并扩展全局变量的类型。
+5. **在 npm 包或 UMD 库中扩展全局变量：引用 npm 包或 UMD 库后，改变一个全局变量的结构**。对于一个 npm 包或者 UMD 库的声明文件，只有 export 导出的类型声明才能被导入。所以对于 npm 包或 UMD 库，如果导入此库之后会扩展全局变量，则需要使用 declare global语法在声明文件中扩展全局变量的类型。注意即使模块声明文件不需要导出任何东西，仍然需要导出一个空对象，用来告诉编译器这是一个模块的声明文件，而不是一个全局变量的声明文件。
+6. **模块插件：通过 `<script>` 或 import 导入后，改变另一个模块的结构**。有时通过 import 导入一个模块插件，可以改变另一个原有模块的结构。此时如果原有模块已经有了类型声明文件，而插件模块没有类型声明文件，就会导致类型不完整，缺少插件部分的类型。TypeScript提供declare module语法用来在模块插件的类型声明文件对原有模块的类型进行扩展。declare module 也可用于在一个文件中一次性声明多个模块的类型。
+
+一个声明文件有时会依赖另一个声明文件中的类型。除了可以在声明文件中通过 import 导入另一个声明文件中的类型之外，还可以使用**三斜线指令（`/// <reference  type=''或path=''/>`）**来导入另一个声明文件。三斜线指令也是 ts 在早期版本中为了描述模块之间的依赖关系而创造的语法。随着 ES6 的广泛应用，现在已经不建议再使用 ts 中的三斜线指令来声明普通模块之间的依赖关系了，而在声明文件中有用武之地。类似于声明文件中的 import，它可以用来导入另一个声明文件。与 import 的区别是，当且仅当在以下几个场景下才需要使用三斜线指令替代 import，在其他的一些不是必要使用三斜线指令的情况下，就都需要使用 import 来导入：
+1. 当书写一个全局变量的声明文件时；在全局变量的声明文件中，是不允许出现 import, export 关键字的，否则会被视为一个 npm 包或 UMD 库，就不再是全局变量的声明文件了。故书写一个全局变量的声明文件时，如果需要引用另一个库的类型，那么就必须用三斜线指令了。
+2. 当需要依赖一个全局变量的声明文件时。由于全局变量不支持通过 import 导入，当然也就必须使用三斜线指令来引入。
+
+注意，三斜线指令必须放在文件的最顶端，三斜线指令的前面只允许出现单行或多行注释。当全局变量的声明文件太大时，可以通过拆分为多个文件，然后在一个入口文件中将它们一一引入，来提高代码的可维护性。types 和 path 是三斜线指令中两种不同的指令。它们的区别是：types 用于声明对另一个库的依赖，而 path 用于声明对另一个文件的依赖。
+
+**自动生成声明文件：如果库的源码本身就是由 ts 写的，那么在使用 tsc 脚本将 ts 编译为 js 的时候，在tsconfig.json中添加 declaration 选项为true，就可以自动生成 .d.ts 声明文件到lib**。使用 tsc 自动生成声明文件时，每个 ts 文件都会对应一个 .d.ts 声明文件。这样的好处是，使用方不仅可以在使用 import some from 'some' 导入默认的模块some时获得类型提示，还可以在使用 import other from 'some/lib/other' 导入一个子模块other时，也获得对应的类型提示。除了 declaration 选项之外的与自动生成声明文件有关的选项有：
+1. declarationDir 设置生成 .d.ts 文件的目录；
+2. declarationMap 对每个 .d.ts 文件，都生成对应的 .d.ts.map（sourcemap）文件；
+3. emitDeclarationOnly 仅生成 .d.ts 文件，不生成 .js 文件。
+
+### 发布声明文件
+
+发布声明文件有两种方案：
+1. 将声明文件和源码放在一起。如果声明文件是通过 tsc 自动生成的，那么无需做任何其他配置，只需要把编译好的文件也发布到 npm 上，使用方就可以获取到类型提示了。如果是手动写的声明文件，那么按以下优先级满足其中一个条件才能被正确的识别（有的库为了支持导入子模块，就需要额外再编写一个类型声明文件）：
+    1. 给 package.json 中的 types 或 typings 字段指定一个类型声明文件地址；
+    2. 在项目根目录下，编写一个 index.d.ts 文件；
+    3. 针对入口文件（package.json 中的 main 字段指定的入口文件），编写一个同名不同后缀的 .d.ts 文件；
+2. 将声明文件发布到 @types 下。与普通的 npm 模块不同，@types 是统一由 DefinitelyTyped 管理的。要将声明文件发布到 @types 下，就需要给 DefinitelyTyped 创建一个 pull-request，其中包含了类型声明文件，测试代码，以及 tsconfig.json 等。pull-request 需要符合它们的规范，并且通过测试，才能被合并，稍后就会被自动发布到 @types 下。
+
+优先选择第一种方案。保持声明文件与源码在一起，使用时就不需要额外增加单独的声明文件库的依赖了，而且也能保证声明文件的版本与源码的版本保持一致。仅当在给别人的仓库添加类型声明文件，但原作者不愿意合并 pull request 时，才需要使用第二种方案，将声明文件发布到 @types 下。
+

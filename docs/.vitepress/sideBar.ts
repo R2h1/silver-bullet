@@ -31,7 +31,8 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
   },
   {
     text: 'typescript',
-    link: '/front-end/typescript/index'
+    link: '/front-end/typescript/index',
+    items: []
   },
   {
     text: '设计模式',
