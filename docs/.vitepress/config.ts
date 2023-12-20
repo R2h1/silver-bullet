@@ -44,6 +44,7 @@ export default defineConfig({
     outline: [1, 4],
     nav: [
       { text: '计算机基础', link: '/basics/data-structures-algorithms/index' },
+      { text: "前端基础", link: 'front-end/basics/index'},
       { text: '前端工程化', link: '/front-end/engineering/index' }
     ],
     sidebar,

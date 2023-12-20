@@ -30,6 +30,24 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     ]
   },
   {
+    text: '前端基础',
+    link: '/front-end/basics/index',
+    items: [
+      {
+        text: 'html',
+        link: '/front-end/basics/html/index',
+      },
+      {
+        text: 'css',
+        link: '/front-end/basics/css/index',
+      },
+      {
+        text: 'javascript',
+        link: '/front-end/basics/javascript/index',
+      },
+    ]
+  },
+  {
     text: 'typescript',
     link: '/front-end/typescript/index',
     items: []
@@ -75,7 +93,8 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     link: '/front-end/engineering/index',
     collapsed: true,
     items: [
-      { text: 'Git', link: '/front-end/engineering/git' },
+      { text: 'git', link: '/front-end/engineering/git' },
+      { text: 'webpack', link: '/front-end/engineering/webpack' },
       { text: 'babel', link: '/front-end/engineering/babel' },
       { text: 'eslint', link: '/front-end/engineering/eslint' },
       { text: 'esbuild', link: '/front-end/engineering/esbuild' },
