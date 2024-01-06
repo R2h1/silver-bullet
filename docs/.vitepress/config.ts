@@ -45,7 +45,8 @@ export default defineConfig({
     nav: [
       { text: '计算机基础', link: '/basics/data-structures-algorithms/index' },
       { text: "前端基础", link: 'front-end/basics/index'},
-      { text: '前端工程化', link: '/front-end/engineering/index' }
+      { text: '前端工程化', link: '/front-end/engineering/index' },
+      { text: '超级大乐透生成器', link: '/front-end/superlotto'}
     ],
     sidebar,
     socialLinks: [
