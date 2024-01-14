@@ -10,21 +10,28 @@ function update() {
 # 超级大乐透生成器
 
 <div :class="$style.result">
-  <div :class="$style.frontArea">
+  <div>
+    <h4>前区：</h4>
+    <div  :class="$style.frontArea">
       <div :class="$style.front" v-for="item in result[0]">{{item}}</div>
+    </div>
   </div>
-  <div :class="$style.back" v-for="item in result[1]">{{item}}</div>  
-
+  <div>
+    <h4>后区：</h4>
+    <div  :class="$style.backArea">
+      <div :class="$style.back" v-for="item in result[1]">{{item}}</div> 
+    </div>
+  </div>
 </div>
-
 <button :class="$style.button" @click="update">随机生成一注</button>
 
 <style module>
 
 .result {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   margin: 50px 0 30px 0;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
@@ -41,10 +48,12 @@ function update() {
   cursor: pointer;
 }
 
-.frontArea {
-  display: inline-flex;
+.frontArea,
+.backArea {
+  display: flex;
   align-items: center;
   gap: 15px;
+  margin-top: 20px;
   margin-right: 30px;
 }
 
