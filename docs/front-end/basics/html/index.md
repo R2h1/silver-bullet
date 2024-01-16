@@ -155,7 +155,7 @@ link：html标签，用于导入外部css文件，还可定义RSS和rel连接属
 
 ## 离线存储
 
-允许用户离线时通过缓存的资源展示页面。
+**允许用户离线时通过缓存的资源展示页面**。
 
 在文档的 `<html>` 标签中包含 manifest 属性manifest=".appcache"或者在 manifest 文件中直接指定该页面或者离线时操作window.applicationCache进行实现
 
@@ -168,3 +168,44 @@ manifest 文件的建议的文件扩展名是：".appcache"。并且在 web 服�
 ![](../../../public/front-end/basics/html/1.png)
 
 其中，CACHRE MANIFEST表示需缓存的资源（必须有）；ETWORK表示永远不会被缓存的资源（可选）；FALLBACK表示页面无法访问时的回退页面（可选/html5/ 目录中的所有文件回退为"offline.html"）。
+
+## XML
+
+XML（可扩展标记语言，Extensible Markup Language）是由 W3C 指定的一种通用标记语言。XML 是数据描述性语言，因此Web 服务可以利用 XML 去交换请求和响应。
+
+XML 标签类似 HTML 标签，但由于 XML 允许用户定义自己的标签，所以 XML 更加灵活。XML被设计为传输和存储数据，HTML被设计用来显示数据。
+
+```html
+<!-- XML -->
+<sites>
+  <site>
+    <name>谷歌</name> <url>www.google.com</url>
+  </site>
+  <site>
+    <name>微博</name> <url>www.weibo.com</url>
+  </site>
+</sites>
+<!-- JSON
+{
+  "sites": [
+    { "name": "谷歌", "url": "www.google.com" },
+    { "name": "微博", "url": "www.weibo.com" },
+  ]
+}
+-->
+```
+
+JSON 和 XML 都用于接收 web 服务端的数据。针对 AJAX 应用，JSON 比 XML 数据加载更快，而且更简单，XML 需要使用 XML 解析器解析XML文档，JSON 可以使用标准的 JavaScript 函数（JSON.parse()和JSON.stringify()）来解析。
+
+## 中英文换行问题
+
+1. 浏览器默认是不认识中文字符，将一个字当成一个字符，加上下一个字超出当前行宽则该下一个字换行显式。
+2. 而对于英文，默认将一个连续的多个字母的英文串当作一个单词，即使超过当前行宽也不换行。
+
+## 国际化、本地化、全球化
+
+**国际化**：internationalization，因首尾字母间有 18 个字母，简称为 i18n；指的是将软件与特定语言及地区脱钩的过程。当软件被移植到不同的语言及地区时，软件本身不用做内部工程上的改变或修正。
+
+**本地化**：localization，由于同样的原因被简称为 l10n；是指为特定区域翻译文件，并为了使软件能在该特定语言环境或地区使用，而应用特殊布局、加入本地特殊化部件等的过程。
+
+**全球化**：globalization，有时会用来表示以上两者的合称；也会简称为 g11n。
