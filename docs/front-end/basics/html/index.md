@@ -289,3 +289,95 @@ if (startPlayPromise !== undefined) {
 ```
 
 要检测浏览器是否需要用户交互才能播放音频，需在创建音频上下文后检查 AudioContext.state。如果允许播放，则AudioContext.state为“running”。否则AudioContext.state为suspended。如果监听 statechange 事件，则可以异步检测AudioContext.state的更改。
+
+
+## HTML 元素
+
+HTML 元素通过“标签”（tag）将文本从文档中引出，标签由在“<”和“>”中包裹的元素名组成，HTML 标签里的元素名不区分大小写。习惯上与实践上都推荐将标签名全部小写。
+
+### 内容分类
+
+每一个 HTML 元素都必须遵循定义了它可以包含哪一类内容的规则。这些规则被归类为几个常见的元素内容模型（content model）。大多数 HTML 元素都属于一个或多个内容类别--这些类别将具有共同特征的元素组合在一起。这是一种松散的分组（实际上并没有在这些类别的元素之间建立关系），但它们有助于定义和描述这些类别的共同行为及其相关规则，尤其是当你遇到它们错综复杂的细节时。元素也有可能不属于任何类别。以下是三种类型的内容分类：
+1. 主内容类：描述了很多元素共享的内容规范；
+    1. 元数据内容（Metadata content）：元素（`<base>、<link>、<meta>、<noscript>、<script>、<style>` 和 `<title>`）可以修改文档其余部分的呈现或行为，建立与其他文档的链接，或者传达其他外带信息。
+    2. 流式内容（Flow content）：大多数可以包含在`<body>`元素之内的元素（`<address>、<bdi>、<blockquote>、<data>、<del>、<details>、<div>、<dl>、<figure>、<footer>、<header>、<hr>、<ins>、<main>、<map>、<menu>、<ol>、<p>、<pre>、<s>、<table>、<template>、<u>、<ul>`和以下子集）。
+        1. 标题内容（Heading content）：（`<h1> 、<h2>、<h3>、<h4>、<h5>、<h6>`）是流式内容的子集，可在任何可以使用流式内容的地方出现，它定义了分段的标题，而这个分段可能由一个明确的分段内容元素直接标记，也可能由标题本身隐式地定义。
+        2. 分段内容（Sectioning content）：是流式内容的子集，可在任何可以使用流式内容的地方出现。属于分段内容模型的元素（`<article>、<aside>、<nav>` 和 `<section>`）创建了一个当前大纲中的分段，它定义了 `<header>` 元素、`<footer>` 元素和标题内容的范围。
+        3. 短语内容（Phrasing content）：（`<abbr>、<audio>、<b>、<bdo>、<br>、<button>、<canvas>、<cite>、<code>、<datalist>、<dfn>、<em>、<embed>、<i>、<iframe>、<img>、<input>、<kbd>、<label>、<mark>、<math>、<meter>、<noscript>、<object>、<output>、<progress>、<q>、<ruby>、<samp>、<script>、<select>、<small>、<span>、<strong>、<sub>、<sup>、<svg>、<textarea>、<time>、<var>、<video>、<wbr>` 、文本节点（但不包括那些只由空白字符组成的节点）、`<a>`仅包含短语内容时、`<area>`为 `<map>` 元素的子元素时、`<del>`仅包含短语内容时、`<ins>`仅包含短语内容时、`<link>`仅限于 itemprop 属性存在的情形、`<map>`仅包含短语内容时和`<meta>`仅限于 itemprop 属性存在的情形）流式内容的子集，定义了文本和它包含的标记，且可以在任何可以使用流式内容的地方出现。
+        4. 嵌入内容（Embedded content）：（`<audio>、<canvas>、<embed>、<iframe>、<img>、<math>、<object>、<picture>、<svg>` 和 `<video>`）是流式内容的子集，它将来自另一种标记语言或命名空间的内容插入到文档中，且可以在任何可以使用流式内容的地方出现。
+        5. 交互式内容（Interactive content）：（`<a>、<button>、<details>、<embed>、<iframe>、<label>、<select> 、<textarea>、<audio>`若controls 属性存在、`<img>`若 usemap 属性存在、`<input>`若 type 属性不处于隐藏（hidden）状态、`<object>`，若 usemap 属性存在和`<video>`若 controls 属性存在）是流式内容的子集，包含为用户交互而特别设计的元素，且可以在任何可以使用流式内容的地方出现。
+        6. 与表单相关的内容（Form-associated content）：（`<button>、<fieldset>、<input>、<label>、<meter>、<object>、<output>、<progress>、<select>`和`<textarea>`）是流式内容的子集，包括存在表单所有者的元素，通过 form 属性指定表单所有者id。可以在预期有流式内容的地方使用。其子类：
+            1. 可列举的元素（listed）：在 form.elements 和 fieldset.elements 集合中列举出的元素（`<button>、<fieldset>、<input>、<object>、<output>、<select>` 和 `<textarea>`）。
+            2. 可标记的元素（labelable）：和 `<label>` 相关联的元素（ `<button>、<input>、<meter>、<output>、<progress>、<select>` 和 `<textarea>`）。
+            3. 可提交的元素（submittable）：包括当表单提交时可以用来组成表单数据的元素（`<button>、<input>、<object>、<select>` 和 `<textarea>`）。
+            4. 可重置的元素（resettable）：当表单重置时会被重置的元素（ `<input>、<output>、<select> 和 <textarea>`）。
+2. 表单相关的内容类：描述了表单相关元素共有的内容规范。
+3. 特殊内容类：描述了仅仅在某些特殊元素上才需要遵守的内容规范，通常这些元素都有特殊的上下文关系。
+    1. 透明内容模型（Transparent content model）：如果元素（`<del>` 和 `<ins>` ）拥有透明内容模型（Transparent content model），即使将透明内容移除并使用子元素取代，其内容也必须由合法的 HTML5 元素组成。
+    2. 支持脚本的元素（Script-supporting elements）：（`<script>`和`<template>`）不会直接渲染输出在页面文档中。相反，它们的作用是支持脚本，或者直接包含或指定脚本代码，或者指定将被脚本使用的数据。
+
+![](../../../public/front-end/basics/html/3.png)
+
+### 属性分类
+
+HTML 中的元素拥有属性（attribute）；这些额外的值可以配置元素或者以各种方式来调整元素的行为，进而满足用户所需的标准。
+
+在 HTML 中，大多数属性都有两个方面：**内容属性**和 **IDL**（**Interface Definition Language或Interface Description Language，接口定义语言或接口描述语言**）**属性**。
+
+**内容属性**：内容属性需要在内容（HTML 代码）中设置。内容属性总是字符串，即使值是整数。可以通过element.setAttribute()或element.getAttribute()来设置或获取。
+
+**IDL属性**：即JavaScript 属性（property）。当需要获取 IDL 属性的值时，IDL 属性总会使用隐含的内容属性的值（可能先经过转换）来返回值。同样地，当设置值时会保存在内容属性中。即IDL 属性本质上反映了内容属性。大多数时候，IDL 属性会返回元素实际使用的值，例如JavaScript设置 inputElement.type="foobar"，内容属性的值（element.getAttribute()）是“foobar”，但`<input>`元素在外观上和表现上会是默认的文本类型，因此IDL属性依旧返回”text”。IDL 属性并不总是字符串，读取或设置值的类型都是要求的类型，如果传入别的类型，可能会根据标准 JavaScript 的类型转换规则被转换为数字。大多数时候，属性的 IDL 属性与对应的内容属性如何关联会遵守规范中列出的规则，但有时并不遵守，具体需要阅读规范。
+
+**布尔属性**：内容属性，如 required、readonly、disabled，如果属性存在，则其值为真（true），如果不存在，其值为假（false）。HTML 定义了布尔属性允许的取值：如果属性存在，其值必须是一个空字符串（或未给该属性赋值），或者是一个大小写无关的 ASCII 字符串，该字符串与属性名严格相同，前后都没有空格。切记，布尔值属性不能取值为 "true" 和 "false"。如果需要表示假值，布尔值属性需要整个忽略不写。
+
+**事件处理器属性**：所有事件处理器属性，如onclick、onkeypress、onfocus，都接受字符串值。字符串将用于合成 JavaScript 函数：”function name(/*args*/) {body}”，其中，name 为属性名，body 为属性值。处理器接收与其 JavaScript 事件处理器对应项相同的参数——大多数处理器只接收一个 event 参数，而 onerror 接收五个参数：event、source、lineno、colno、error。不建议使用事件处理器属性。将 HTML 和 JavaScript 代码混合在一起通常会产生难以维护的代码，而且事件处理器属性的执行也可能会被内容安全策略阻止。
+
+#### src 属性和href属性
+
+href（超文本引用）：用于`<a>`和`<link>`，用于指向资源地址（建立当前html与资源的联系），`<link>`中的href并行下载资源（css）并且阻塞当前文档的处理
+Src（source来源）：用于`<img>`，`<script>`，`<iframe>`中替换html页面内容，下载资源时会**阻塞**当前文档的处理。
+
+#### data-*属性
+
+data-* 全局属性是一类被称为自定义数据属性的属性，它赋予我们在所有 HTML 元素上语义化地嵌入自定义数据属性的能力，并可以通过脚本在 HTML 与 DOM 表现之间进行专有数据的交换。
+
+所有这些自定义数据属性都可以通过所属元素的 HTMLElement.dataset 来访问，dataset是字符串映射DOMStringMap，其本身不能被修改，设置属性时，它的值总是转化为一个字符串，移除一个属性可以使用delete操作符。*具有以下限制：
+1. 该名称不能以xml开头，无论这些字母是大写还是小写；
+2. 该名称不能包含任何分号 (U+003A)；
+3. 该名称不能包含 A 至 Z 的大写字母。
+
+并且自定义数据属性中的任何破折号 (U+002D) 都会被下个字母的大写替代 (驼峰拼写)。
+
+#### script元素的属性defer和async
+
+HTML解析过程中，遇到脚本script默认会停止解析HTML和渲染DOM（阻塞）等待脚本加载执行完毕再继续解析HTML和渲染DOM，因此导致脚本无法访问下方DOM和可能长时间阻塞页面，通常建议放在body的底部。
+
+这样的解决方案，对于长HTML造成脚本的操作会具有明显的延迟，script提供两个属性defer和async更好解决阻塞问题。
+
+**共同点**是两者都不会阻塞解析HTML和渲染DOM（‘后台’下载），在load事件之前执行完毕。
+
+**defer**：即延迟执行，等待解析HTML和渲染DOM完毕，并在DOMContentLoaded之前，才开始执行（多个defer脚本按顺序执行）。**如果`<script>`元素type为module，则默认为defer**。
+
+**async**: 即异步执行，加载完（下载）即执行，不限制是否在DOMContentLoaded之前或之后执行。多个async脚本先加载完的先执行（**加载优先规则**）。**页面中的DOM可能会先于异步脚本显示，因此建议不要在异步脚本执行期间修改DOM**。
+
+通过Javasciprt可动态添加script脚本，动态脚本默认async = true。
+实际开发中，defer可 用于需要整个 DOM 的脚本，以及脚本的相对执行顺序很重要的时候。**async 可用于独立脚本（第三方脚本）**，例如计数器或广告，这些脚本的相对执行顺序不重要。
+
+`<noscript>`标签规定浏览器不支持脚本或禁用脚本时的替代显示内容。
+
+#### rel属性的值：prefetch与 preload
+
+关键字 prefetch 作为元素 `<link>` 的属性 rel 的值，是为了提示浏览器，用户**未来的浏览（其他页面）**有可能需要加载目标资源，所以浏览器在空闲时通过事先获取和缓存对应资源，优化用户体验。
+
+关键字 preload 作为元素 `<link>` 的属性 rel 的值，表示用户十分有可能需要在**当前浏览（当前页面）**中加载目标资源，所以浏览器必须预先获取和缓存对应资源。
+
+#### rel属性的值：dns-prefetch
+
+dns-prefetch (DNS预获取) 是尝试在请求资源之前解析域名。当浏览器从（第三方）服务器请求资源时，必须先将该跨域域名解析为 IP 地址，然后浏览器才能发出请求。此过程称为 DNS 解析。DNS解析会导致请求增加明显的延迟，此延迟可能会大大降低加载性能，尤其是对于对于打开许多跨域域许的网站。
+
+dns-prefetch 可帮助开发人员减少跨域域上的DNS 解析延迟。HTML `<link>`元素 通过 dns-prefetch的rel属性值提供此功能。然后在 href 属性中指要跨域的域名（`<link rel="dns-prefetch" href="https://some.example.com/">`）。每当站点引用跨域域上的资源时，都应在`<head>`元素中放置dns-prefetch。
+
+最佳实践：
+1. 首先，dns-prefetch 仅对跨域域上的 DNS 查找有效，因此请避免使用它来指向您的站点或域。这是因为，到浏览器看到提示时，您站点域背后的 IP 已经被解析。
+2. 其次，还可以通过使用 HTTP 链接字段（即Link）将 dns-prefetch（以及其他资源提示）指定为 HTTP 标头。
+3. 结合preconnect使用。即`<link rel="preconnect" href="https://impartant.com/" crossorigin> <link rel="dns-prefetch" href="https://example1.com/">`。其中，dns-prefetch 仅执行 DNS 查找，但preconnect 会建立与服务器的连接（）。如果站点是通过 HTTPS 服务的，则此过程包括 DNS 解析，建立 TCP 连接以及执行 TLS 握手。将两者结合起来可提供进一步减少跨域请求的感知延迟的机会。但是如果页面需要建立与许多第三方域的连接，则preconnect 会适得其反。preconnect最好仅用于最关键的连接。对于其他的，使用dns-prefetch。
