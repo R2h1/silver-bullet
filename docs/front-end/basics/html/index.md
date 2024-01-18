@@ -209,3 +209,83 @@ JSON 和 XML 都用于接收 web 服务端的数据。针对 AJAX 应用，JSON 
 **本地化**：localization，由于同样的原因被简称为 l10n；是指为特定区域翻译文件，并为了使软件能在该特定语言环境或地区使用，而应用特殊布局、加入本地特殊化部件等的过程。
 
 **全球化**：globalization，有时会用来表示以上两者的合称；也会简称为 g11n。
+
+## 自动播放
+
+Web浏览器正在转向更严格的自动播放策略，以改善用户体验、最大限度地减少安装广告拦截器的动机，并减少昂贵或受限网络上的数据消耗，这些更改旨在为用户提供更好的播放控制权，并使拥有合法用例的发布商受益。
+
+Chrome 66 中针对audio和video元素推出了自动播放策略，可有效阻止 Chrome 中大约一半不需要的媒体自动播放。对于Web Audio API，Chrome 71 中推出了自动播放策略。这会影响网页游戏、部分WebRTC应用程序以及其他使用音频功能的网页。
+
+**Chrome 的自动播放策略**：
+1. 始终允许静音自动播放。
+2. 在以下情况下允许自动播放声音：
+    1. 用户已与域进行交互（单击、点击等）。
+    2. 在桌面上，用户的**媒体参与度**阈值已被突破，这意味着用户之前播放过有声视频。
+    3. 用户已将该网站添加到移动设备的主屏幕或在桌面设备上安装了**PWA**。
+3. 顶部框架可以将**自动播放权限委托**给其 iframe，以允许自动播放声音。
+
+**媒体参与度** (**MEI，Media Engagement Index**) 衡量个人在网站上消费媒体的倾向。Chrome 的方法是计算每个来源的重要媒体播放事件的访问比率：
+1. 媒体（音频/视频）的消耗必须大于七秒。
+2. 音频必须存在且未静音。
+3. 包含视频的选项卡处于活动状态。
+4. 视频大小（以像素为单位）必须大于200x140。
+
+据此，Chrome 会计算出媒体参与度得分，该得分在定期播放媒体的网站上最高。当它足够高时，允许媒体仅在桌面上自动播放。用户的 MEI 可在about://media-engagement内部页面获取。
+
+![](../../../public/front-end/basics/html/2.png)
+
+对于开发者而言，可以通过以下手段在本地更改 Chrome 自动播放政策行为，以测试网站的不同级别的用户参与度：
+1. 可以使用命令行标志：chrome.exe --autoplay-policy=no-user-gesture-required 完全禁用自动播放策略。这就好像用户与网站强烈互动一样，而始终允许自动播放。
+2. 还可以使用命令行标志：chrome.exe --disable-features=PreloadMediaEngagementData, MediaEngagementBypassAutoplayPolicies决定通过禁用 MEI 来确保永远不允许自动播放，以及是否让 MEI 总值最高的网站默认为新用户自动播放。
+
+HTTP Permissions-Policy 标头autoplay指令（Permissions-Policy: autoplay `<allowlist>`;其中 `<allowlist>` 使用分号分隔，在chrome上默认值’self’表示仅允许当前文档同源的autoplay，’none’则是完全禁止 autoplay）控制当前文档是否允许自动播放通过 HTMLMediaElement接口请求的媒体。启用该策略后，如果没有用户交互，HTMLMediaElement.play() 返回的 Promise 将出现 DOMException 异常。`<audio>` 和 `<video>` 元素上的自动播放属性将被忽略。
+
+permissions policy 允许开发人员有选择地启用和禁用浏览器功能和API。一旦源收到自动播放权限，它就可以将该权限委托给具有autoplay permissions policy的跨源 iframe 。请注意，默认情况下，同源 iframe 上允许自动播放。
+
+iframe 委托：
+```html
+<!-- autoPlay is allowed -->
+<iframe src="https://cross-origin.com/myvideo.html" allow="autoplay">
+
+<!-- autoPlaya and fullscreen are allowed -->
+<iframe src="https://cross-origin.com/myvideo.html" allow="autoplay: fullscreen">
+```
+
+如果禁用了自动播放的权限策略，在没有用户手势的情况下调用 play() 会出现 NotAllowedError 的DOMException 异常，从而promise被拒绝。autoplay属性也将被忽略。
+
+**最佳实践一**：不要假设视频会播放，也不要在视频实际未播放时显示暂停按钮。而且应该始终查看播放函数返回的 Promise，以确定它是否被拒绝：
+
+```javascript
+const video = document.querySelector('video');
+const startPlayPromise = video.play();
+
+if (startPlayPromise !== undefined) {
+  startPlayPromise.then(_ => {
+    // 仅在播放开始后才开始执行需要执行的操作
+  }).catch(error => {
+    // 自动播放被阻止
+    if (error.name === 'NotAllowedError') { // 显示 "播放" 按钮以便用户可以开始播放
+      showPlay
+    } else {
+      // 其他 error
+    }
+  })
+}
+```
+
+首先需确保play()返回的不是undefined，因为在IE上，play()没有返回值。
+
+**最佳实践二**：使用静音自动播放并让用户自主选择取消静音
+
+```html
+<video id="video" muted atuoplay>
+<button id="unmuteButton"></button>
+
+<script>
+  ummuteButton.addEventListener('click', function() {
+    video.muted = false;
+  });
+</script>
+```
+
+要检测浏览器是否需要用户交互才能播放音频，需在创建音频上下文后检查 AudioContext.state。如果允许播放，则AudioContext.state为“running”。否则AudioContext.state为suspended。如果监听 statechange 事件，则可以异步检测AudioContext.state的更改。
