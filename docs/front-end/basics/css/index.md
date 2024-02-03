@@ -797,7 +797,7 @@ y = (1−t)^2 * y1 + 2(1−t)ty2 + t^2 * y3
 2. 解决闪动问题，使用3D属性perspective、backface-visibility、translate3d(0,0,0)
 3. 缺点适合简单动画，JavaScript动画更灵活实现任何动画逻辑
 
-### animation（帧动画）
+### animation（帧动画，CSS3）
 
 一个关键帧动画由animation属性设置，可以指定一组或多组动画，每组之间用逗号相隔，animation 属性是以下属性的简写：
 1. animation-name关键字动画名称由@keyframes指定。需同时配置 animation-duration 属性，否则时长为 0，动画不会播放。
@@ -1129,3 +1129,38 @@ Houdini 是一组底层 API，它们公开了 CSS 引擎的各个部分，从而
 
 ### CSS 属性和值 API
 CSS 属性和值 API允许开发者显式地定义它们的 **CSS 自定义属性**（值使用var() 函数访问），允许设置属性类型检查、默认值以及是否可继承其值。
+
+## 几何图形绘制
+
+## 布局
+
+### 居中布局
+
+水平且垂直居中只需要将同时满足水平居中和垂直居中即可。
+
+#### 水平居中
+
+1. 行内级元素（inline， inline-block， inline-flex， inline-table）和文本在设置 text-align；center的非inline元素内水平居中。
+2. 设置 margin-left：auto；margin-right：auto；的固定宽度的块级元素，在父容器内水平居中。
+3. 设置 position：absolute; left：0; right：0；margin-left：auto；margin-right：auto的固定宽度块级元素，在 position：relative 的父容器内水平居中。
+4. 单个 flex 项在设置 justify-content：center；的 flex 容器内水平居中。
+5. 设置 margin-left：auto；margin-right：auto 的flex 项在 flex 容器内水平居中。
+6. 设置 position：absolute；left： 50%；margin-left：-0.5 * width；的固定宽度块级元素，在position：relative；的父容器内水平居中。
+7. 设置 position：absolute； left：50%；transform：translateX（-50%）；的块级元素，在position：relative；的父容器内水平居中。
+8. 设置margin-left：auto；margin-right：auto；的grid 项在网格区域内水平居中。
+9. grid项在设置为 justify-items：center；的 grid 容器的网格区域内水平居中。
+10. 设置 justify-self：center；的grid 项 在网格区域内水平居中。
+
+#### 垂直居中
+
+1. 单行文本或行内级元素在设置 line-height：height；的固定高度块级元素内垂直居中。
+2. 设置position；absolute；top：50%；margin-top：-0.5 * height；的固定高度块级元素在设置position：relative的父元素内垂直居中。
+3. 单行 flex 项在设置 align-items：center 的flex 容器内垂直居中。
+4. 设置 margin-top：auto；margin-bottom：auto；的单行 flex 项在 flex 容器内垂直居中。
+5. 设置 position：absolute；top：50%；transform：translateY（-50%）；的块级元素在设置position：relative；的父元素内垂直居中。
+6. 设置 display：table-cell；vertical-align：middLe的元素在设置 display：table 的父元素内垂直居中。
+7. 设置 position：absolute；top：0；bottom：0；margin-top：auto；margin-bottom；auto的固定高度块级元素在设置position：relative的父元素内垂直居中。
+8. 设置vertical-align：middle的行内级元素与高度100%，宽度为0的伪元素对齐，在父元素内垂直居中。
+9. 设置vertical-align：middle的行内级元素在设置 line-height：height；font-size：0；的父元素内垂直居中。
+10. 设置 margin-top：auto；margin-bottom：auto；的 grid 项在网格区域内垂直居中
+11. grid项在设置align-items：center的网格区域内垂直 。
