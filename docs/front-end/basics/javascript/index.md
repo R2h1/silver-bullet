@@ -428,21 +428,35 @@ JS是⼀⻔单线程的语⾔，这是因为它运⾏在浏览器的渲染主线
 
 创建函数的方式包括函数声明、函数表达式（包括立即执行函数表达式）、箭头函数表达式（参考3.7.9箭头函数）、Function构造函数（参考3.7.8 闭包首图）、函数生成器表达式、函数生成器声明、GeneratorFunction构造函数（与Function构造函数类似，字符串作为函数体会阻止一些JS引擎优化和存在安全问题）。
 
-函数声明：
+**函数声明**：
 
-函数表达式：
+![](../../../public/front-end/basics/javascript/12.png)
 
-函数生成器声明（生成器实现机制（即如何让函数暂停和恢复）是协程，一个线程可以存在多个协程（函数可以看做一个协程），协程被程序自定义所控制，而不受操作系统的管理，并不会像线程切换那样消耗资源。单个线程同一时刻只能一个协程（即获得线程控制权）运行）：
 
-函数生成器表达式声明：
+**函数表达式**：
+
+![](../../../public/front-end/basics/javascript/13.png)
+
+
+**函数生成器声明**（生成器实现机制（即如何让函数暂停和恢复）是**协程**，一个线程可以存在多个协程（函数可以看做一个协程），**协程被程序自定义所控制，而不受操作系统的管理**，并不会像线程切换那样消耗资源。**单个线程同一时刻只能一个协程（即获得线程控制权）运行）**：
+
+![](../../../public/front-end/basics/javascript/14.png)
+
+
+**函数生成器表达式声明**：
+
+![](../../../public/front-end/basics/javascript/15.png)
+
 
 ### 函数参数
 
-调用函数时，传递给函数的值被称为函数的实参（值传递，即“原始值”传递的是值的拷贝，“引用值”传递的是指向引用对象的地址），对应位置的函数参数名叫作形参。函数的参数默认是undefined。严格模式下不允许出现同名参数。
+调用函数时，传递给函数的值被称为函数的**实参（值传递，即“原始值”传递的是值的拷贝，“引用值”传递的是指向引用对象的地址）**，对应位置的函数参数名叫作形参。函数的参数默认是undefined。严格模式下不允许出现同名参数。
 
-默认参数（ES6）允许在没有值或undefined被传入时使用默认形参。前面的参数可用于后面的默认参数被访问，但前面的默认参数表达式不能访问后面的（包括函数体内），可以叫做默认参数的暂时性死区（TDZ）。默认参数的位置不存在限制，但建议放在所有非默认参数后面。默认参数支持解构赋值（参考解构赋值）。
+**默认参数（ES6）**允许在没有值或undefined被传入时使用默认形参。前面的参数可用于后面的默认参数被访问，但前面的默认参数表达式不能访问后面的（包括函数体内），可以叫做默认参数的暂时性死区（TDZ）。默认参数的位置不存在限制，但建议放在所有非默认参数后面。默认参数支持解构赋值（参考解构赋值）。
 
-剩余参数（ES6）允许将一个不定数量的参数表示为一个真数组。
+**剩余参数（ES6）**允许将一个不定数量的参数表示为一个真数组。
+
+![](../../../public/front-end/basics/javascript/16.png)
 
 JavaScript 函数不能像传统意义上那样实现重载。而在其他语言中，可以为一个函数编写两个定义，只要这两个定义的签名（接受的参数的类型和数量）不同即可。
 JavaScript 函数没有签名，因为其参数是由包含零个或多个值的数组来表示的。而没有函数签名，真正的重载是不可能做到的。只能通过检查传入函数中参数的类型和数量（实现方式有arguments或剩余参数）并作出不同的反应，来模仿方法的重载。
@@ -450,6 +464,8 @@ JavaScript 函数没有签名，因为其参数是由包含零个或多个值的
 ### arguments
 
 arguments对象是所有（非箭头）函数中都可用的局部变量， 是一个对应于传递给函数的参数即实参的类数组对象，实现有Symbol.iterator方法，是一个可迭代对象。“类数组”意味着 arguments 有length属性并且属性的索引是从零开始的，但是它没有 Array的内置方法。将arguments转化为真数组的方式：
+
+![](../../../public/front-end/basics/javascript/17.png)
 
 调用函数的实参个数为零时，形参的值与arguments对象的值互不影响。在严格模式下，无论剩余参数、默认参数和解构赋值参数是否存在，arguments对象和参数的值均互相不影响。而非严格模式中，函数没有（有）包含剩余参数、默认参数和解构赋值，那么arguments对象中的值和参数的值互相（不）影响。
 
@@ -459,7 +475,7 @@ arguments.length 本次函数调用时传入函数的实参数量。
 
 ### Function原型属性与方法
 
-Function([arg0, ... , argN, ]functionBody) 构造函数创建了一个新的 Function 对象，Function构造函数的隐式原型（`__proto__`）指向Function.prototype。直接调用构造函数可以动态创建函数，但可能会经受一些安全和类似于 eval()（但远不重要）的性能问题。使用 Function 构造函数创建的 Function 对象会在函数创建时完成解析。这比用函数表达式或函数声明创建一个函数并在代码中调用它的效率要低，因为使用表达式或声明创建的函数会和其他的代码一起被解析。然而，不像 eval（可能访问到本地作用域），Function 构造函数只创建全局执行的函数。调用 Function() 时可以使用或不使用 new。两者都会创建一个新的 Function 实例：	
+Function([arg0, ... , argN, ]functionBody) 构造函数创建了一个新的 Function 对象，**Function构造函数的隐式原型（`__proto__`）指向Function.prototype**。直接调用构造函数可以动态创建函数，但可能会经受一些安全和类似于 eval()（但远不重要）的性能问题。使用 Function 构造函数创建的 Function 对象会在函数创建时完成解析。这比用函数表达式或函数声明创建一个函数并在代码中调用它的效率要低，因为使用表达式或声明创建的函数会和其他的代码一起被解析。然而，不像 eval（可能访问到本地作用域），Function 构造函数只创建全局执行的函数。调用 Function() 时可以使用或不使用 new。两者都会创建一个新的 Function 实例：	
 1. argN：被函数用作形参的名称。每一个必须是字符串，对应于一个有效的 JavaScript 参数（任何一个普通的标识符、剩余参数或解构参数，可选择使用默认参数），或用逗号分隔的此类字符串的列表。由于参数的解析方式与函数表达式的解析方式相同，所以接受空白和注释。
 2. functionBody：一个包含构成函数定义的 JavaScript 语句的字符串。
 
@@ -467,82 +483,134 @@ Function.prototype.displayName 属性获取函数的显示名称，默认是没�
 
 Function.prototype.prototype 属性是使用new运算符调用构造函数时，构造函数的 prototype 属性将成为新对象的原型。默认情况下，构造函数的 prototype 是一个普通的对象。这个对象具有一个属性：constructor，它是对构造函数本身的一个引用，constructor 属性是可编辑、可配置但不可枚举的。如果prototype 被赋予了 Object 以外的值，则当它被 new 运算符调用时，返回对象的原型将会指向Object.prototype(换句话说，new 运算符会忽略它的prototype属性并构造一个普通对象)。Function.prototype.bind返回的绑定函数不具有 prototype 属性，但是可以作为构造函数。而异步函数，箭头函数没有prototype属性，不能成为构造函数，即便手动添加prototype属性。生成器函数、Symbol、BigInt有prototype 属性，但它不能作为构造函数。
 
-Function.prototype.apply调用一个具有给定 this 值的函数，以及以一个数组（或一个类数组对象）的形式提供的参数。apply可以用来针对只接受参数列表的函数调用时避免循环，或者直接使用展开语法（...）。
+![](../../../public/front-end/basics/javascript/18.png)
 
-Function.prototype.call方法使用一个指定的 this 值和单独给出的参数列表来调用一个函数。语法与apply几乎相同，但根本区别在于，call接受一个参数列表，而 apply 接受一个为数组或类数组对象的参数。
+![](../../../public/front-end/basics/javascript/19.png)
 
-Function.prototype.bind方法创建一个新的函数，并拥有指定的 this 值和初始实参，即该函数在调用时，会将 this 设置为bind提供的 thisArg，而新参数会接续在bind中传递的参数列表之后。如果使用 new 运算符构造该函数，则会忽略thisArg。
+**Function.prototype.apply调用一个具有给定 this 值的函数，以及以一个数组（或一个类数组对象）的形式提供的参数。apply可以用来针对只接受参数列表的函数调用时避免循环，或者直接使用展开语法（...）**。
+
+![](../../../public/front-end/basics/javascript/20.png)
+
+**Function.prototype.call方法使用一个指定的 this 值和单独给出的参数列表来调用一个函数。语法与apply几乎相同，但根本区别在于，call接受一个参数列表，而 apply 接受一个为数组或类数组对象的参数**。
+
+![](../../../public/front-end/basics/javascript/21.png)
+
+**Function.prototype.bind方法创建一个新的函数，并拥有指定的 this 值和初始实参，即该函数在调用时，会将 this 设置为bind提供的 thisArg，而新参数会接续在bind中传递的参数列表之后。如果使用 new 运算符构造该函数，则会忽略thisArg**。
 
 Function.prototype.toString方法返回一个表示当前函数源代码的字符串，而且得到的源代码时准确的，注释、空格也是包括在内的，该方法覆盖 Object.prototype.toString方法。在 Function 需要表示为字符串时，JavaScript 会自动调用函数的 toString 方法（比如函数与一个字符串进行拼接或包装在模板字符串中）。若调用的this不是Function对象，则 toString() 方法将抛出 TypeError。如果是在内置函数或由 Function.prototype.bind 返回的函数上调用 toString()，则toString() 返回原生代码字符串（"function someName() { [native code] }"），其中someName是实现定义的名称或函数的初始名称。对原生函数的字符串调用 eval() 将始终产生语法错误。若是在由 Function 构造函数生成的函数上调用 toString()，则 toString() 返回创建后的函数源码，包括形参和函数体，函数名为“anonymous”。
 
-实现apply：
+**实现apply**：
 
-实现call：
+![](../../../public/front-end/basics/javascript/22.png)
 
-实现bind：
+**实现call**：
+
+![](../../../public/front-end/basics/javascript/23.png)
+
+**实现bind**：
+
+![](../../../public/front-end/basics/javascript/24.png)
 
 ### getter & setter
 
 get 语法将对象属性绑定到查询该属性时将被调用的函数。set语法将对象属性绑定到要设置属性时将被调用的函数。getter 和 setter 通常用于创建和操作一个伪属性。可以使用delete操作符移除getter和 setter创建的伪属性。getter 或setter可以用Object.defineProperty添加到现有对象上。在 Classes中使用时，get和set关键字语法是定义在原型上的，Object.defineProperty是定义在实例自身上。
 
+![](../../../public/front-end/basics/javascript/25.png)
+
 getter设置的伪属性在访问它们之前不会计算属性的值，能延迟计算值的成本。当属性值的计算是昂贵的（占用大量 RAM 或 CPU 时间，产生工作线程，检索远程文件等）、或者现在不需要该值而是在稍后甚至某些情况根本不使用、或者多次访问值不改变也就不需要被重新计算时，可用智能（或称记忆化）getters延迟属性值的计算并将其缓存返回缓存值以备以后访问而不需要重新计算。示例：
+
+![](../../../public/front-end/basics/javascript/26.png)
 
 ### 异步函数（async）
 
 异步（async）函数是在普通函数前添加async关键字声明的函数，它是 AsyncFunction 构造函数的实例，并且在且仅在其中允许使用 await 关键字，async/await 的行为就好像搭配使用了生成器和 promise，避开链式调用Promise。使用 async/await 关键字，可通过同步的方式书写异步代码。
 
+![](../../../public/front-end/basics/javascript/27.png)
+
 async 函数可能包含 0 个或者多个 await 表达式，从第一行代码直到（并包括）第一个 await 表达式（如果有的话）都是同步运行的，因此一个不含 await 表达式的 async 函数是会同步运行的，然而，如果函数体内有一个 await 表达式，async 函数就一定会异步执行。await 表达式会暂停整个 async 函数的执行进程并出让其控制权，只有当其await的基于 promise 的异步操作被兑现或被拒绝之后才会恢复进程。promise 的resolve值会被当作该 await 表达式的返回值。
+
+![](../../../public/front-end/basics/javascript/28.png)
 
 在await 表达式之后的代码可以被认为是存在在链式调用的 then 回调中，多个 await 表达式都将加入链式调用的 then 回调中，返回值将作为最后一个 then 回调的返回值。任何一个 await 语句后面的 Promise 对象变为 rejected 状态，如果该promise没加catch捕获，或使用try/catch捕获，那么整个 async 函数都会中断执行，并通过隐式返回 Promise 将错误传递给调用者。
 
-优雅的try/catch处理 async /await错误：
+**优雅的try/catch处理 async /await错误**：
+
+![](../../../public/front-end/basics/javascript/29.png)
 
 async函数返回一个async 函数成功返回的值被 resolve 或 async 函数中抛出的（或其中没有被捕获到的）异常被reject的Promise，即使async函数return看起来不是Promise，也会隐式的被Promise.resolve包装。
 
 return await Promise和 return Promise 区别在于前者返回的是解决后的返回值的Promise，后者返回的是该Promise是异步的，是不能使用try/catch捕获的，await Promise 才可以。
 
-async/await重试逻辑实现：
+**async/await重试逻辑实现**：
 
-async/await 实现原理：
+![](../../../public/front-end/basics/javascript/30.png)
 
-async/await应用场景：
+**async/await 实现原理**：
+
+![](../../../public/front-end/basics/javascript/31.png)
+
+**async/await应用场景**：
+
+![](../../../public/front-end/basics/javascript/32.png)
 
 ### new操作符
+
 new 运算符创建一个用户定义的对象类型的实例或具有构造函数的内置对象的实例。new可以看做下列操作的语法糖：
-1.创建一个新对象，使用构造函数的原型来作为新创建对象的原型（prototype）
-2.将新对象作为this调用构造函数（apply） 
-3.如果构造函数没有返回对象（即返回的是非引用类型），则返回this，否则返回构造函数返回的对象。
+1. 创建一个新对象，使用构造函数的原型来作为新创建对象的原型（prototype）
+2. 将新对象作为this调用构造函数（apply） 
+3. 如果构造函数没有返回对象（即返回的是非引用类型），则返回this，否则返回构造函数返回的对象。
 
-对于普通对象，无论性能上还是可读性，更推荐使用字面量的方式创建对象。（否则new涉及到可能通过原型链一层层查找到Object）。
+对于普通对象，无论性能上还是可读性，**更推荐使用字面量的方式创建对象**。（否则new涉及到可能通过原型链一层层查找到Object）。
 
-实现new：
+**实现new**：
+
+![](../../../public/front-end/basics/javascript/33.png)
 
 new.target 属性允许你检测函数或构造方法是否是通过new运算符被调用的。在通过new运算符被初始化的函数或构造方法中，new.target返回一个指向构造方法或函数的引用。在普通的函数调用中，new.target 的值是undefined。
 
-new的优先级？
+**new的优先级？**
 
 new相关的部分优先级从高（20）变低：
+
+![](../../../public/front-end/basics/javascript/34.png)
 
 带参数列表的new即new Foo()的优先级、函数调用以及成员访问同级，且大于无参数列表的new的优先级new Foo，虽然new Foo()等同于new Foo。
 
 ### 闭包
-闭包（closure）是将一个函数与对其周围状态（词法环境）的引用捆绑在一起（封闭）的组合。闭包产生的本质是当前函数存在对父级作用域的引用，因此JavaScript 中的所有函数都是闭包的（new Function例外）。
+
+闭包（closure）是将一个函数与对其周围状态（词法环境）的引用捆绑在一起（封闭）的组合。**闭包产生的本质是当前函数存在对父级作用域的引用，因此JavaScript 中的所有函数都是闭包的（new Function例外）**。
+
+![](../../../public/front-end/basics/javascript/35.png)
 
 被引用的变量即自由变量（当前函数作用域未声明而访问的变量，不包括函数参数arguements）。闭包也可以捕获块作用域和模块作用域中的变量。
 
-闭包应用场景：
+![](../../../public/front-end/basics/javascript/36.png)
 
-循环中的闭包问题？
+**闭包应用场景**：
+
+![](../../../public/front-end/basics/javascript/37.png)
+
+**循环中的闭包问题？**
+
+![](../../../public/front-end/basics/javascript/38.png)
 
 如果不是某些特定任务需要使用闭包，在其它函数中创建函数是不明智的，因为闭包在处理速度和内存消耗方面对脚本性能具有负面影响。在创建新的对象或者类时，方法通常应该关联于对象的原型，而不是定义到对象的构造器中。原因是这将导致每次构造器被调用时，方法都会被重新赋值一次。
 
+![](../../../public/front-end/basics/javascript/39.png)
+
 理论上当函数可达时，它外部的所有变量也都将存在。但在实际中，JavaScript 引擎会试图优化它：分析变量的使用情况，如果从代码中可以明显看出有未使用的外部变量，那么就会将其删除。在 V8（Chrome，Edge，Opera）中的一个重要的副作用是，此类变量在调试中将不可用。
+
+![](../../../public/front-end/basics/javascript/40.png)
 
 ### 箭头函数（ES6）
 
-引入箭头函数有两个方面的作用：更简短的函数并且运行时不绑定this。
+**引入箭头函数有两个方面的作用：更简短的函数并且运行时不绑定this**。
 
-箭头函数保持为创建时封闭词法作用域的this或arguments值（箭头函数不是封闭词法作用域）。箭头函数内没有自己的this（所以从上层作用域去找）， arguments（所以从上层作用域去找），super，new.target，prototype。箭头函数不能用作构造函数（会报TypeError错）。yield关键字不能在箭头函数中使用即不能作为 Generator 函数。箭头函数在参数和箭头之间不能换行。
+![](../../../public/front-end/basics/javascript/41.png)
+
+**箭头函数保持为创建时封闭词法作用域的this或arguments值（箭头函数不是封闭词法作用域）。箭头函数内没有自己的this（所以从上层作用域去找）， arguments（所以从上层作用域去找），super，new.target，prototype**。箭头函数不能用作构造函数（会报TypeError错）。yield关键字不能在箭头函数中使用即不能作为 Generator 函数。箭头函数在参数和箭头之间不能换行。
+
+![](../../../public/front-end/basics/javascript/42.png)
 
 
 ### 构造函数
@@ -553,24 +621,36 @@ new相关的部分优先级从高（20）变低：
 
 惰性函数表示函数执行的分支只会在函数第一次调用的时候执行，在第一次调用过程中，该函数会被覆盖为另一个按照合适方式执行的函数，这样任何对原函数的调用就不用再经过执行的分支了。常见的检测浏览器支持情况选择为 DOM 节点添加事件监听的函数：
 
+![](../../../public/front-end/basics/javascript/43.png)
+
 
 ### 级联函数
 
 级联函数也叫链式函数，是一种在一个对象上使用一条连续的代码来重复调用不同方法的技巧。一定程度上可以减少代码量，提高代码可读性，缺点是它占用了函数的返回值。比如字符串方法，jQuery方法。要使用级联函数，我们只需要在每个函数中返回 this 对象（也就是后面方法中操作的对象）。操作的对象就会在执行完一个函数后继续调用往后的方法，即实现了链式操作。
 
+![](../../../public/front-end/basics/javascript/44.png)
+
 ### 高阶函数
 
 高阶函数指操作函数的函数，一般地，有以下两种情况：
-1.函数作为参数被传递：把函数当作参数传递，代表可以抽离出一部分容易变化的业务逻辑，把这部分业务逻辑放在函数参数中，这样一来可以分离业务代码中变化与不变的部分。比如回调函数，包括Ajax，事件监听，数组排序方法sort等
-2.函数作为返回值输出。比如偏函数（Partial），返回了一个包含预处理参数的新函数，以便后续逻辑可以调用。在计算机科学中，Partial应是指将部分参数固定，从而产生一个新的较小元（元即参数的个数）的函数。偏函数是把一个 n 元函数转换成一个 n - x 元函数，比如Function.prototype.bind。
+1. **函数作为参数被传递**：把函数当作参数传递，代表可以抽离出一部分容易变化的业务逻辑，把这部分业务逻辑放在函数参数中，这样一来可以分离业务代码中变化与不变的部分。比如回调函数，包括Ajax，事件监听，数组排序方法sort等
+2. **函数作为返回值输出**。比如偏函数（Partial），返回了一个包含预处理参数的新函数，以便后续逻辑可以调用。在计算机科学中，Partial应是指将部分参数固定，从而产生一个新的较小元（元即参数的个数）的函数。偏函数是把一个 n 元函数转换成一个 n - x 元函数，比如Function.prototype.bind。
 
-AOP 即面向切面编程，它的主要作用是 把一些跟核心业务逻辑模块无关的功能抽离出来，这些跟业务逻辑无关的功能通常包括日志统计、安全控制、异常处理等。把这些功能抽离出来之后，再通过动态植入的方式掺入业务逻辑模块中。这样做的好处首先是可以保持业务逻辑模块的纯净和高内聚性，其次是可以很方便地复用日志统计等功能模块。通常，在 JavaScript 中实现 AOP，都是指把一个函数动态植入到另外一个函数之中。
+![](../../../public/front-end/basics/javascript/45.png)
+
+**AOP 即面向切面编程**，它的主要作用是 把一些跟核心业务逻辑模块无关的功能抽离出来，这些跟业务逻辑无关的功能通常包括日志统计、安全控制、异常处理等。把这些功能抽离出来之后，再通过**动态植入**的方式掺入业务逻辑模块中。这样做的好处首先是可以保持业务逻辑模块的纯净和高内聚性，其次是可以很方便地复用日志统计等功能模块。通常，在 JavaScript 中实现 AOP，都是指把一个函数**动态植入**到另外一个函数之中。
+
+![](../../../public/front-end/basics/javascript/46.png)
 
 或者通过扩展 Function.prototype 来实现：
+
+![](../../../public/front-end/basics/javascript/47.png)
 
 ### 函数柯里化与反柯里化
 
 **柯里化**（Currying）是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。柯里化是利用闭包的特性实现的。完全柯里化指的是将函数变换成每次只接受一个参数的新函数，直到参数个数等于原函数即返回结果，即柯里化应该将 sum(a, b, c) 转换为 sum(a)(b)(c)。而JavaScript 中大多数的柯里化实现都是高级版的，即使得函数被多参数变体调用。
+
+![](../../../public/front-end/basics/javascript/48.png)
 
 **柯里化的优点**：
 1. 参数复用（返回的函数可复用前面的参数）； 
@@ -583,9 +663,13 @@ AOP 即面向切面编程，它的主要作用是 把一些跟核心业务逻�
 
 **柯里化的实现**：
 
+![](../../../public/front-end/basics/javascript/49.png)
+
 **以上的柯里化实现要求原函数具有固定数量的形参**，如果是使用剩余参数的函数，例如 f(...args)，不能以这种方式进行柯里化。
 
 柯里化是为了缩小适用范围，创建一个针对性更强的函数；**反柯里化**则是扩大适用范围，创建一个应用范围更广的函数。
+
+![](../../../public/front-end/basics/javascript/50.png)
 
 ### 函数记忆与睡眠
 
@@ -621,9 +705,148 @@ AOP 即面向切面编程，它的主要作用是 把一些跟核心业务逻�
 4. 滚轮场景：鼠标滚轮事件（wheel）。
 5. Canvas 画笔功能。
 
-
 ### 函数管道与组合
 
 函数组合是一种将简单函数组合起来构建更复杂函数的行为或机制，函数组合对传入的多个简单函数从右到左执行，函数管道则刚好相反。
 
 <<< ../../../../src/函数相关/函数管道与组合/index.js#docs
+
+## 浏览器事件相关
+
+在 Web 中，事件在浏览器窗口中被触发并且通常被绑定到窗口内部的特定部分 — 可能是一个元素、一系列元素、document或者是window。每个可用的事件可设置事件处理器（或事件监听器），监听事件的发生，也就是事件触发时会运行的代码块。
+
+实际上，JavaScript 网页上的事件机制不同于在其他环境中的事件机制。Nodejs中事件模型（nodejs event model）依赖定期监听事件的监听器和定期处理事件的处理器，比如使用on方法注册一个事件监听器，使用once方法注册一个在运行一次之后注销的监听器。浏览器插件（WebExtensions）的事件模型和网站的事件模型相似，唯一不同在于事件监听属性是小驼峰的且需要紧接着addListener。（比如browser.runtime.onMessage.addListener）。网络事件不是 JavaScript 语言的核心——它们被定义成内置于浏览器的 JavaScript APIs。
+
+事件分为通用事件（比如几乎所有元素的onclick）和专门事件（video才有的onplay）。每个事件都使用继承自 Event 接口的对象来表示，可以包括额外的自定义成员属性及函数，以获取事件发生时相关的更多信息。
+
+Event 接口表示在 DOM 中出现的事件。触发方式有
+1. 用户触发，比如鼠标、键盘事件。
+2. API生成，比如动画运行结束。
+3. 脚本触发，比如对元素调用HTMLElement.click或使用Even接口定义一些自定义事件，再使用 EventTarget.dispatchEvent方法将自定义事件派发往指定的目标（EventTarget）或直接使用EventTarget.dispatchEvent触发原生事件。和经由浏览器触发，并通过事件循环异步调用事件处理程序的“原生”事件不同，dispatchEvent() 会同步调用事件处理函数。在 dispatchEvent() 返回之前，所有监听该事件的事件处理程序将在代码继续前执行并返回。要向事件对象添加更多数据，可以使用 CustomEvent 接口，detail 属性可用于传递自定义数据。
+
+事件处理函数内部，**事件对象**被自动以第一个参数传递给事件处理函数，以提供额外的功能和信息。大多数事件处理器的事件对象都有可用的标准属性和函数（方法），更高级的事件处理器的事件对象会添加一些专业属性，这些属性包含它们需要运行的额外数据。例如，媒体记录器 API 有一个 dataavailable 事件，它会在录制一些音频或视频时触发，并且可以用来保存它，或者回放。对应的ondataavailable处理程序的事件对象有一个可用的数据属性。
+
+在事件处理程序内部，对象 this 始终等于 Event.currentTarget 的值且等于注册事件的对象，Event.target 则是对最初派发事件的目标的引用。
+
+只读属性Event.isTrusted 表示当事件是由用户行为生成的时候，这个属性的值为 true ，而当事件是由脚本创建、修改、通过 EventTarget.dispatchEvent() 派发的时候，这个属性的值为 false 。
+
+Event() 构造函数：
+
+![](../../../public/front-end/basics/javascript/51.png)
+
+最开始，使用**事件处理程序 HTML 属性（内联事件处理程序）**，会混用 HTML 和 JavaScript，而且没有直接移除事件的方式，不推荐使用，因为这样文档很难解析且不好维护。
+
+DOM0级事件通过**事件处理程序属性**添加事件监听器，不允许给同一个监听器注册多个处理器，任何后面设置的都会尝试覆盖之前的，但具有更好的跨浏览器兼容性（IE8+）。
+
+DOM 2级事件可以使用addEventListener添加事件处理程序，而且如果有需要，可以向同一类型的元素添加多个事件处理器，同时可以使用removeEventListener()移除某个事件处理程序，但需要保证 type, listener，capture/useCapture和addEventListener的相同。
+
+过去 Netscape（网景）只使用事件捕获，而 Internet Explorer 只使用事件冒泡。DOM 2级事件规定的事件流（也叫事件传播）包括三个阶段，Event.eventPhase表示事件流当前处于哪一个阶段：
+
+![](../../../public/front-end/basics/javascript/52.png)
+
+1. **事件捕获阶段（Capture Phase）**：事件对象，从Window开始，然后Document, 然后是HTMLHtmlElement，直到目标元素的父元素，这个过程中通过addEventListener 注册为捕获模式（第三个参数为true）的事件处理程序会被调用。Event.eventPhase 为 1。
+2. **处于目标阶段（Target Phase）**：执行顺序会按照 addEventListener 的添加顺序决定，现添加先执行。Event.eventPhase为2。如果该事件只读属性的Event.bubbles为false，则不会进入冒泡阶段。如果多个事件监听器被附加到相同元素的相同事件类型上，会按其被添加的顺序被调用，如果如果在其中一个事件处理函数中执行Event. stopImmediatePropagation ，那么剩下的事件监听器都不会被调用。
+3. **事件冒泡阶段（Bubbling Phase）**：事件对象从父亲元素开始逆向向上传播回目标元素的祖先元素并最终到达包含元素 Window。这个过程中通过addEventListener 注册为冒泡模式（第三个参数为false）的事件处理程序会被调用。Event.eventPhase为3。可以通过在事件处理程序return之前设置Event.cancelBubble为true或调用Event.stopPropagation方法阻止事件冒泡。
+
+调用方法Event.preventDefault或设置属性Event.returnValue为true来阻止事件的默认行为，比如阻止表单默认提交行为。为一个不支持取消即只读属性的Event.bubbles为true的事件调用preventDefault将没有效果。
+
+**事件委托**依赖于**事件冒泡**，如果想要在大量子元素中单击任何一个都可以运行一段代码，可以将事件监听器设置在其父节点上，并让子节点上发生的事件冒泡到父节点上，而不是每个子节点单独设置事件监听器。
+
+## 数据类型相关
+
+数据类型分为基本数据类型（原始值）和引用数据类型。
+
+### 基本数据类型
+
+**基本类型**：存储在栈中的简单数据段。值直接存储在变量访问的位置（栈空间），因为原始值占据的空间是固定的，所以可存储在较小的内存区域 – 栈中，便于迅速查寻变量的值。**变量赋值时**，将原始值的副本赋值给新变量，两个变量完全独立，只是拥有相同的 value。
+
+JavaScript 中存在 7 种基本数据类型（原始值）：boolean、bigInt（ES10）、null、undefined、number、string、symbol （ ES6——表示独一无二的值），其中undefined、 null  和 number **字面量**是没有属性和方法的（直接调用方法1.toString()会失败，通过let a = 1;a.toString()却可以成功），或者字符串字面量可以直接调用方法（**隐式创建包装器对象**）。
+
+### 引用数据类型
+
+**引用类型**：存储在堆（heap）中。存储在变量处的值是一个指针（point），指向存储堆中对象的内存地址。因为引用值（堆中对象）的大小会改变，放在栈中会降低变量查寻的速度。相反，放在变量的栈空间中的值是该对象存储在堆空间中对应的地址。地址的大小是固定的，所以把它存储在栈中对变量性能无任何负面影响。**变量赋值时**，把存储在栈空间的内存地址赋值给新变量，即两个变量都**指向堆内存中的同一个对象**，任何一个**变量的属性**作出的改变都会反映在另一个身上。**复制不会产生新的堆内存消耗**。
+除基本类型外都是对象类型（Object）—引用类型，包括Object（父对象）、Array（数组对象）、RegExp（正则对象）、Date（日期对象）、Math（数学函数）、Function（函数对象）、Error（错误对象）、Arguments（类数组对象）、自定义对象等.
+
+### 类型检测与转换
+
+**类型检测**的方法有，typeof、instanceof、Object.prototype.toString、constructor。
+
+**typeof 运算符**返回一个字符串，表示操作数的类型。基本数据类型除null返回object，都正确，引用类型除函数对象返回Function,其余均返回Object。因为在 JavaScript 最初的实现中，在 JavaScript 第一个版本中，所有值都存储在 32 位的单元中，每个单元包含一个小的类型标签(1-3 bits) 以及当前要存储值的真实数据。对象的类型标签是 0。由于 null 代表的是空指针（大多数平台下值为 0x00），因此，null 的类型标签是 0，typeof null 也因此返回 "object"。对于声明未初始化和未声明的变量，typeof都会返回undefined，但不能在let或const的暂存性死区内使用，会抛出ReferenceError。适合检测非null的基本数据类型和引用数据类型中的function。typeof 运算符的优先级高于加法（+）等二进制运算符。
+
+![](../../../public/front-end/basics/javascript/53.png)
+
+**instanceof 运算符**用于检测构造函数的 prototype 属性是否出现在某个实例对象的原型链上。instanceof的检测结果不一定正确，构造函数的 prototype 属性对象可能被修改，实例对象的__proto__也可能被修改。多个窗口意味着多个全局环境，不同的全局环境拥有不同的全局对象，从而拥有不同的内置类型构造函数，比如 [] instanceof window.frames[0].Array 会返回false。Symbol.hasInstance用于自定义判断某对象是否为某构造器的实例时应该调用的方法，即使用 instanceof时会调用到该方法。
+
+![](../../../public/front-end/basics/javascript/54.png)
+
+**Object.prototype.toString.call(value)**返回"[object Type]"，Type 是value的类型。如果value有 Symbol.toStringTag 属性，其值是一个字符串，则它的值将被用作 Type。可以通过定义 Symbol.toStringTag 属性来更改 Object.prototype.toString.call() 的行为，因此也会被篡改。
+
+**value.constructor属性**获取value的构造函数的原型对象上的constructor属性，该属性实际上是原型对象的constructor属性，也因此如果原型对象被修改，就不能用来判断类型了。
+
+**实现获取一个值的类型的函数**：
+
+![](../../../public/front-end/basics/javascript/55.png)
+
+**JavaScript中存在的类型转换规则**：
+1. **转换为布尔值（ToBoolean）**：除falsy值（false、-0、+0、0n、null、undefined、NaN、""、 ''、 ``）转换为 false，其余均转换为true。
+2. **转换为数字（To Number）**：
+    1. **基本数据类型**：
+        1. null 转换为 0；
+        2. 空字符串，以及空格、制表符、换行符的各种组合，转化为0，忽略前导和尾随空格/行终止符的字符串有效纯数字转换为数字，其余按失败处理转化为NaN；+ 和 - 允许且只能出现一次且不得后跟空格在字符串的开头指示其符号。
+        3. undefined 转换为 NaN
+        4. true 转换为 1，false转换为 0；
+        5. BigInt 抛出 TypeError，以防止意外的强制隐式转换损失精度。
+        6.Symbol 抛出 TypeError。
+    2. **引用数据类型**：先转换为基本数据类型（ToPrimitive），再按基本数据类型处理。
+3. **转换为字符串**：
+    1. 基本数据类型：
+        1. null 转换为 'null'；
+        2. undefined转为 "undefined"；
+        3. true 转为 "true"，false 转为 "false"；
+        4. Number类型转为数字的字符串形式，极小和极大的数字会使用指数形式；
+    2. **引用数据类型**：先转换为基本数据类型（ToPrimitive），再按基本数据类型处理。
+4. **转换为基本数据类型（ToPrimitive）**：
+    1. 首先如果[@@toPrimitive](hint)即Symbol.toPrimitive存在，则调用该方法，该方法必须返回原始值——返回对象会导致 TypeError。
+    2. 如果该方法不存在，如果hint为"number"，按先调用valueOf() 再 toString()的顺序。如果hint为"string"，按先调用toString()再valueOf()的顺序。如果前一个返回对象，则忽略其返回值，从而使用后一个的返回值。如果两个方法都不存在或都不返回原始值，则抛出TypeError。注意：Date.prototype[@@toPrimitive] 的hint视为"string"调用 toString() 。Symbol.prototype[@@toPrimitive] 忽略 hint，并总是返回一个 symbol。
+
+**a == 1 && a == 2 如何返回true?**
+
+![](../../../public/front-end/basics/javascript/56.png)
+
+**四则运算中转换规则**：
+1. 非加法，将两个操作数均转化为数字，再计算。
+2. 加法， a+b 为例，先计算a，再计算b，然后相加。
+    1. 如果a 或 b 中有对象，将对象转为原始值，hint为"number"，存在[@@toPrimitive](hint)则先调用，否则再valueOf，再toString()，
+    2. 均转为原始值后，如果其中一个是字符串，另一边转换为字符串进行拼接，否则，两边都转换为Number进行自然加法运算，如果无法转换为Number则会报错（比如Symbol）。
+
+**比较运算符类型转换**：
+1. 如果是对象，就通过 toPrimitive 转换对象 
+2. 如果是字符串，就通过 unicode 字符索引来比较。
+
+### 判断相等
+
+**== （抽象相等运算符）**，进行必要类型转换再比较。**类型转换规则如下**：
+1. **类型相同**，对象看是否为同一引用，基本数据类型看值是否相同。
+2. **类型不同**：
+    1. 其中一个为对象，另一个是基本数据类型，将对象转换为基本类型
+    2. 两个均为基本数据类型：
+        1. 类型相同，看值是否相同。
+        2. 其中一个是null，另一个是undefiend，返回true。
+        3. 如果其中一个操作数是 Symbol 而另一个不是，返回 false。
+        4. 如果其中一个是布尔值而另一个不是，将布尔值转换为数字。
+        5. 其中一个是number，另一个是string，将string转为number。
+        6. 其中一个是number，另一个是BigInt，按数值进行比较。如果其中一个数值为 ±∞ 或 NaN，返回 false。
+        7. 其中一个是string，另一个是BigInt，将string转为number。
+
+![](../../../public/front-end/basics/javascript/57.png)
+
+**=== （严格相等运算符）判定规则**：
+1. 如果操作数的类型不同，则返回 false。
+2. 如果两个操作数都是对象，只有当它们指向同一个对象时才返回 true。
+3. 如果两个操作数都为 null，或者两个操作数都为 undefined，返回 true。
+4. 如果两个操作数有任意一个为 NaN，返回 false。
+5. 否则，比较两个操作数的值，数字类型必须拥有相同的数值。+0 和 -0 会被认为是相同的值。字符串类型必须拥有相同顺序的相同字符。布尔运算符必须同时为 true 或同时为 false。由于不进行类型转换因此会更快。
+
+**实现Object.is**（ES6，在严格相等的基础上处理包括+0和-0应该不相等才对，NaN和NaN应该相等才对的特殊情况）：
+
+![](../../../public/front-end/basics/javascript/58.png)
