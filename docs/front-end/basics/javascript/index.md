@@ -1136,15 +1136,15 @@ Object 是 JavaScript 中用于存储各种键值集合和更复杂的实体数�
 4. Object.defineProperties(obj, props)方法直接在一个对象上定义新的属性或修改现有属性props（一个对象，其键表示要定义或修改的属性的名称，其值是描述属性的属性描述符对象），并返回该对象。
 5. Object.getOwnPropertyDescriptor(obj, prop)方法返回指定对象obj的一个自有属性prop对应的属性描述符对象，如果属性不存在于该对象上则返回 undefined。在 ES5 中，如果该方法的第一个参数不是对象而是原始值就会抛出TypeError错误。而在 ES6中，第一个的参数不是对象的话就会被强制转换为对象。
 6. Object.getOwnPropertyNames(obj)方法返回一个由指定对象obj的所有自身属性的属性名（**包括不可枚举属性但不包括 Symbol 值作为名称的属性**）组成的数组。数组中枚举属性的顺序与通过 for...in 循环（或 Object.keys）迭代该对象属性时一致。数组中不可枚举属性的顺序未定义。在 ES5 中，如果该方法的第一个参数不是对象而是原始值就会抛出TypeError错误。而在 ES6中，第一个的参数不是对象的话就会被强制转换为对象。
-7. Object.getPrototypeOf(obj) 方法返回指定对象obj的原型（内部[[Prototype]]属性的值。比如，Object.prototype 是Object()或对象字面量构造出来的对象的原型。Function.prototype是Object()的原型。在 ES5 中，如果该方法的第一个参数不是对象而是原始值就会抛出TypeError错误。而在 ES6中，第一个的参数不是对象的话就会被强制转换为对象。
+7. Object.getPrototypeOf(obj) 方法返回指定对象obj的原型（内部`[[Prototype]]`属性的值。比如，Object.prototype 是Object()或对象字面量构造出来的对象的原型。Function.prototype是Object()的原型。在 ES5 中，如果该方法的第一个参数不是对象而是原始值就会抛出TypeError错误。而在 ES6中，第一个的参数不是对象的话就会被强制转换为对象。
 8. Object.getOwnPropertySymbols(obj)方法返回一个给定对象obj自身的所有 Symbol 属性键组成的数组。
 9. Object.entries(obj)方法（ES2017）返回一个给定对象obj自身可枚举属性的键值对数组，其排列与使用 for...in 循环遍历该对象时返回的顺序一致（区别在于 for-in 循环还会枚举原型链中的属性）。借助Object.entries方法可将一个Object转换为Map，即new Map(Object.entries(obj))。
 10. Object.fromEntries(iterable)方法该迭代对象iterable条目提供对应属性的新对象。Object.fromEntries() 执行与 Object.entries 互逆的操作。
-11. Object.isExtensible(obj)方法判断一个对象obj是否是可扩展的（是否可以在它上面添加新的属性）。默认情况下，对象是可扩展的，即可以为他们添加新的属性，以及它们的 __proto__ (已弃用) 即[[prototype]]属性的值可以被更改。Object.preventExtensions，Object.seal 或 Object.freeze 方法都可以标记一个对象为不可扩展（non-extensible）。在 ES5 中，如果参数不是一个对象类型，将抛出一个 TypeError 异常。在 ES6 中，非object 参数将被视为一个不可扩展的普通对象，因此会返回 false。
+11. Object.isExtensible(obj)方法判断一个对象obj是否是可扩展的（是否可以在它上面添加新的属性）。默认情况下，对象是可扩展的，即可以为他们添加新的属性，以及它们的 __proto__ (已弃用) 即`[[prototype]]`属性的值可以被更改。Object.preventExtensions，Object.seal 或 Object.freeze 方法都可以标记一个对象为不可扩展（non-extensible）。在 ES5 中，如果参数不是一个对象类型，将抛出一个 TypeError 异常。在 ES6 中，非object 参数将被视为一个不可扩展的普通对象，因此会返回 false。
 12. Object.preventExtensions(obj)方法让一个对象变的不可扩展，也就是永远不能再给自身添加新的属性，但不可扩展对象的自身属性可能仍然可被删除，而且只是原型对象不可变，但不影响原型对象上的属性新增或修改或删除。一旦将对象变为不可扩展的对象，就再也不能使其可扩展。在 ES5 中，如果参数不是一个对象类型（而是原始类型），将抛出一个TypeError异常。在 ES6 中，非对象参数将被视为一个不可扩展的普通对象，因此会被直接返回。
-13. Object.seal(obj)方法封闭目标对象obj，阻止添加新属性和删除现有属性并将所有现有属性标记为不可配置。不会影响从原型链上继承的属性。但__proto__ (已弃用) 即[[prototype]]属性的值也不能修改。在 ES5 中，如果这个方法的参数不是一个（原始）对象，那么它将导致TypeError。在 ES6 中，非对象参数将被视为已被密封的普通对象，会直接返回它。
+13. Object.seal(obj)方法封闭目标对象obj，阻止添加新属性和删除现有属性并将所有现有属性标记为不可配置。不会影响从原型链上继承的属性。但__proto__ (已弃用) 即`[[prototype]]`属性的值也不能修改。在 ES5 中，如果这个方法的参数不是一个（原始）对象，那么它将导致TypeError。在 ES6 中，非对象参数将被视为已被密封的普通对象，会直接返回它。
 14. Object.isSealed(obj)方法判断一个对象是否被密封。在 ES5 中，如果这个方法的参数不是一个对象（一个原始类型），那么它会导致TypeError。在 ES2015 中，非对象参数将被视为是一个密封的普通对象，只返回true。
-15. Object.freeze(obj)方法可以冻结一个对象obj，不能向这个对象添加新的属性，不能删除已有属性，所有属性不可配置，且所有数据属性（即除了get和set以外的属性）不可修改。该对象的原型即__proto__ (已弃用) 即[[prototype]]属性的值也不能被修改。被冻结的对象不是常量对象，即浅冻结。在 ES5 中，如果这个方法的参数不是一个对象（一个原始值），那么它会导致 TypeError。在 ES2015 中，非对象参数将被视为要被冻结的普通对象，并被简单地返回。
+15. Object.freeze(obj)方法可以冻结一个对象obj，不能向这个对象添加新的属性，不能删除已有属性，所有属性不可配置，且所有数据属性（即除了get和set以外的属性）不可修改。该对象的原型即__proto__ (已弃用) 即`[[prototype]]`属性的值也不能被修改。被冻结的对象不是常量对象，即浅冻结。在 ES5 中，如果这个方法的参数不是一个对象（一个原始值），那么它会导致 TypeError。在 ES2015 中，非对象参数将被视为要被冻结的普通对象，并被简单地返回。
 16. Object.isFrozen(obj)方法判断一个对象是否被冻结。在 ES5 中，如果参数不是一个对象类型，将抛出一个TypeError异常。在 ES6 中，非对象参数将被视为一个冻结的普通对象，因此会返回true。
 17. Object.keys(obj)方法会返回一个由一个给定对象的自身可枚举属性键组成的数组，其排列与使用 for...in 循环遍历该对象时返回的顺序一致（区别在于 for-in 循环还会枚举原型链中的属性）。在 ES5 里，如果此方法的参数不是对象（而是一个原始值）会抛出 TypeError错误。在 ES6中，非对象的参数将被强制转换为一个对象。
 18. Object.values(obj)方法返回一个给定对象自身可枚举属性值组成的数组，值的顺序与使用 for...in 循环的顺序相同（区别在于 for-in 循环枚举原型链中的属性）。如果此方法的参数不是对象（而是一个原始值）会抛出 TypeError错误。
@@ -1158,7 +1158,7 @@ Object 是 JavaScript 中用于存储各种键值集合和更复杂的实体数�
     7. 都是 -0 
     8. 都是 NaN 
     9. 都是同一个数字值，都非零且都不是 NaN
-20. Object.setPrototypeOf(obj, prototype)方法设置一个指定的对象obj的原型（即，内部 [[Prototype]] 属性）为prototype（对象或 null）。如果obj 参数是不可扩展的或是一个不可修改原型的特异对象（exotic object）（比如 Object.prototype 或 window或location），或者prototype 参数不是对象或 null，将抛出TypeError错误。通常，由于__proto__属性已经弃用，应该使用 Object.setPrototypeOf() 方法来设置对象的原型。如果 obj 参数不是一个对象（例如，数字、字符串等），该方法将什么也不做。由于性能和可读性的原因，不建议使用 setPrototypeOf 来代替 extends实现继承。
+20. Object.setPrototypeOf(obj, prototype)方法设置一个指定的对象obj的原型（即，内部 `[[Prototype]]` 属性）为prototype（对象或 null）。如果obj 参数是不可扩展的或是一个不可修改原型的特异对象（exotic object）（比如 Object.prototype 或 window或location），或者prototype 参数不是对象或 null，将抛出TypeError错误。通常，由于__proto__属性已经弃用，应该使用 Object.setPrototypeOf() 方法来设置对象的原型。如果 obj 参数不是一个对象（例如，数字、字符串等），该方法将什么也不做。由于性能和可读性的原因，不建议使用 setPrototypeOf 来代替 extends实现继承。
 21. Object.hasOwn(instance, prop)如果指定的对象instance自身有指定的属性 prop，则返回 true。如果属性是继承的或者不存在，该方法返回 false。建议使用此方法替代 Object.prototype.hasOwnProperty()，因为它适用于使用 Object.create(null) 创建的对象以及覆盖了继承的 hasOwnProperty() 方法的对象。
 
 **object原型方法**：
@@ -1202,7 +1202,7 @@ Array(arrayLength) 或Array(element0, element1, /* … ,*/ elementN)构造器�
 2. Array.prototype[@@unscopables] 包含了所有 ES2015 (ES6) 中新定义的、且并未被更早的 ECMAScript 标准收纳的属性名，这些属性在由 with 语句绑定的环境中被排除，防止某些数组方法被添加到 with 语句的作用域内。@@unscopables即Symbol.unscopables。其属性特性为enumerable、writable均为false，configurable为true。
 3. Array.prototype.at(index)方法接收一个整数值并返回该索引对应的元素，允许正数和负数。负整数从数组中的最后一个元素开始倒数。如果找不到指定的索引，则返回 undefined。由于括号表示法不能使用负数（因为方括号内的所有值都会被视为字符串属性），通常的做法是访问 length 并将其减去从末端开始的相对索引，而at()方法可以使用负索引，index < 0时，array[index + array.length]简化为array.at(index)。at() 方法是通用的，其仅期望 thisArg 具有 length 属性和以整数为键的属性，即Array.prototype.at.call(arrayLike, index)。
 4. Array.prototype.concat(value0, value1, /* … ,*/ valueN)方法用于合并两个或多个数组。此方法不会更改现有数组，而是返回一个新数组，如果参数value不是数组，直接放入新数组中，如果参数是数组则展开放入新数组中。concat 在类数组对象的 Symbol.isConcatSpreadable 被设置为真值时才会将类数组对象视作数组。concat 方法不会改变 this 或任何作为参数提供的数组，而是返回一个浅拷贝。
-5. Array.prototype.copyWithin(target, start, end)方法浅复制数组的一部分[start, end)到同一数组中的指定区域[target + start, target + end)，并返回该数组，不会改变原数组的长度。参数 target、start 和 end 必须为整数。如果如果 start或end 为负，则其指定的索引位置为 length+start或length+start。target和start默认值为0，end默认值为length，如果target大于等于length或参数为空则什么也不会发生，如果target小于- length则为0。copyWithin 方法不要求其 thisArg 值必须是一个数组对象。
+5. Array.prototype.copyWithin(target, start, end)方法浅复制数组的一部分`[start, end)`到同一数组中的指定区域`[target + start, target + end)`，并返回该数组，不会改变原数组的长度。参数 target、start 和 end 必须为整数。如果如果 start或end 为负，则其指定的索引位置为 length+start或length+start。target和start默认值为0，end默认值为length，如果target大于等于length或参数为空则什么也不会发生，如果target小于- length则为0。copyWithin 方法不要求其 thisArg 值必须是一个数组对象。
 6. Array.prototype.keys()方法返回一个包含数组中每个索引键的 Array Iterator 对象，会包括空槽（Object.keys则不会包含空槽）。
 7. Array.prototype.values()方法返回一个包含数组每个索引的值的新的 Array Iterator 对象。 Array Iterator 对象中存储的是原数组中元素值的地址，而不是数组元素值，Array Iterator 对象是一次性或临时的。Array.prototype.values 是 Array.prototype[Symbol.iterator] 的默认实现，即Array.prototype.values 默认等于 Array.prototype[Symbol.iterator]。
 8. Array.prototype.entries()方法返回一个新的数组迭代器对象，该对象包含数组中每个索引的键/值对。在稀疏数组上使用时，entries() 方法会迭代空槽，对应值为undefined。entries() 方法是通用的,它只要求 thisArg 值具有 length 属性和以整数为键的属性。
@@ -1232,8 +1232,8 @@ Array(arrayLength) 或Array(element0, element1, /* … ,*/ elementN)构造器�
 26. Array.prototype.reverse()方法将数组中元素的位置颠倒，并返回该数组的引用。方法是通用的,它只要求 thisArg 值具有 length 属性和以整数为键的属性，否则什么也不会发生。
 27. Array.prototype.every(callback[, thisArg])方法测试一个数组内的所有元素是否都能通过某个指定函数callback的测试。它返回一个布尔值。若是空数组，此方法在任何情况下都会返回 true。如果遇到callback 返回 falsy 会立即返回 false。如果数组中一个尚未被callback函数访问到的元素的值被callback函数所改变，那么当callback函数访问到它时，它的值将是根据它在数组中的索引所访问到的当前值即改变后的值。callback会跳过空槽和被删除的元素。
 28. Array.prototype.some(callback[, thisArg])方法与Array.prototype.every方法的区别在于是否存在元素通过了被提供的函数callback测试，遇到callback 返回truthy会立即返回true，而且若是空数组，始终返回true。
-29. Array.prototype.fill(value, start, end)方法用一个固定值value填充数组中[start, end)的全部元素。如果start 或end是个负数，则会被自动计算成为 length + start或length+end，start默认为0，end默认为length。如果start或end超过数组索引范围或无效或start等于end，则什么也不做。当一个对象被传递给 fill 方法的时候，填充到数组的是这个对象的引用。fill方法是通用的，它只要求 thisArg 值具有 length 属性。
-30. Array.prototype.slice(begin, end)方法返回一个原数组[begin, end)的浅拷贝的新的数组对象。如果省略 begin，则 slice 从索引 0 开始。如果 begin 超出原数组的索引范围，则会返回空数组。如果begin或end为负数，则表示从原数组中的倒数第几个元素开始提取或终止提取。如果end被省略或大于数组长度，slice 会一直提取到原数组末尾。
+29. Array.prototype.fill(value, start, end)方法用一个固定值value填充数组中`[start, end)`的全部元素。如果start 或end是个负数，则会被自动计算成为 length + start或length+end，start默认为0，end默认为length。如果start或end超过数组索引范围或无效或start等于end，则什么也不做。当一个对象被传递给 fill 方法的时候，填充到数组的是这个对象的引用。fill方法是通用的，它只要求 thisArg 值具有 length 属性。
+30. Array.prototype.slice(begin, end)方法返回一个原数组`[begin, end)`的浅拷贝的新的数组对象。如果省略 begin，则 slice 从索引 0 开始。如果 begin 超出原数组的索引范围，则会返回空数组。如果begin或end为负数，则表示从原数组中的倒数第几个元素开始提取或终止提取。如果end被省略或大于数组长度，slice 会一直提取到原数组末尾。
 31. Array.prototype.filter(callback[, thisArg])方法创建给定数组的一部分的浅拷贝，其包含通过所提供函数callback的测试的所有元素，callback返回 true 表示该元素通过测试，保留该元素，false 则不保留。如果没有任何数组元素通过测试，则返回空数组。callback会跳过空槽和被删除的元素。filter() 不会改变原数组，遍历会通过in检查跳过空槽。
 
 ![](../../../public/front-end/basics/javascript/73.png)
@@ -1327,11 +1327,11 @@ RegExp 对象用于将文本与一个模式匹配，继承自Function。可以�
 8. \B匹配非词边界。
 9. 默认插入符号 ^ 匹配行开头，效果同 str.startsWith；美元符号 $ 匹配行结尾，效果同str.endsWith（如果只是匹配固定字符串结尾，应都使用后者str方法）。两者同时使用即完全匹配，^ 和 $ 均属于测试条件，本身不匹配任一字符。
 10. 换行符 \n匹配行尾\n并会将\n加入到匹配结果中，而且不会匹配字符串文本结尾。
-11. **特殊字符列表[ \ ^ $ . | ? * + ( )**：匹配特殊字符需要用反斜杠 \ 进行转义，注意，对于正斜杠 / 虽然不是特殊字符，对于是/pattern/flags方式的正则表达式，匹配正斜杠 / 也才需要转义。同时，对于使用new  RegExp(pattern, flags) 创建正则方式，pattern字符串中的所有\都需要再加转义（即 new  RegExp(‘\\d’, flags) ）
-12. **方括号[...]**：搜索给定的字符或字符类或字符范围（集）中的任意且仅一个。方括号中的特殊字符可以不用转义（除了方括号），转义也没问题。
-13. 数量 {n} 或者{n, m} 或者{n, }：指定具体需要的匹配数量或数量范围，如\d{5} 表示 5 位的数字，同 \d\d\d\d\d，\d{3,5}表示3到5位的数字，\d{3,}表示三位及以上位数的数字。 + 代表“一个或多个”，相当于 {1,}。 ? 代表“零个或一个”，相当于 {0,1},  * 代表着“零个或多个”，相当于 {0,}, 比如匹配没有属性的HTML标签：**/<\/?[a-z][a-z0-9]*>/gi**
+11. **`特殊字符列表[ \ ^ $ . | ? * + ( )`**：匹配特殊字符需要用反斜杠 \ 进行转义，注意，对于正斜杠 / 虽然不是特殊字符，对于是/pattern/flags方式的正则表达式，匹配正斜杠 / 也才需要转义。同时，对于使用new  RegExp(pattern, flags) 创建正则方式，pattern字符串中的所有\都需要再加转义（即 new  RegExp(‘\\d’, flags) ）
+12. **`方括号[...]`**：搜索给定的字符或字符类或字符范围（集）中的任意且仅一个。方括号中的特殊字符可以不用转义（除了方括号），转义也没问题。
+13. 数量 {n} 或者{n, m} 或者{n, }：指定具体需要的匹配数量或数量范围，如\d{5} 表示 5 位的数字，同 \d\d\d\d\d，\d{3,5}表示3到5位的数字，\d{3,}表示三位及以上位数的数字。 + 代表“一个或多个”，相当于 {1,}。 ? 代表“零个或一个”，相当于 {0,1},  * 代表着“零个或多个”，相当于 {0,}, 比如匹配没有属性的HTML标签：**`/<\/?[a-z][a-z0-9]*>/gi`**
 14. **贪婪模式/惰性模式**：都是针对量词而言，前者（默认情况下）量词都会尽可能地重复多次（**量词重复直到量词前的不匹配，否则搜索至末尾，再进行回溯匹配模式中量词后的部分**）。后者重复最少次数（**量词后面接 ? 即才启用惰性模式——量词重复直到模式 ? 中后的剩余部分找到匹配项，如果没有剩余部分直接就结束**）。惰性模式并不是能完全弥补贪婪模式的不适用，有时需通过微调贪婪模式而不是使用惰性模式
-15. **括号（...）**：捕获组，后接量词则捕获组作为一个整体；将括号内匹配的部分作为结果数组中的单独项返回（str.match(regexp)不是g模式时），括号编号从1开始从左到右，括号可嵌套，编号从外到里，然后从左到右编号。如果捕获组是可选的（即量词可以为0），那么即使捕获组匹配不存在，结果数组也存在该索引且值为undefined。允许为括号命名——通过在括号里一开始放置?<name>实现，匹配的组在 .groups 属性中。允许为捕获组的一开始添加 ?: 来排除该组在结果数组中返回。前瞻断言x(?=Y)，它表示“仅在后面是 Y 时匹配 X”。这里的 X 和 Y 可以是任何模式。前瞻断言只是一个测试，不消耗待匹配字符串，括号 (?=...) 中的内容不包含在匹配结果。
+15. **括号（...）**：捕获组，后接量词则捕获组作为一个整体；将括号内匹配的部分作为结果数组中的单独项返回（str.match(regexp)不是g模式时），括号编号从1开始从左到右，括号可嵌套，编号从外到里，然后从左到右编号。如果捕获组是可选的（即量词可以为0），那么即使捕获组匹配不存在，结果数组也存在该索引且值为undefined。允许为括号命名——通过在括号里一开始放置 `?<name>` 实现，匹配的组在 .groups 属性中。允许为捕获组的一开始添加 ?: 来排除该组在结果数组中返回。前瞻断言x(?=Y)，它表示“仅在后面是 Y 时匹配 X”。这里的 X 和 Y 可以是任何模式。前瞻断言只是一个测试，不消耗待匹配字符串，括号 (?=...) 中的内容不包含在匹配结果。
 
 **实现手机号中间四位变成**：
 
@@ -1360,7 +1360,7 @@ Date 对象基于 Unix 时间戳（即自 1970 年 1 月 1 日（UTC，即Univer
 ![](../../../public/front-end/basics/javascript/82.png)
 
 3. Date.parse(dateString)方法解析一个表示某个日期的字符串dateString，并返回从 1970-1-1 00:00:00 UTC 到该日期对象（该日期对象的 UTC 时间）的毫秒数，如果该字符串无法识别，或者一些情况下，包含了不合法的日期数值（如：2015-02-31），则返回值为 NaN。当输入为 "March 7, 2014" 时， parse() 将默认使用本地时区。但如果使用 ISO 格式如 "2014-03-07" ，则会被默认为 UTC (ES5 和 ECMAScript 2015) 时区。不同宿主在如何解析日期字符串上仍存在许多差异，强烈建议不要使用 Date.parse()）解析日期字符串，因此最好还是手动或使用库解析日期字符串。
-4. Date.UTC(year[, monthIndex [, day [, hours [, minutes [, seconds [, milliseconds]]]]])方法与new Date 构造函数不同在于会将参数视为 UTC 时间，其返回从 1970 年 1 月 1 日 00:00:00 UTC 到指定时间的毫秒数，而且monthIndex是可选的，但是ECMAScript 2017 要求提供少于两个的参数时返回NaN。
+4. `Date.UTC(year[, monthIndex [, day [, hours [, minutes [, seconds [, milliseconds]]]]])`方法与new Date 构造函数不同在于会将参数视为 UTC 时间，其返回从 1970 年 1 月 1 日 00:00:00 UTC 到指定时间的毫秒数，而且monthIndex是可选的，但是ECMAScript 2017 要求提供少于两个的参数时返回NaN。
 
 **date的原型属性与方法**：
 1. Date.prototype.getDate()方法根据本地时间，返回一个指定的日期对象为一个月中的哪一日（从 1--31）。Date.prototype.getUTCDate()则是根据协调世界时。
@@ -1481,93 +1481,635 @@ Math 是一个拥有一些数学常数属性和数学函数方法的内置对�
 ![](../../../public/front-end/basics/javascript/97.png)
 
 33. Math.min(value0, value1, /* … ,*/ valueN)和Math.max的区别在于返回数值序列中的最小值。如果没有提供参数，返回Infinity。
-34. Math.random() 函数返回一个[0, 1)范围内的伪随机浮点数。实现为随机数生成算法选择初始种子，用户不能选择或重置种子。Math.random()并不提供加密安全的随机数。不要将它们用于与安全有关的任何事情。请使用Web Crypto API的window.crypto.getRandomValues()方法。
+34. Math.random() 函数返回一个`[0, 1)`范围内的伪随机浮点数。实现为随机数生成算法选择初始种子，用户不能选择或重置种子。Math.random()并不提供加密安全的随机数。不要将它们用于与安全有关的任何事情。请使用Web Crypto API的window.crypto.getRandomValues()方法。
 
 ![](../../../public/front-end/basics/javascript/98.png)
 
 ### Function（参考函数相关）
 
 ### Map
+
 Map 对象保存键值对，并且能够记住键的原始插入顺序，继承自Function。任何值（对象或者基本类型）都可以作为一个键或一个值。Map 中的一个键只能出现一次；Map 对象按键值对迭代，迭代按插入顺序进行。规范要求 map 实现“平均访问时间与集合中的元素数量呈次线性关系”。因此，它可以在内部表示为哈希表（使用 O(1) 查找）、搜索树（使用 O(log(N)) 查找）或任何其他数据结构，只要复杂度小于 O(N)。
+
 设置对象属性同样适用于 Map 对象，但不会改变 Map 的数据结构，它使用的是通用对象的特性，正确的存储数据到 Map 中的方式是使用 Map.prototype.set(key, value) 方法。
+
 使用 Array.from 函数或展开运算符可以将一个 Map 对象转换成一个二维键值对数组：Array.from(map)或[...map]。
+
 Map 对象间可以进行合并new Map([...firstMap, ...secondMap])，但是会保持键的唯一性。Map对象可以通过new Map(map)进行浅复制。
 Map中键的比较基于零值相等算法，即在同值相等（Object.is）的基础上认为 0、-0、+0都相等。
+
 Object和Map都允许按键存取一个值、删除键、检测一个键是否绑定了值。区别在于：
-1.意外的键：Map默认情况不包含任何键。只包含显式插入的键。Object 有一个原型，原型链上的键名有可能和对象上的设置的自有键名产生冲突（但可以通过Object.create(null)创建一个没有原型的对象）。
-2.键的类型：Map 的键可以是任意值，包括函数、对象或任意基本类型。Object 的键必须是一个 String 或是 Symbol。
-3.键的顺序：Map 中的键是有序，迭代时以插入的顺序返回键值对。Object 的键目前是有序的，但该顺序时复杂的，没有可以迭代对象所有属性的机制，for-in 仅包含了可枚举的以字符串为键的属性；Object.keys 仅包含了对象自身的可枚举的以字符串为键的属性；Object.getOwnPropertyNames 包含了所有以字符串为键的属性；Object.getOwnPropertySymbols 包含的是以 Symbol 为键的属性。
-4.Size：Map 的键值对个数轻松通过size属性获得。Object 的键值对个数只能手动计算。
-5.迭代：Map 是可迭代的，可直接使用for...of迭代。Object没有实现迭代协议，不能直接使用for...of，只能使用for...in或自己实现迭代协议或迭代Object.keys/Object.values/Object.entries等等的返回数组。
-6.性能：Map在频繁增删键值对的场景下表现更好。Object则未对此做出优化。
-7.序列化和解析：Map没有原生序列化和解析的支持，但可以借助SON.stringify()和JSON.parse()的replacer和receiver进行处理特殊处理。由 Object 到 JSON 的序列化和由 JSON 到 Object 的解析的原生支持分贝是 JSON.stringify()和JSON.parse()。
+1. 意外的键：Map默认情况不包含任何键。只包含显式插入的键。Object 有一个原型，原型链上的键名有可能和对象上的设置的自有键名产生冲突（但可以通过Object.create(null)创建一个没有原型的对象）。
+2. 键的类型：Map 的键可以是任意值，包括函数、对象或任意基本类型。Object 的键必须是一个 String 或是 Symbol。
+3. 键的顺序：Map 中的键是有序，迭代时以插入的顺序返回键值对。Object 的键目前是有序的，但该顺序时复杂的，没有可以迭代对象所有属性的机制，for-in 仅包含了可枚举的以字符串为键的属性；Object.keys 仅包含了对象自身的可枚举的以字符串为键的属性；Object.getOwnPropertyNames 包含了所有以字符串为键的属性；Object.getOwnPropertySymbols 包含的是以 Symbol 为键的属性。
+4. Size：Map 的键值对个数轻松通过size属性获得。Object 的键值对个数只能手动计算。
+5. 迭代：Map 是可迭代的，可直接使用for...of迭代。Object没有实现迭代协议，不能直接使用for...of，只能使用for...in或自己实现迭代协议或迭代Object.keys/Object.values/Object.entries等等的返回数组。
+6. 性能：Map在频繁增删键值对的场景下表现更好。Object则未对此做出优化。
+7. 序列化和解析：Map没有原生序列化和解析的支持，但可以借助SON.stringify()和JSON.parse()的replacer和receiver进行处理特殊处理。由 Object 到 JSON 的序列化和由 JSON 到 Object 的解析的原生支持分贝是 JSON.stringify()和JSON.parse()。
+
+![](../../../public/front-end/basics/javascript/99.png)
 
 Map(iterable) 构造函数用于创建 Map 对象，且只能用 new 构造，否则会抛出 TypeError。iterable是可迭代对象，而且每个条目是对象即可（如果是空对象，则生成的键值都是undefined）。如果不指定此参数或其值为 null，则新的 WeakSet 为空。
-Map的静态属性与方法：
-1.get Map[@@species]访问器属性（即Map[Symbol.species]）会返回一个 Map 构造函数。该访问器属性允许子类覆盖对象的默认构造函数。
-map的原型属性与方法：
-1.Map.prototype.size是只读属性，返回 Map 对象的成员数量。
-2.Map.prototype.clear()方法会移除 Map 对象中的所有元素，返回值为undefined。
-3.Map.prototype.delete(key)方法用于移除 Map 对象中指定key的键值对。如果 Map 对象中的元素存在并已被移除，则为 true；如果该元素不存在，则为 false。
-4.Map.prototype.get(key)方法从 Map 对象返回指定key的值。如果键在 Map 对象中找不到，则返回 undefined。如果与所提供的键相关联的值是一个对象，那么获得的将是该对象的引用。但持有原始对象的引用实际上意味着对象不能被垃圾回收，这可能会导致意外的内存问题。如果希望存储在映射中的对象具有与原始对象相同的生命周期，请考虑使用 WeakMap。
-5.Map.prototype.has(key)方法返回一个布尔值，指示具有指定键key的元素是否存在于Map中。
-6.Map.prototype.set(key, value)方法为 Map 对象添加或更新一个指定键（key）和值（value）的键值对，并返回Map对象（因此可以链式调用）。key与value均可以是任意类型。
-7.Map.prototype[@@iterator]()是Map实现的迭代协议，使得map对象被for..of直接使用，其初始值与 Map.prototype.entries 的初始值是同一个函数对象。也可以写成Map.prototype[Symbol.iterator]()。
-8.Map.prototype.keys()方法返回一个新的迭代器对象，该对象包含按插入顺序排列的 Map 对象中每个元素的key键。
-9.Map.prototype.values()方法返回一个新的迭代器对象，该对象包含按插入顺序排列的 Map 对象中每个元素的value值。
-10.Map.prototype.entries()方法返回一个新的迭代器对象，其中包含 Map 对象中按插入顺序排列的每个元素的 [key, value] 对。
-11.Map.prototype.forEach(callbackFn[, thisArg])方法按照插入顺序依次对 Map 中每个键/值对执行一次给定的函数callback，它不会对被删除的键执行函数，然而，它会对每个值为 undefined 的键执行函数。每个值只被访问一次，除非它在 forEach 结束前被删除并被重新添加。callbackFn 不会对在被访问前就删除的元素执行。在 forEach 结束前被添加的元素都将会被访问。callback具有如下的可选参数（Array.prototype.forEach的callback要求第一个值element必传）：每个迭代的值value、每个迭代的键 key、正在迭代的map。
+
+**Map的静态属性与方法**：
+1. get Map[@@species]访问器属性（即Map[Symbol.species]）会返回一个 Map 构造函数。该访问器属性允许子类覆盖对象的默认构造函数。
+
+**map 的原型属性与方法**：
+1. Map.prototype.size是只读属性，返回 Map 对象的成员数量。
+2. Map.prototype.clear()方法会移除 Map 对象中的所有元素，返回值为undefined。
+3. Map.prototype.delete(key)方法用于移除 Map 对象中指定key的键值对。如果 Map 对象中的元素存在并已被移除，则为 true；如果该元素不存在，则为 false。
+4. Map.prototype.get(key)方法从 Map 对象返回指定key的值。如果键在 Map 对象中找不到，则返回 undefined。如果与所提供的键相关联的值是一个对象，那么获得的将是该对象的引用。但持有原始对象的引用实际上意味着对象不能被垃圾回收，这可能会导致意外的内存问题。如果希望存储在映射中的对象具有与原始对象相同的生命周期，请考虑使用 WeakMap。
+5. Map.prototype.has(key)方法返回一个布尔值，指示具有指定键key的元素是否存在于Map中。
+6. Map.prototype.set(key, value)方法为 Map 对象添加或更新一个指定键（key）和值（value）的键值对，并返回Map对象（因此可以链式调用）。key与value均可以是任意类型。
+7. Map.prototype[@@iterator]()是Map实现的迭代协议，使得map对象被for..of直接使用，其初始值与 Map.prototype.entries 的初始值是同一个函数对象。也可以写成Map.prototype[Symbol.iterator]()。
+8. Map.prototype.keys()方法返回一个新的迭代器对象，该对象包含按插入顺序排列的 Map 对象中每个元素的key键。
+9. Map.prototype.values()方法返回一个新的迭代器对象，该对象包含按插入顺序排列的 Map 对象中每个元素的 value 值。
+10. Map.prototype.entries()方法返回一个新的迭代器对象，其中包含 Map 对象中按插入顺序排列的每个元素的 [key, value] 对。
+11. Map.prototype.forEach(callbackFn[, thisArg])方法按照插入顺序依次对 Map 中每个键/值对执行一次给定的函数callback，它不会对被删除的键执行函数，然而，它会对每个值为 undefined 的键执行函数。每个值只被访问一次，除非它在 forEach 结束前被删除并被重新添加。callbackFn 不会对在被访问前就删除的元素执行。在 forEach 结束前被添加的元素都将会被访问。callback 具有如下的可选参数（Array.prototype.forEach 的 callback 要求第一个值element必传）：每个迭代的值value、每个迭代的键 key、正在迭代的 map。
 
 ### WeakMap
 
 WeakMap 对象是一组键/值对的集合，其键必须是对象，而值可以是任意的，其中的键是弱引用的（当键所指对象没有其他地方引用的时候，它会被 GC 回收掉）。与Map对象区别在于WeakMap的键是不可枚举的，不可迭代，不提供列出其键的方法（比如entries/keys/values/@@iterator/forEach等），也没有size属性，也没有Map中移除所有元素的clear方法。WeakMap可以用于存储一个对象的私有数据或隐藏实施细节。
 在 JavaScript 里，map API 可以通过共用两个数组（一个存放键，一个存放值）来实现。给这种 map 设置值时会同时将键和值添加到这两个数组的末尾。从而使得键和值的索引在两个数组中相对应。当从该 map 取值的时候，需要遍历所有的键，然后使用索引从存储值的数组中检索出相应的值。首先赋值和搜索操作都是 O(n) 的时间复杂度（n 是键值对的个数）。其次可能会导致内存泄漏，因为数组会一直引用着每个键和值。这种引用使得垃圾回收算法不能回收处理。相比之下，原生的 WeakMap 持有的是每个键对象的“弱引用”，意味着在没有其他引用存在时垃圾回收能正确进行，也正是由于这样的弱引用，WeakMap 的 key 是不可枚举的。
+
 WeakMap([iterable]) 构造函数用于创建 WeakMap 对象，且只能用 new 构造，否则会抛出 TypeError。iterable是一个二维数组或者其他可迭代对象，且元素是键值对。如果不指定此参数或其值为 null，则新的 WeakSet 为空。
-weakMap的原型方法：
-1.WeakMap.prototype.delete(key)方法可以从一个 WeakMap 对象中删除指定key的元素。如果成功删除，返回 true，否则返回 false。
-2.WeakMap.prototype.get(key)方法返回 WeakMap 指定key的元素的值，如果 WeakMap 对象找不到这个键则返回 undefined。
-3.WeakMap.prototype.has(key)方法根据 WeakMap 对象的元素中是否存在 key 键返回一个 boolean 值。
-4.WeakMap.prototype.set(key, value)方法根据指定的 key 和 value 在 WeakMap对象中添加新/更新元素，并返回该WeakMap对象。key必须是对象。
+
+**weakMap的原型方法**：
+1. WeakMap.prototype.delete(key)方法可以从一个 WeakMap 对象中删除指定key的元素。如果成功删除，返回 true，否则返回 false。
+2. WeakMap.prototype.get(key)方法返回 WeakMap 指定key的元素的值，如果 WeakMap 对象找不到这个键则返回 undefined。
+3. WeakMap.prototype.has(key)方法根据 WeakMap 对象的元素中是否存在 key 键返回一个 boolean 值。
+4. WeakMap.prototype.set(key, value)方法根据指定的 key 和 value 在 WeakMap对象中添加新/更新元素，并返回该WeakMap对象。key必须是对象。
+
+![](../../../public/front-end/basics/javascript/100.png)
 
 ### Set
+
 Set 对象允许存储任何类型的唯一值，无论是原始值或者是对象引用。可以按照插入的顺序迭代它的元素，Set 中的元素是只会出现一次。从ES6开始，Set使用零值相等算法判断元素的唯一性。
+
 使用 Array.from 函数或展开运算符可以将一个Set对象转换成一个value数组：Array.from(set)或[...set]。
+
 Set([iterator]) 构造函数用于创建 Set 对象，只能用 new 构建，否则会抛出 TypeError。iterable如果传递一个可迭代对象，它的所有元素将不重复地被添加到新的 Set 中，如果不指定此参数或其值为 null，则新的 Set 为空。
-Set的静态属性与方法：
-1.get Set[@@species]子构造函数或许会重载这个属性以至改变构造函数的赋值。子构造函数或许会重载这个属性以至改变构造函数的赋值。
-set的原型的属性与方法：
-1.Set.prototype.size是只读属性，返回 Set 对象的成员数量。
-2.Set.prototype.clear()方法会移除 Set对象中的所有元素，返回值为undefined。
-3.Set.prototype.delete(value)方法用于移除 Set 对象中指定value。成功删除返回 true，否则返回 false。对象是通过引用比较的，所以如果没有对原始对象的引用，就必须通过迭代或遍历检查单个属性来删除。
-4.Set.prototype.has(value)方法返回一个布尔值，指示的元素value是否存在于Set中。
-5.Set.prototype[@@iterator]()是Set实现的迭代协议，使得Set对象被for..of直接使用，其初始值与Set.prototype.values 的初始值是同一个函数对象。也可以写成Set.prototype[Symbol.iterator]()。
-6.Set.prototype.keys()方法是Set.prototype.values() 方法的别名。
-7.Set.prototype.values()方法返回一个新的迭代器对象，该对象按插入顺序包含 Set 对象中每个元素的值。
-8.Set.prototype.entries()方法返回一个新的迭代器对象，这个对象包含的元素是类似 [value, value] 形式的数组，value 是Set对象中的每个元素，迭代器对象元素的顺序即Set对象中元素插入的顺序。
-9.Set.prototype.add(value)方法如果Set对象中不存在指定值value，将作为新元素插入到 Set 对象中，并返回Set对象。
-10.Set.prototype.forEach(callbackFn[, thisArg])方法对 Set 对象中的每个值按插入顺序执行一次提供的函数callback，返回undefined。它不会对被删除的键执行函数，然而，它会对每个值为 undefined 的键执行函数。callback 被调用时带有三个可选参数：（Array.prototype.forEach的callback要求第一个值element必传）：Set 中正在处理的当前元素value和key（因为 Set 中没有键，所以 value 会被共同传递给这两个参数）、调用forEach的Set对象。每个值都访问一次，除非在 forEach() 完成之前删除并重新添加它。在访问之前删除的值不会调用 callback。在 forEach() 完成之前添加的新值将被访问。
-实现集合的基本操作：
-1.判断子集：
 
-2.并集：
+**Set的静态属性与方法**：
+1. get Set[@@species]子构造函数或许会重载这个属性以至改变构造函数的赋值。子构造函数或许会重载这个属性以至改变构造函数的赋值。
 
-3.交集：
+**set的原型的属性与方法**：
+1. Set.prototype.size是只读属性，返回 Set 对象的成员数量。
+2. Set.prototype.clear()方法会移除 Set对象中的所有元素，返回值为undefined。
+3. Set.prototype.delete(value)方法用于移除 Set 对象中指定value。成功删除返回 true，否则返回 false。对象是通过引用比较的，所以如果没有对原始对象的引用，就必须通过迭代或遍历检查单个属性来删除。
+4. Set.prototype.has(value)方法返回一个布尔值，指示的元素value是否存在于Set中。
+5. Set.prototype[@@iterator]()是Set实现的迭代协议，使得Set对象被for..of直接使用，其初始值与Set.prototype.values 的初始值是同一个函数对象。也可以写成Set.prototype[Symbol.iterator]()。
+6. Set.prototype.keys()方法是Set.prototype.values() 方法的别名。
+7. Set.prototype.values()方法返回一个新的迭代器对象，该对象按插入顺序包含 Set 对象中每个元素的值。
+8. Set.prototype.entries()方法返回一个新的迭代器对象，这个对象包含的元素是类似 [value, value] 形式的数组，value 是Set对象中的每个元素，迭代器对象元素的顺序即Set对象中元素插入的顺序。
+9. Set.prototype.add(value)方法如果Set对象中不存在指定值value，将作为新元素插入到 Set 对象中，并返回Set对象。
+10. Set.prototype.forEach(callbackFn[, thisArg])方法对 Set 对象中的每个值按插入顺序执行一次提供的函数callback，返回undefined。它不会对被删除的键执行函数，然而，它会对每个值为 undefined 的键执行函数。callback 被调用时带有三个可选参数：（Array.prototype.forEach的callback要求第一个值element必传）：Set 中正在处理的当前元素value和key（因为 Set 中没有键，所以 value 会被共同传递给这两个参数）、调用forEach的Set对象。每个值都访问一次，除非在 forEach() 完成之前删除并重新添加它。在访问之前删除的值不会调用 callback。在 forEach() 完成之前添加的新值将被访问。
 
-4.相对补集，即差集：
+**实现集合的基本操作**：
 
-5.绝对补集，要求B是A的子集：
+**1.判断子集**：
+
+![](../../../public/front-end/basics/javascript/101.png)
+
+**2.并集**：
+
+![](../../../public/front-end/basics/javascript/102.png)
+
+**3.交集**：
+
+![](../../../public/front-end/basics/javascript/103.png)
+
+**4.相对补集，即差集**：
+
+![](../../../public/front-end/basics/javascript/104.png)
+
+**5.绝对补集，要求B是A的子集**：
+
+![](../../../public/front-end/basics/javascript/105.png)
 
 ### WeakSet
-WeakSet 对象允许将弱引用对象存储在一个集合中。和 Set 对象的主要区别有：
-1.WeakSet 只能是对象的集合，Set可以是任何类型的值。
-2.WeakSet 集合中对象的引用为弱引用。如果没有其它的对 WeakSet 中对象的引用，那么这些对象会被当成垃圾回收掉。WeakSet 中没有存储value对象的列表，因此WeakSet 是不可枚举的，也就没有提供value列表的方法（比如entries/keys/values/@@iterator/forEach）。也没有size属性，也没有Set中移除所有元素的clear方法。
-由于对象的数量或它们的遍历顺序不重要，尤其是在涉及大量对象时，WeakSet 比 Set 更适合跟踪对象引用，检测是否循环引用。
-WeakSet([iterable]) 构造函数用于创建 WeakSet 对象，且只能用 new 构造，否则会抛出 TypeError。iterable是一个可迭代对象，如果不指定此参数或其值为 null，则新的 WeakSet 为空。
-weakSet的原型方法：
-1.WeakSet.prototype.delete(value)方法从 WeakSet 对象中移除指定的value对象。如果在 WeakSet 对象中成功移除元素则返回 true。如果 key 没有在 WeakSet 中找到或者 key 不是一个对象，则返回 false。
-2.WeakSet.prototype.has(value)方法根据 WeakSet 对象的元素中是否存在 value对象返回一个 boolean 值。
-3.WeakSet.prototype.add(value)方法在 WeakSet 对象的最后一个元素后添加新的value对象。返回该WeakSet 对象。
 
+WeakSet 对象允许将弱引用对象存储在一个集合中。和 Set 对象的主要区别有：
+1. WeakSet 只能是对象的集合，Set可以是任何类型的值。
+2. WeakSet 集合中对象的引用为弱引用。如果没有其它的对 WeakSet 中对象的引用，那么这些对象会被当成垃圾回收掉。WeakSet 中没有存储value对象的列表，因此WeakSet 是不可枚举的，也就没有提供value列表的方法（比如entries/keys/values/@@iterator/forEach）。也没有size属性，也没有Set中移除所有元素的clear方法。
+
+由于对象的数量或它们的遍历顺序不重要，尤其是在涉及大量对象时，WeakSet 比 Set 更适合跟踪对象引用，检测是否循环引用。
+
+WeakSet([iterable]) 构造函数用于创建 WeakSet 对象，且只能用 new 构造，否则会抛出 TypeError。iterable是一个可迭代对象，如果不指定此参数或其值为 null，则新的 WeakSet 为空。
+
+weakSet的原型方法：
+1. WeakSet.prototype.delete(value)方法从 WeakSet 对象中移除指定的value对象。如果在 WeakSet 对象中成功移除元素则返回 true。如果 key 没有在 WeakSet 中找到或者 key 不是一个对象，则返回 false。
+2. WeakSet.prototype.has(value)方法根据 WeakSet 对象的元素中是否存在 value对象返回一个 boolean 值。
+3. WeakSet.prototype.add(value)方法在 WeakSet 对象的最后一个元素后添加新的value对象。返回该WeakSet 对象。
+
+### Promise（ES6）
+
+Promise 对象用于表示一个异步操作的最终完成（或失败）及其结果值。**Promise 可以解决回调地狱的问题**（即**多层嵌套的问题和在同一方法中处理完成或失败逻辑的问题**），通过链式回调的方式使得回调变得可控。**Promise 的出现是为了统一JS中的异步实现方案，异步是JS中的常见场景，统一实现方案，不仅可以有效的降低心智负担，还可以让不同的异步场景相互联动**。Promise 继承自 Function。Promise 可以在 Web Worker 中使用。
+
+一个Promise处于以下状态中的一种：
+1. pending（待定）：初始状态，既不完成也不拒绝。
+2. fulfilled（已完成）: 意味着操作成功完成。
+3. rejected（已拒绝）: 意味着操作失败。
+
+![](../../../public/front-end/basics/javascript/106.png)
+
+pending状态的 Promise 对象要么会通过一个值被fulfilled（已完成），要么会通过一个原因（错误）被rejected（已拒绝）。then方法绑定处理方法onFulfilled或onRejected和Promise的状态不存在竞态条件，可以在任一状态绑定该微任务。Promise.prototype.then、Promise.prototype.catch、Promise.prototype.finally方法均返回的是新Promise，因此支持链式调用，也被称为复合（composition），这些方法的回调是要等调用方法的原始Promise状态改变为对应状态才会将对应状态的回调放入微队列。同一个promise也可以通过多次调用 Promise.prototype.then 添加多个回调函数，会按照插入顺序进行执行。
+
+当Promise被拒绝时，会派发PromiseRejectionEvent 接口创建的事件（继承自Event）到全局作用域（window或Worker）中，如果有可用的有 rejection 处理程序时派发的是 rejectionhandled 事件，如果没有可用的rejection处理程序时派发的是unhandledrejection事件，这两个事件均包含promise属性和 reason属性分别表示被拒绝的 Promise和被拒绝的原因的。
+
+Promise() 只能用 new 构造。尝试在没有 new 的情况下调用它会引发 TypeError。new Promise(executor) 构造函数主要用于包装不支持 promise的函数executor（返回值不是 Promise）。executor的函数签名为**function(resolutionFunc, rejectionFunc){ // 通常是一些异步操作，是一段将输出与 promise 联系起来的自定义代码}**。在executor中，已解决（resolved）时去调用resolutionFunc(value)，已拒绝时（rejected）时去调用rejectFunc(reason)。executor中的异步操作通过 resolutionFunc 或 rejectionFunc 产生的副作用与Promise实例进行通信。如果在 executor 中抛出一个错误，该 promise 将被同步拒绝，除非 resolveFunc 或 rejectFunc 已经被调用，而且resolveFunc 或 rejectFunc如果是同步调用，Promise则会同步变成已完成或已拒绝，只有在异步函数中调用resolveFunc 或 rejectFunc才会异步的变成已完成或已拒绝。而且，executor 的返回值将被忽略。executor 函数在Promise构造函数执行时立即被调用。
+
+![](../../../public/front-end/basics/javascript/107.png)
+
+**Promise的静态属性与方法**：
+1. get Promise[@@species]访问器属性返回用于从 promise 方法构造返回值的构造函数。该访问器属性允许子类覆盖对象的默认构造函数。如果this.constructor是undefined，或者this.constructor[Symbol.species]是undefined或null，则then()、catch()和finally()均是使用默认构造函数Promise()来构造新的 promise 对象，否则使用this.constructor[Symbol.species]来构造新的 promise 对象。
+2. Promise.resolve(value)方法返回一个以给定值value解析后的 Promise 对象。如果value是promise，则直接返回该value；如果value是 thenable对象（即value有then方法），返回一个状态跟随value的状态的Promise对象；其他情况返回以value已完成（fulfilled）的Promise对象。注意：不要在resolve为自身的 thenable对象上调用Promise.resolve。这将导致无限递归。
+
+![](../../../public/front-end/basics/javascript/108.png)
+
+3. Promise.reject(reason) 方法返回一个以reason作为拒绝原因的新 Promise 对象，无论reason的类型是什么。
+
+![](../../../public/front-end/basics/javascript/109.png)
+
+4. Promise.race(iterable) 方法返回一个当可迭代对象iterable中的某个 promise （如果不是Promise则会被包装为Promise异步地变为完成）解决或拒绝就会对应的解决或拒绝promise。如果可迭代对象iterable是空的，则返回的 promise 将永远等待。如果iterable中存在非promise值或已完成的promise或已拒绝的promise，则Promise将以迭代到的第一个这样的值完成或拒绝。
+
+![](../../../public/front-end/basics/javascript/110.png)
+
+5. Promise.all(iterable)方法将由多个promise组成的可迭代对象iterable作为输入并返回单个 Promise。
+    1. 当且仅当如果iterable是一个空的可迭代对象，则返回一个同步已完成（resolved）状态的 Promise，Promise结果为空数组。
+    2. 如果iterable不包含任何 promise，则返回一个异步完成（resolved）Promise，Google 注意：Chrome 58返回一个已完成（resolved）状态的 Promise。
+    3. 其它情况下返回一个处理中（pending）的Promise。这个返回的 promise 之后会在所有的 promise 都完成（对于不是Promise的则会被包装为Promise异步地变为完成））或有一个 promise 失败时异步地变为完成或失败。返回值将会按照iterable内的 promise 顺序排列，而不是由 promise 的完成顺序决定。
+
+![](../../../public/front-end/basics/javascript/111.png)
+
+6. Promise.any(iterable)将由多个promise组成的可迭代对象iterable作为输入并返回单个 Promise。Promise.any() 方法依然是实验性的。它当前处于 TC39 第四阶段草案（Stage 4）。
+    1. 当且仅当如果iterable是一个空的可迭代对象，则返回一个同步已拒绝（rejected）状态的 Promise，其拒因是一个 AggregateError 实例。
+    2. 如果iterable不包含任何 promise，则返回一个异步完成（resolved）Promise，
+    3. 其它情况下返回一个处理中（pending）的Promise。这个返回的 promise 之后会在任意一个 promise完成则异步地变为完成（如果不是Promise则会被包装为Promise异步地变为完成），而在所有的 promise 都失败时异步地变为失败，其拒因是一个 AggregateError 实例，用于把单一的错误集合在一起。
+
+7. Promise.allSettled(iterable)将由多个promise组成的可迭代对象iterable作为输入并返回单个 Promise。
+    1. 当且仅当如果iterable是一个空的可迭代对象，则返回一个同步已完成（resolved）状态的 Promise，Promise结果为空数组。
+    2. 如果iterable不包含任何 promise，则返回一个异步完成（resolved）Promise。
+    3. 其它情况下返回一个处理中（pending）的Promise。这个返回的 promise 之后会在所有的 promise 都完成或失败时完成，返回的Promise 的结果是带有描述每个 promise 结果的对象数组（每个对象将会按照iterable内的 promise 顺序排列，而不是由 promise 的完成顺序决定）：
+        1. status: 一个字符串，要么是 "fulfilled"，要么是 "rejected"，表示 promise 的最终状态。
+        2. value：仅当 status 为 "fulfilled"才存在。
+        3. reason：仅当 status 为 "rejected"才存在。
+
+![](../../../public/front-end/basics/javascript/112.png)
+
+**promise的原型方法**：
+1. **Promise.prototype.then(onFulfilled[, onRejected])** 方法接受**原 Promise** 的成功情况的回调函数onFulfilled（可选）和失败情况的回调函数onRejected（可选），并返回一个新Promise：
+    1. onFulfilled是当**原 Promise** 变成已完成状态（fulfilled）执行的函数，唯一参数是已完成的最终结果（the fulfillment value），如果onFulfilled不是函数（包括undefined），则会在内部被替换为 **(x) => x**（即原样返回原Promise 已完成的最终结果的函数）。
+    2. onRejected是当 Promise 变成拒绝状态（rejected）时调用的函数。唯一参数是拒绝的原因（rejection reason）。如果onRejected不是函数（包括undefined），则会在内部被替换为一个 "Thrower" 函数 (err) => { throw err; }。
+    3. then方法是立即返回一个新的处理中pending的Promise，与调用then方法的原Promise的状态无关，而是取决于onFulfilled或onRejected处理函数的执行结果：
+        1. 如果onFulfilled或onRejected处理函数返回一个值value或没有返回值（即undefined），**新 Promise** 以value（没有返回值即undefined）作为其结果变成已完成状态（fulfilled）。
+        2. 如果onFulfilled或onRejected处理函数中抛出错误，**新 Promise** 以该错误为拒绝原因变成已拒绝状态（rejected）。
+        3. 如果onFulfilled或onRejected返回的是一个“已完成（或已拒绝）状态的Promise”，**新 Promise** 将以“此已完成（已拒绝）状态的Promise”结果值（或原因）作为其结果（或原因）**异步的（V8中是放入微队列中）**变成已完成（或已拒绝）状态。
+        4. 如果onFulfilled或onRejected返回的是一个“pending 的Promise”，新Promise的状态**异步的（V8中是放入微队列中）**跟随该“pending 的Promise”的状态。
+
+![](../../../public/front-end/basics/javascript/113.png)
+
+2. Promise.prototype.catch(onRejected) 方法处理拒绝的情况，并返回一个新的Promise。**事实上，promise.catch(onRejected) 内部调用并返回promise.then(undefined, onRejected)**。onRejected函数拥有一个参数：reason是 rejection 的原因。如果 onRejected 抛出一个错误或return一个失败的 Promise，catch方法返回的 Promise 被 rejected；否则，catch方法返回的已完成（resolved）的 Promise。catch方法能捕获executor中的同步错误和rejectFunc调用，以及then/catch/finally回调方法中抛出的错误或失败的Promise返回；但不能捕获executor中使用异步方法（比如setTimeout/setInterval）抛出的错误。因此，建议总是使用catch()方法，而不使用then()方法的第二个参数。
+
+![](../../../public/front-end/basics/javascript/114.png)
+
+3. Promise.prototype.finally(onFinally) 方法在 promise 结束时，无论结果是 fulfilled 或者是 rejected，都会执行指定的回调函数onFinally，并且finally方法返回一个新的Promise。finally(onFinally) 虽然与 .then(onFinally, onFinally) 类似，不同之处在于 finally 的回调函数中不接收任何参数；如果在 finally 的回调函数中 throw错误或返回被拒绝的 promise，新的 promise以错误或拒绝原因变为拒绝状态；否则新的promise的状态跟随调用finally方法的promise。
+
+![](../../../public/front-end/basics/javascript/115.png)
+
+混用旧式回调（比如setTimeout）和 Promise 可能会造成运行时序问题，可以使用Promise对其进行封装（实现sleep函数）。
+
+![](../../../public/front-end/basics/javascript/116.png)
+
+Promise 链式编程最好保持扁平化，不要嵌套 Promise，在编写 Promise 链时，一个好的经验法则是总是返回或终止 Promise 链，并且一旦得到一个新的 Promise，返回它。
+
+![](../../../public/front-end/basics/javascript/117.png)
+
+**任务按顺序执行**，即任一任务函数可以是异步或同步的，它们能被保证按顺序执行。composeAsync函数将会接受任意数量的函数作为其参数，并返回一个新的函数接受一个通过 composition pipeline 传入的初始值。
+
+![](../../../public/front-end/basics/javascript/118.png)
+
+**Promise 局限性**：
+1. 注册**完成或失败处理函数**后，无法取消（有支持“取消”FetchAPI 的 promise 的 AbortController API，但它不是 Promise API 的一部分） 
+2. pending状态下，不知道处理进展 
+3. 一个promise只能被完成或失败一次，不适合不断发生的事件。
+
+1. **并发请求控制**
+对于短时间可能发送大量网络请求的场景，为了节约资源，需要进行请求的并发控制。设置最大并发数，当某个请求完成时，才发起新的请求。
+
+![](../../../public/front-end/basics/javascript/119.png)
+
+![](../../../public/front-end/basics/javascript/120.png)
+
+2. **节流控制**
+通过发布订阅的设计模式，对请求的结果进行复用，适用于在短时间内发送多个相同请求的场景。
+
+关键在于如果有正在进行的请求，则新建一个 promise，将 resolve 和 reject 存到 listeners 数组中，订阅请求的结果。
+
+![](../../../public/front-end/basics/javascript/121.png)
+
+3. **淘汰请求**
+根据搜索词展示关联词的场景，短时间会发送大量的请求，这时要保证先发起的请求如果后返回是需要淘汰掉的。可以通过比较请求返回时，请求的序号是不是比上一个有效请求大。如果不是，则说明一个后面发起的请求先响应了，当前的请求应该丢弃。
+
+![](../../../public/front-end/basics/javascript/122.png)
+
+### Generator
+
+Generator 对象只能由生成器函数返回并且它符合**可迭代协议**和**迭代器协议**。Generator 对象继承自Function。
+
+**可迭代协议**允许 JavaScript 对象定义或定制它们的迭代行为。**要成为可迭代对象，该对象必须实现 @@iterator 方法**，这意味着对象（或者它原型链上的某个对象）必须有一个键为 @@iterator 的属性（一个无参数的函数，其返回值必须是一个**符合迭代器协议**的对象），可通过常量 Symbol.iterator 访问该属性。如果一个可迭代对象的 @@iterator 方法不能返回迭代器对象，则此**可迭代对象**被认为是一个不符合标准的可迭代对象，可能会导致某些运行时异常。
+
+**迭代器协议**定义了产生一系列值（无论是有限个还是无限个）的标准方式，值为有限个时，所有的值都被迭代完毕后，则会返回一个默认返回值。**要成为迭代器对象，必须实现 next 方法**，该方法是无参数或者接受一个参数的函数，并返回符合 IteratorResult 接口的对象，可选地，迭代器也实现了 return(value) 和 throw(exception) 方法。所有迭代器协议的方法（next()、return() 和 throw()）都应返回实现 IteratorResult 接口的对象。它必须有以下属性：
+1. done 属性表明迭代器是否迭代完毕的布尔值。
+2. value 属性是迭代器返回的任何 JavaScript 值，对应于生成器函数中yield关键字后面的表达式的值（如果省略表达式，则值为 undefined）。done 为 true 时可省略，如果value依然存在，即为迭代结束之后的默认返回值。
+3. done与value均不是严格要求的，如果返回没有任何属性的对象，则等价于 { done: false, value: undefined }，但是如果返回一个非对象返回值，将会抛出 TypeError（"iterator.next() returned a non-object value"）错误。
+
+因为几乎JavaScript中所有的语法和 API （比如for..of循环、数组展开语法、yield*和数组解构赋值）都期待可迭代对象而不是迭代器，**要使迭代器对象可迭代即成为可迭代迭代器，只需在迭代器对象上实现一个返回this的 [@@iterator]() 方法**，比如Generator对象。
+
+同样存在用于异步迭代的协议——**异步可迭代协议和异步迭代器协议**，区别在于异步可迭代协议必须实现的方法是[@@asyncIterator]()（一个无参数的函数，其返回值为一个符合**异步迭代器协议**的对象,即所有异步迭代器协议的方法（next()必须实现、return() 和 throw()）都返回的是以实现 IteratorResult 接口的对象为最终结果的Promise）。在不是同步迭代的异步迭代对象（即它有 [@@asyncIterator]() 但没有 [@@iterator]()）上使用 for...of、数组展开等将抛出 TypeError：x is not iterable错误。
+
+内置的可迭代迭代器对象包括String、Array、TypedArray、Map、Set，类数组对象（arguments和DOM集合类型），各自的prototype 对象都继承了一个未暴露的公共类（构造函数是Object）上的[Symbol.iterator]() { return this; } 方法。目前，没有内置的异步可迭代对象。生成器函数返回Generator对象，它们是可迭代的迭代器。异步生成器函数返回异步生成器对象，它们是异步可迭代的迭代器。当内置语法迭代一个可迭代迭代器对象，并且最后的结果中 done 为 false（即迭代器能够生成更多值）但不需要更多值时（在 for...of 循环中遇到 break 或 return，或者数组解构中的标识符只是有限个的），如果可迭代迭代器对象中存在return 方法，将调用 return 方法。由于Symbol.iterator是定义在原型上的所有，可以为内置可迭代对象的实例编写自有的[Symbol.iterator]达到重写该实例对象上的可迭代行为的目的。
+
+`yield* [[expression]]` 用于将执行权委托给另一个generator 或可迭代对象。整个yield* 表达式的值是当其后面的迭代器关闭时返回的值（即done为true时）。
+
+**Generator的原型属性与方法**：
+1. Generator.prototype[@@toStringTag] 属性的初始值是字符串 "Generator"。该属性被 Object.prototype.toString()使用。
+2. Generator.prototype.next(v)方法接受可选参数v并返回一个包含属性 done 和 value 的对象，其中v对应于生成器函数中yield关键字的前面返回值。
+3. Generator.prototype.return(v)方法接受可选参数v并始终返回一个包含属性 done 为true和 value 为 v 的对象，使生成器是完成状态。
+4. Generator.prototype.throw(exception)方法接受可选参数exception用来向生成器抛出异常，如果抛出的异常被 try...catch 捕获才可恢复生成器的执行并返回带有 done 及 value 两个属性的对象。如果抛出的异常没有被 try...catch 捕获，异常将从生成器函数中抛出，且此次不会返回值，生成器将变成完成状态。
+
+### Proxy
+
+Proxy 对象用于创建一个对象的代理，从而实现拦截并重新定义该对象的基本操作（如属性查找、赋值、枚举、函数调用等）。对象是属性的集合。然而语言不提供任何机制来直接操作对象中存储的数据，相反，与对象的所有交互最终都归结为对内部方法之一的调用，并且它们都可以通过Proxy进行自定义。所有内部方法均由语言本身调用，并且不能在 JavaScript 代码中直接访问。所有对象都有的内部方法：
+1. `[[GetPrototypeOf]]`：对应handler为getPrototypeOf()。
+2. `[[SetPrototypeOf]]`：对应handler为setPrototypeOf()。
+3. `[[IsExtensible]]`：对应handler为isExtensible()。
+4. `[[PreventExtensions]]`：对应handler为preventExtensions()。
+5. `[[GetOwnProperty]]`：对应handler为getOwnPropertyDescriptor()。
+6. `[[DefineOwnProperty]]`：对应handler为defineProperty()。
+7. `[[HasProperty]]`：对应handler为has()。
+8. `[[Get]]`：对应handler为get()。
+9. `[[Set]]`：对应handler为set()。
+10. `[[Delete]]`：对应handler为deleteProperty()。
+11. `[[OwnPropertyKeys]]`：对应handler为ownKeys()。
+
+**函数对象还具有以下内部方法**：
+1. `[[Call]]`：对应handler为apply()。
+2. `[[Construct]]`：对应handler为construct()。
+
+**Proxy的静态属性与方法**：
+1. Proxy.revocable(target, handler) 方法接受一个target参数和handler参数，返回一个包含了代理对象proxy（和使用new Proxy(target, handler) 创建的代理对象唯一区别在于可撤销）和该代理对象的撤销方法revoke（调用的时候不需要加任何参数）的对象：
+    1. 参数target是将用 Proxy 封装的目标对象，可以是任何类型的对象
+    2. 参数handler是一个对象，其属性是一批可选函数，这些函数定义了对应的操作被执行时代理对象的行为。
+
+    一旦代理对象被撤销，和它关联的目标对象以及处理器对象都有可能被垃圾回收掉，在它身上执行任何的可代理操作都会抛出 TypeError 异常，但执行可代理操作以外的操作不会抛出异常，再次调用撤销方法 revoke则不会有任何效果，但也不会报错。
+
+new Proxy(target, handler)构造函数用来创建 Proxy 对象，接受两个参数target和handler。target是要使用 Proxy 包装的目标对象（可以是任何类型的对象，包括原生数组，函数，甚至另一个代理），handler是一个通常以函数方法作为属性的对象，各方法分别定义了在执行各种操作时代理 p 的行为，这些方法也称为捕捉器。所有的捕捉器是可选的。如果没有定义某个捕捉器，那么就会保留源对象的默认行为，也就是说一个空的 handler 参数将会创建一个与被代理对象行为几乎完全相同的代理对象。handler对象内的方法：
+1. const proxy = new Proxy(target, { apply(target, thisArg, argumentsList) { } } )：apply方法用于拦截目标函数target的调用。如果定义了apply捕捉器，那么在执行proxy(...args)、Function.prototype.apply、Function.prototype.call和Reflect.apply时会触发apply捕捉器的行为，否则执行target的默认行为。其中target是必须是可调用的函数否则会抛出TypeError错误，thisArg是proxy被调用时的上下文对象，argumentsList是被调用函数proxy的参数数组。
+2. const P = new Proxy(target, { construct(target, argumentsList, newTarget) { } })：construct方法用于拦截 new 操作符和Reflect.construct()。construct方法必须返回一个对象，否则代理P将会抛出TypeError错误。target必须具有 `[[Construct]]` 内部方法（即 new target 必须是有效的），否则new proxy 会抛出TypeError错误。argumentsList是new proxy 的参数列表。newTarget是构造函数P即代理对象本身。方法内的this绑定在处理器对象handler上。
+3. const proxy = new Proxy(target, { defineProperty(target, property, descriptor) {} })：defineProperty方法用于拦截对象的Object.defineProperty()、Object.defineProperties()、Reflect.defineProperty()和proxy.property='value' 操作或调用 `[[DefineOwnProperty]]` 内部方法的任何其他操作。必须返回一个表示定义该属性的操作成功与否的Boolean。target是目标对象，而且调用Object.defineProperty()或Reflect.defineProperty()或Object.defineProperties()时传递的 descriptor中除enumerable、configurable、writable、value、get、set之外的非标准描述符属性会被忽略。property是待定义或修改其描述的属性名。descriptor是待定义或修改的属性的描述符。方法内的this绑定在处理器对象handler上。以下情况proxy会抛出TypeError：
+    1. 在严格模式下，false 作为 handler.defineProperty 方法的返回值。
+    2. 如果目标对象不可扩展时添加属性。
+4. const proxy = new Proxy(target, { deleteProperty(target, property) { } })：方法用于拦截对对象属性的 delete 操作和Reflect.deleteProperty()，必须返回一个表示该属性是否被成功删除的Boolean。target是目标对象。property是待删除的属性名。如果目标对象的属性是不可配置的，那么该属性不能被删除，proxy 将会抛出一个 TypeError。方法内的this 被绑定在 handler 上。
+5. const proxy = new Proxy(target, { get(target, property, receiver) { } })：方法用于拦截对象的读取属性和Reflect.get()操作，可以返回任何值。target是目标对象。property是被获取的属性名。receiver是proxy 或者继承 proxy 的对象。**如果property对应的目标对象的属性是不可写且不可配置的，则get方法返回的值必须与该目标属性的值相同**；如果property对应的目标对象的属性没有配置getter方法，则get方法返回的值必须为 undefined； 否则都会抛出TypeError错误。方法内的this 被绑定在 handler 上。
+6. const proxy = new Proxy(target, { getOwnPropertyDescriptor(target, prop) { } })：getOwnPropertyDescriptor方法用于拦截对象的Object.getOwnPropertyDescriptor()和Reflect.getOwnPropertyDescriptor()操作，必须返回一个 object 或 undefined。如果属性是目标对象的不可配置属性或目标对象不可扩展时，只能返回object。如果属性不是目标对象的属性且目标对象不可扩展，只能返回undefined。如果属性不是目标对象的自身属性或者时目标对象的可配置属性，只能返回configurable为true的描述符对象。target是目标对象。prop是应检索其描述符的属性名。方法内的this 被绑定在 handler 上。
+7. `const proxy = new Proxy(target, { getPrototypeOf(target) { } }))`：getPrototypeOf方法用于拦截读取目标对象原型的Object.getPrototypeOf()、Reflect.getPrototypeOf()、Object.prototype.__proto__、Object.prototype.isPrototypeOf()和instanceof操作。方法的返回值必须是一个对象或者 null，而且如果目标对象是不可扩展的则该方法必须返回目标对象的原型对象，否则会抛出TypeError错误。target是目标对象。方法内的this 被绑定在 handler 上。
+8. `const proxy = new Proxy(target, { has(target, prop) { } }))`：has方法是针对 in 操作符和Reflect.has()的代理方法，返回是否存在属性的boolean值。如果属性是目标对象的自有属性，而且该属性不可配置或者目标对象不可扩展，则该方法不能返回false，否则会抛出TypeError错误。target是目标对象。prop是需要检查是否存在的属性。方法内的this 被绑定在 handler 上。
+9. `const proxy = new Proxy(target, { isExtensible(target) { } }))`：isExtensible方法用于拦截对目标对象的 Object.isExtensible()方法，返回值必须和Object.isExtensible(target) 相同，否则会抛出TypeError错误。target是目标对象。方法内的this 被绑定在 handler 上。
+10. `const proxy = new Proxy(target, { ownKeys(target) { } }))`：ownKeys方法用于拦截 Reflect.ownKeys()、Object.getOwnPropertyNames()、Object.getOwnPropertySymbols()和Object.keys()操作，方法必须返回一个可枚举数组对象，且数组的元素类型必须是String或Symbol，且必须包含目标对象的所有不可配置的自有属性key。如果目标对象不可扩展，那么返回值必须包含且只包含目标对象自身属性的所有键。target是目标对象。方法内的this 被绑定在 handler 上。
+11. `const proxy = new Proxy(target, { preventExtensions(target) { } }))`：preventExtensions方法用于拦截Object.preventExtensions()、Reflect.preventExtensions()、Object.seal()和Object.freeze()操作，并返回一个boolean值。方法仅在 Object.isExtensible(proxy) 为 false，即目标对象为不可扩展时返回 true，否则会抛出TypeError错误。target是目标对象。方法内的this 被绑定在 handler 上。
+12. `const proxy = new Proxy(target, { set(target, property, value, receiver) { } })`：方法用于拦截对象的设置属性和Reflect.set()操作，方法应当返回一个属性是否设置成功的布尔值，在在严格模式下只能返回true否则抛出TypeError错误。target是目标对象。property是要被设置的属性名。value是要设置的属性值。receiver是proxy 或者继承 proxy 的对象。如果property对应的目标对象的属性是不可写且不可配置的，则不可修改proxy的值；如果property对应的目标对象的属性没有配置setter方法，则无法设置proxy该属性的值；在严格模式下set方法只能返回true; 否则都会抛出TypeError错误。方法内的this 被绑定在 handler上。
+13. `const proxy = new Proxy(target, { setPrototypeOf(target, prototype) { } }))`：用来拦截设置目标对象的原型的 Object.setPrototypeOf()和Reflect.setPrototypeOf()操作，方法返回是否成功修改目标对象原型的boolean值。如果target是不可扩展的，则参数prototype必须和与 Object.getPrototypeOf(target)相同，否则会抛出TypeError错误。如果不想给目标对象设置对象设置一个新的原型，setPrototypeOf 方法可以返回 false，也可以抛出异常。target是目标对象。方法内的this 被绑定在 handler 上。
+
+与内部插槽相关的实现（具有内部插槽的内置对象/私有类字段，比如Map, Set, Date, Promise）、严格相等运算符无法被代理。
+
+### Reflect
+
+Reflect 对象包含用于调用可拦截的 JavaScript 对象内部方法的静态方法。这些方法与Proxy handler的方法相同。Reflect 的主要用例是在Proxy handler中提供默认转发行为。Proxy handler用于拦截对象上的操作，它为对象内部方法提供自定义实现，而Reflect API用于调用相应的内部方法。Reflect继承自Object，Reflect不是构造函数，不能通过new 运算符或作为函数调用。和Math对象相同，Reflect的所有属性和方法都是静态的。Reflect 对象提供的静态方法与Proxy handler处理器的相同。
+
+**Reflect的静态方法**：
+1. Reflect.apply(target, thisArg, argumentsList) 通过指定的参数列表argumentsList（数组或类数组对象）和指定的上下文对象thisArg发起对目标函数target的调用并返回函数调用的结果。等同于Function.prototype.apply.call(target, thisArg, argumentsList)如果 target 对象不可调用，抛出 TypeError。相比Function.prototype.apply或Function.prototype.call，使用 Reflect.apply 方法会使代码更加简洁易懂。
+2. Reflect.construct(target, argumentsList[, newTarget])方法相当于new target(...argumentsList)。target是被运行的目标构造函数。参数列表argumentsList是传递给target的类数组或数组。newTarget是作为新创建对象的原型对象的 constructor 属性，可选，默认值为 target。如果 target 或者 newTarget 不是构造函数，抛出TypeError,异常。obj = Reflect.construct(target, argumentsList, newTarget)与使用obj = Object.create(newTarget.prototype); target.apply(obj, argumentsList)来创建对象实例obj等效，如果前者不传newTarget则，后者即修改为Object.create(target.prototype)，区别在于后者构造函数中的new.target始终为undefined。
+3. Reflect.defineProperty(target, propertyKey, descriptor)方法返回一个 Boolean，来说明该属性是否被成功定义，如果target不是 Object，抛出一个 TypeError。相比之下，Object.defineProperty 方法，如果成功则返回一个对象，否则抛出一个 TypeError。
+4. Reflect.deleteProperty(target, propertyKey)方法允许删除目标对象target上的属性propertyKey，返回一个 Boolean 值表示该属性是否被成功删除。该方法几乎与非严格模式下的delete 操作符相同。如果target不是 Object将抛出TypeError错误。
+5. Reflect.get(target, propertyKey[, receiver])方法通过函数调用的方式从目标对象target上读取属性propertyKey并返回属性的值，如果target对象中指定了getter，receiver则为getter调用时的this值。
+6. Reflect.getOwnPropertyDescriptor(target, propertyKey)方法获取在对象target中给定的属性propertyKey的属性描述符，如果属性不存在则返回 undefined。如果target不是 Object将抛出TypeError错误。
+7. Reflect.getPrototypeOf(target)方法返回指定对象target的原型（即内部的 `[[Prototype]]` 属性的值）。如果target不是 Object将抛出TypeError错误。
+8. Reflect.has(target, propertyKey)方法返回一个 Boolean值指示指定对象target上是否存在此属性 propertyKey，作用与in操作符相同。如果target不是 Object将抛出TypeError错误。
+9. Reflect.isExtensible(target)方法返回一个 Boolean 值表明该对象target是否可扩展（即是否能够添加新的属性）。如果target不是 Object将抛出TypeError错误。
+10. Reflect.ownKeys(target) 方法返回一个由目标对象自身的属性键组成的数组。如果target不是 Object将抛出TypeError错误。它的返回值等同于 Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target))。
+11. Reflect.preventExtensions(target)方法返回一个 Boolean 值表明目标对象target是否成功被设置为不可扩展。如果target不是 Object将抛出TypeError错误。
+12. Reflect.setPrototypeOf(target, prototype)方法返回一个 Boolean 值表明是否原型已经成功设置。如果 target 不是 Object ，或者prototype 既不是对象也不是 null，抛出一个 TypeError 异常。
+13. Reflect.set(target, propertyKey, value[, receiver])方法以函数的方式在target上成功设置属性propertyKey的值为value，并返回一个 Boolean 值表明是否设置成功。如果target不是 Object将抛出TypeError错误。如果遇到 setter，receiver则为setter调用时的this值。
+
+### Error
+
+当运行时错误产生时，Error 对象会被抛出。Error 对象也可用于用户自定义的异常的基础对象。
+
+**存在以下错误类型，均继承自Error**：
+1. EvalError：代表了一个关于 eval() 全局函数的错误。此异常不再会被 JavaScript 抛出，但是 EvalError 对象仍然存在，以保持兼容性。EvalError 是一个可序列化对象，所以可以使用 structuredClone() 对它进行克隆，也可以使用 postMessage() 在 Worker 之间拷贝它。
+2. RangeError：表示一个特定值不在所允许的范围或者集合中的错误。在以下的情况中，可能会遇到这个问题：
+    1. 将不允许的字符串值传递给 String.prototype.normalize()，或
+    2. 尝试使用 Array 构造函数创建一个具有不合法的长度的字符串，或
+    3. 传递错误值到数值计算方法（Number.toExponential()、Number.toFixed() 或 Number.toPrecision()）。
+3. ReferenceError：代表当一个不存在（或尚未初始化）的变量被引用时发生的错误。
+4. SyntaxError：代表尝试解析不符合语法的代码的错误。当 Javascript 引擎解析代码时，遇到了不符合语法规范的标记（token）或标记顺序，则会抛出 SyntaxError。
+5. TypeError：通常（但并不只是）用来表示值的类型非预期类型时发生的错误。以下情况会抛出 TypeError：
+    1. 传递给运算符的操作数或传递给函数的参数与预期的类型不兼容；或
+    2. 尝试修改无法更改的值；
+    3. 尝试以不适当的方法使用一个值。
+6. URIError：用来表示以一种错误的方式使用全局 URI 处理函数而产生的错误。
+7. AggregateError：代表了包装了多个错误对象的单个错误对象。当一个操作需要报告多个错误时，例如 Promise.any()，当传递给它的所有承诺都被拒绝时，就会抛出该错误。
+8. InternalError：表示出现在 JavaScript 引擎内部的错误，该特性是非标准的，仅firefox支持，请尽量不要在生产环境中使用它。通常描述某种数量过多的情况，例如：
+    1. "too many switch cases"（过多 case 子句）；
+    2. "too many parentheses in regular expression"（正则表达式中括号过多）；
+    3. "array initializer too large"（数组初始化器过大）；
+    4. "too much recursion"（递归过深）。
+
+**Error的原型属性与方法**：
+1. Error.prototype.toString()：方法覆盖了 Object.prototype.toString() 方法，返回一个表示指定 Error 对象的字符串，其实现如下：
+
+![](../../../public/front-end/basics/javascript/123.png)
+
+2. Error.prototype.message：错误消息。对于用户自定义创建的 Error 对象，这是构造函数的第一个参数提供的字符串。
+3. Error.prototype.name: 错误名称。这是由具体错误类型构造函数决定的。
+4. Error.prototype.cause：表示导致当前错误被抛出的原因——通常是另一个错误。它通过构造函数的第二个可选参数 options.cause 参数被传入。自定义错误类型也可以使用 cause 属性，前提是通过 super() 调用子类的构造函数时传递 options 参数。
+5. Error.prototype.stack：此非标准堆栈属性提供了调用哪些函数、调用顺序、来自哪行和文件以及使用哪些参数的堆栈追踪。堆栈字符串从最近的调用开始到较早的调用，返回到原始的全局范围调用。
+
+**throw 语句（语法为throw expression）**用来抛出一个用户自定义的异常，表达式expression是异常内容。当前函数的执行将被停止（throw 之后的语句将不会执行），并且控制将被传递到调用堆栈中的第一个 catch 块。如果调用者函数中没有 catch 块，程序将会终止。注意throw语句同样受到自动分号插入（ASI）机制的控制，在throw关键字和值之间不允许有行终止符。
+
+**try...catch 语句**标记要尝试的语句块，并指定一个出现异常时抛出的响应。catch块指定一个标识符（即catch后的 exception_var），该标识符保存由throw语句指定的值。catch块是唯一的，因为当输入catch块时，JavaScript 会创建此标识符，并将其添加到当前作用域；标识符是catch子语句内部的。换言之，当进入catch子语句时标识符创建，catch子语句执行完毕后，这个标识符将不再可用。finally块在try块和catch块之后执行但是在下一个try声明之前执行。无论是否有异常抛出或捕获它总是执行。也可以用一个或者更多条件catch子句来处理特定的异常。在这种情况下，当异常抛出时将会进入合适的catch子句中（catch (exception_var_1 if condition_1) {} 这个功能不符合 ECMAscript 规范）。当用一个无条件catch子句和一个或多个条件语句时，无条件catch子句必须放在最后。否则当到达条件语句之前所有的异常将会被非条件语句拦截。如果从finally块中返回一个值，那么这个值将会成为整个try-catch-finally的返回值，无论是否有return语句在try和catch中。
+
+## 继承与原型链
+
+JavaScript不是基于类的语言，而是基于原型的，本身不提供一个 class 实现，即使在 ES2015/ES6 中引入了 class 关键字（仅是一个语法糖）。
+
+JavaScript中关于继承只有一种结构，即对象，每个实例对象（object）都有一个私有属性__proto__指向它的构造函数的原型对象（prototype ，也叫做函数原型即函数才有prototype，默认情况下，prototype是一个包括属性constructor的普通对象，其中属性constructor指向构造函数本身），该原型对象也有私有属性__proto__ 指向它的构造函数的原型对象（prototype ），层层向上，直到一个对象的__proto__为null（Object.prototype的__proto__为null）。__proto__即内部属性 `[[prototype]]`，也叫做对象的隐式原型，默认情况下，__proto__指向创建该对象的构造函数的原型（prototype），__proto__可以访问，`[[prototype]]`无法直接访问，ES6开始可以通过 Object.getPrototypeOf() 和 Object.setPrototypeOf() 来访问和设置 `[[prototype]]`。**Object.prototype是特殊的对象，不是被构造函数new出来的？**。
+
+**原型链**：每个JavaScript 对象通过__proto__属性指向它的构造函数的原型对象，`__proto__` 将对象连接起来组成了原型链。
+
+**属性查找机制**：沿着实例对象 —> 构造函数的原型对象prototype —> ... —>最顶级的原型对象Object.prototype的原型链查找，找到即停止，否则输出undefined。在原型链上查找属性比较耗时，对性能有副作用，尤其是在访问的属性不存在时。检查属性是否存在是不能检测值是否为undefined，有可能值恰好被设置为undefined。
+
+**属性修改机制**：对象上直接修改属性只会修改或添加实例对象本身的属性，如果需要修改原型的属性时，则可以用: 构造函数.prototype.attribute = 2；但是这样会造成所有继承于该对象的实例的属性发生改变。
+
+![](../../../public/front-end/basics/javascript/124.png)
+
+![](../../../public/front-end/basics/javascript/125.png)
+
+ES6 的 class语法糖可以使用extends很容易实现继承，而ES5可以利用Object.create()将子构造函数的prototype的__proto__设置为父构造函数的prototype，并且设置子构造函数的prototype的constructor属性为子构造函数，最后在子构造函数中调用父构造函数Parent.call(this)，即**寄生组合继承的方式（推荐使用）**：
+
+![](../../../public/front-end/basics/javascript/126.png)
+
+基于原型的编程是一种面向对象的编程风格，在这种风格中，类没有明确的定义，而是通过将属性和方法添加到另一个类的实例中，或者少数情况下将它们添加到一个空对象中来派生。简单地说：这种类型的风格允许创建一个对象，而不首先定义它的类。
+
+原型的作用：首先，支持面向对象的语言必须要做到：能判定一个实例的类型。原型作为实现面向对象的手段之一，被JS采用。在JS中，通过原型就可以知晓某个对象从属哪个类型，即原型的存在避免了类型的丢失。此外，支持抽离实例的公共方法到原型上，避免将方法放到实例中，也能减少内存消耗。
+
+**面向对象的设计一定是好的设计吗？**
+
+不一定，从继承的角度说，这一设计是存在巨大隐患的，因为继承最大的问题在于属性继承的不可选择性。而解决的趋势是**使用组合的设计模式：面向组合就是先设计一系列零件，然后将这些零件进行拼装，来形成不同的实例或者类**。
+
+**猴子补丁**：在函数原型中加入成员，以增强对象的功能，猴子补丁会导致原型污染，使用需谨慎。
+
+## Classes相关
+
+类是创建对象的模板。它们将数据与代码封装起来，以便对这些数据进行处理。类也是Function的实例。JS中的类是建立在原型基础上的，但也有一些语法和语义，与ES5类的语义不尽相同。
+
+通过class创建的构造函数只能通过new的方式调用。
+
+类定义语法有两个组成部分：类表达式和类声明。无法重新定义类，否则会抛出SyntaxError错误。
+
+类声明是指使用带有class关键字的类名声明一个类，与函数声明的重要区别是不会提升，在声明之前访问类将会抛出ReferenceError异常。
+
+类表达式可以命名或不命名，类表达式本身不提升，提升的是前面var/let/const声明的的变量。命名类表达式的名称，可以通过类的静态属性name访问，与函数表达式相同，匿名类表达式的name值是首次赋值目标的变量名，命名类表达式则是class关键字后的名称。
+
+一个类的类体是一对{} 中的部分，用于定义类成员（静态方法、原型方法、构造函数、getter、setter）。**类声明和类表达式的主体都执行在严格模式下**。
+
+### constructor
+
+constructor方法是用于创建和初始化class创建的对象的特殊方法，一个类只能有一个constructor，否则将抛出SyntaxError异常。如果没有显式指定构造方法，则会添加默认的 constructor 方法，对于基类默认的构造函数是constructor() {}；对于派生类，默认构造函数是constructor(...args) {super(...args);}。
+
+在构造函数方法体内，可以通过this访问正在创建的对象，通过new.target访问用new调用的类。在构造函数执行之前，方法（包括getters和setters）和原型链已经在this上初始化了，所以甚至可以在基类的构造函数中访问派生类的方法，然而，如果这些派生类的方法中使用到this，由于this还没有被完全初始化，这意味着在基类的构造函数中读取派生类的公共字段将导致未定义以及读取派生类的私有字段将导致TypeError，但在派生类构造函数中可以读取。
+
+构造方法中可以使用 super 关键字来调用父类的构造方法，而且在派生类中，必须先调用 super 才能使用 "this"。super()调用的是当前类本身的原型的构造函数，因此如果改变的是当前类本身的原型，super()将调用新原型的构造函数，而如果改变当前类的prototype属性并不影响super()调用哪个构造函数。
+
+构造函数方法可以有返回值，对于基类可以返回非object值，只不过会被忽略；对于派生类，必须返回object或undefined，否则将会抛出TypeError错误。如果基类的构造函数返回一个对象，则该对象将用作定义派生类的类字段的 this 值，这个技巧称为“返回覆盖”，它允许派生类的字段（包括私有字段）被定义在不相关的对象上。
+
+构造函数必须是文字名称constructor，不能是计算属性[“constructor”]，否则会被定义为原型上的一个constructor方法，不会在new的时候调用。
+
+### extends
+
+extends关键字（class ChildClass extends ParentClass { ... }）用于类声明或者类表达式中创建一个派生类。任何可以用new调用的构造函数都可以作为ParentClass，ParentClass的prototype属性必须是 Object 或 null。extends 将分别设置ChildClass 和 ChildClass.prototype 的原型为ParentClass和ParentClass.prototype，分别使得**静态方法与属性**和**原型方法与属性**分别可以被继承。extends 的右侧不必是标识符，可以使用任何计算结果为可被new调用的构造函数的表达式。
+
+由于extends右侧只能有一个单基类，因此直接多重继承是不可能的。定义一个以基类作为输入和一个继承该基类的派生类作为输出的函数可以用于在 ECMAScript 中实现Mix-ins或抽象子类。
+
+![](../../../public/front-end/basics/javascript/127.png)
+
+### super
+
+super 关键字用于访问对象实例或类本身的原型（`[[Prototype]]`）上的属性和方法，或调用基类的构造函数，遵循原型链属性查找机制。super 关键字有且只有两种使用方式：作为“函数调用”（super(...args)），或作为“属性查询”（super.prop 和 super[expr]），试图访问 super 本身会导致 SyntaxError异常。
+
+函数调用（super(...args)）形式可以在派生类的构造函数体中使用，但必须在使用 this 关键字之前和构造函数返回之前调用super，否则会在实例化时抛出ReferenceError错误。
+
+属性查询形式（super.prop 和 super[expr]）可以用来访问**派生类的 `[[Prototype]]`（即基类）的公有静态方法和属性（即基类的公有静态方法和属性）或派生类的prototype上的 `[[Prototype]]`（即基类的prototype）的方法（即基类中定义的公有实例方法）**。在类字段声明区域声明公有字段时，对于公有静态字段，super的引用是基类的构造函数；对于公有实例字段，super的引用是基类的prototype对象，由于实例字段是在实例上设置的，不能用 super 来访问父类的实例字段，只能是基类的公有实例方法。不能使用 delete 操作符加上 super.prop 或者 super[expr] 去删除父类的属性，这样做会抛出 ReferenceError。
+
+属性查询形式（super.prop 和 super[expr]）还可以用来访问对象字面量的 `[[Prototype]]` 的方法和属性。
+
+属性查询的行为类似于Reflect.get(Object.getPrototypeOf(objectLiteral), prop或[expr], this)意味着该属性总是在对象字面量/类声明的原型链上寻找，取消绑定和重新绑定方法（即赋值给一个变量）不会改变 super 的引用。
+
+属性设置（super.prop = value 和 super[expr] = value）的行为类似于Reflect.set(Object.getPrototypeOf(objectLiteral), prop或[expr], value, this)，由于this是当前实例对象，因此它是在当前实例对象上设置属性，而且会调用setter，意味着不能重写不可写的属性。
+
+### 属性与方法
+
+实例的属性必须定义在类的方法里（准确的说是constructor方法）。静态属性必须类体外在CLASSNAME上定义。原型属性必须类体外在CLASSNAME.prototype上定义。
+
+类体内通过 static 关键字定义公有静态字段和公有静态方法，没有设定初始化的公有静态字段将默认被初始化为 undefined，可以通过类本身的原型链访问它们。在类的构造函数和公有实例方法中访问静态方法，只能使用类名CLASSNAME.STATIC_METHOD_NAME或者使用构造函数的属性this.constructor.STATIC_METHOD_NAME。在类的静态方法中访问同一个类中的其他静态方法，可直接使用 this.STATIC_METHOD_NAME 关键字。在类体外访问静态方法，只能使用类名CLASSNAME.STATIC_METHOD_NAME。在派生类中可以使用super.STATIC_METHOD_NAME访问基类的静态方法。在字段声明区域初始化公有静态字段时，this 指向的是类的构造函数，或者使用类名本身，派生类中此处可以使用 super 来访问基类的构造函数，由此访问基类的公有静态方法和公有静态字段。公有静态方法中的this也是类的构造函数，当方法调用的上下文不是类的构造函数，则方法内的this指向undefined。公有静态方法是在类的声明阶段用 Object.defineProperty方法添加到类的构造函数上的，其属性特性是可写、不可枚举和可配置的。公有静态字段是在类的声明阶段用 Object.defineProperty方法添加到类的构造函数上的，其属性特性是可写、可枚举和可配置的。
+
+公有实例方法是在类的声明阶段用 Object.defineProperty方法添加到类的prototype中，采用方法定义简写语法（可以使用普通方法，生成器方法（*generatorMethod(){}）、异步方法（async asyncMethod(){}）和异步生成器方法（async *asyncGeneratorMethod(){}），getter，setter）。公有实例方法中this指向实例化对象，当方法调用的上下文不是实例对象本身，则this指向undefined。派生类的公有实例方法中可以使用 super 访问到基类的prototype，由此调用基类的公有实例方法。公有实例方法不是构造函数，尝试实例化它们将抛出TypeError异常。其属性特性是可写、不可枚举和可配置的。
+
+公有实例字段是在基类的构造函数运行之前或在派生类的super()返回之后用Object.defineProperty添加到实例对象上的（在基类的构造函数中访问派生类的公有实例字段是未定义（undefiend）），没有设定初始化的字段将默认被初始化为 undefined。和实例的属性一样，公有实例字段名可以使用计算属性（[key]）。在字段声明区域初始化公有实例字段时，this 指向的是实例对象，派生类中此处可以使用 super 来访问基类的prototype，由此调用基类的公有实例方法。派生类中的公有实例字段声明不会调用基类中的 setter，相反，在构造函数中使用this初始化的属性会调用基类中的setter。其属性特性是可写、可枚举和可配置的。公有实例方法和公有实例字段则是可以通过类实例对象的原型链访问。
+
+类字段在默认情况下是公有的，但可以使用增加哈希前缀 # 的方法来定义私有类字段，与公有字段（方法）的区别在于不参与对应原型的继承。私有字段不能通过在之后赋值来创建它们，这种方式只适用普通属性。
+
+私有字段（方法）包括私有实例字段（方法）和私有静态字段（方法）。
+
+私有实例字段（方法）在类声明的构造方法中可被访问。从实例对象上访问私有实例字段（方法）、类体内在未声明的情况下访问或设置私有实例字段、或尝试使用 delete 移除声明的私有实例字段都会抛出语法错误。可以使用 in 运算符检查私有实例字段（或私有实例方法）是否存在，当私有实例字段或私有实例方法存在时，运算符返回 true，否则返回 false。和公有实例字段一样，私有实例字段是在基类的构造函数运行之前或在派生类的super()返回之后用Object.defineProperty添加到实例对象上的（在基类的构造函数中访问派生类的公有实例字段是未定义（undefiend））。私有实例方法则是在类的声明阶段添加到到实例对象上的，但不能在实例对象上访问。私有实例方法可以是生成器方法、异步方法或异步生成器方法，也可以是私有的 getter 和 setter。
+
+私有静态字段或方法是在类的声明阶段用 Object.defineProperty方法添加到类的构造函数上的。只有定义该私有静态字段或方法的类能访问该字段，直接使用派生类访问会抛出TypeError异常。
+
+## 运算符相关
+
+###  in
+
+prop in object如果指定的属性prop在指定的对象object或其原型链中，则 in 运算符返回 true，否则返回false。对于prop，非 symbol 类型且非string类型将会强制转为字符串再判断。对于object，必须是对象。如果对象object上的属性prop被delete运算符删除，则in返回false，如果只是将属性的值赋值为undefined，则in仍返回true。
+
+### delete
+
+delete object.prop或delete object['prop']delete 会从某个对象上object移除指定自身属性prop，成功删除的时候会返回 true，否则返回 false。delete操作符与直接释放内存无关。
+1. 如果属性prop不存在于object自身上，delete将不起作用，但仍然返回true。
+2. 任何使用 var 声明的属性或函数不能从全局作用域或函数的作用域中删除，并且返回false，在严格模式下直接删除变量标识符会抛出SyntaxError错误。
+3. 任何用let或const声明的属性以及函数参数不能够从它被声明的作用域中删除，并且返回false，在严格模式下直接删除变量标识符会抛出SyntaxError错误。
+4. 不可配置的属性不能被删除（var、let、const声明的属性不能删除也是因为它们是不可配置的），并且返回false，在严格模式下会抛出TypeError错误。
+5. 使用delete删除一个数组元素时，数组的长度不受影响。
+
+### void
+
+**void expression 对给定的表达式expression进行求值，然后返回 undefined 原始值**。
+1. 在使用IIFE（立即调用函数表达式）时，如果function 关键字直接位于语句开头会导致该表达式被解析为函数声明，如果是匿名函数，就会立即产生SyntaxError错误；如果不是匿名函数，则会在解析到代表调用的括号时产生SyntaxError错误。使用void或一对圆括号均能使得IIFE被解析为表达式，区别在于void返回值为undefined，圆括号为表达式的值。
+2. 以 javascript: 开头的 URI 被点击时，它会执行 URI 中 javascript: 后面的代码，然后用返回的值替换页面内容，除非返回的值是 undefined，比如javascript:void。但是不推荐利用 javascript: 伪协议来执行 JavaScript 代码，而是应该为链接元素绑定事件。
+3. 在箭头函数中，当函数返回值不会被用到的时候，应该使用 void 运算符，来确保 API 改变时，并不会改变箭头函数的行为。
+
+### 自增&自减
+
+自增或自减运算符只能应用于引用的操作数（变量和对象属性），自增或自减运算符的计算结果是一个值，而不是对一个值的引用，因此不能将多个自增或自减运算符直接链接在一起。
+
+x++或++x，自增（++）运算符对其操作数进行自增（加一），如果使用后缀式（x++），操作数会加一，然后返回加一之前的值。如果使用前缀式（++x），操作数会加一，然后返回加一之后的值。
+
+x--或--x，自减（--）运算符对其操作数进行自减（减一），如果使用后缀式（x--），操作数会减一，然后返回减一之前的值。如果使用前缀式（--x），操作数会减一，然后返回减一之后的值。
+
+### 位运算符
+
+**按位或（|）运算符**在其中一个或两个操作数对应的二进制位为 1 时，该位的结果值为 1。操作数被转换为 32 位整数（如果转换结果是NaN或Infinity或-Infinity，则操作数为0）并由一系列二进制位（0 和 1）表示，超过 32 位的数字会丢弃其最高有效位，而且小数部分直接丢弃。
+
+**按位异或（^）运算符**在两个操作数有且仅有一个对应的二进制位为 1 时，该位的结果值为 1。如同其他位运算符一样，它将操作数转化为 32 位的有符号整型。**判定两个数符号是否相同：a ^ b > = 0；交换变量a，b的值**：
+1. **a = a ^ b; a = a ^ b; a = a ^ b**; 
+2. [a, b] = [b, a];
+3. a = a + b; b = a - b; a = a - b;
+4. temp = a; a = b; b = temp;
+
+**按位与（&）运算符**在两个操作数对应的二次位都1为时，该位的结果才为1。如同其他位运算符一样，它将操作数转化为 32 位的有符号整型。
+
+**按位非（~）运算符**将操作数的位反转。如同其他位运算符一样，它将操作数转化为 32 位的有符号整型。32 位有符号整数操作数根据补码运算规则进行反转，也就是说，最高有效位表示负数。按位非运算时，任何数字 x 的运算结果都是 -(x + 1)，因此，连续两个按位非可以对x快速取整：~~x = -(-x-1) -1 = x。请注意，由于数字 ~-1 和 ~4294967295（232 - 1）均使用 32 位表示形式，它们的运算结果均为 0。
+
+**左移操作符 (<<)** 将第一个操作数向左移动指定位数，左边超出的位数将会被清除，右边将会补零。移动任意数字 x 至左边 y 位，得出 x * 2 ** y。
+
+**右移操作符 (>>)** 将一个操作数的二进制表示形式（运算符以二进制补码的形式对左操作数进行运算）向右移动指定位数，该操作数可以是数值或者 BigInt 类型（BigInt 在使用右移时不会产生截断现象）。右边移出位被丢弃，左边移出的空位补符号位（最左边那位）。该操作也称为“符号位传播右移”（sign-propagating right shift）或“算术右移”（arithmetic right shift），因为返回值的符号位与第一个操作数的符号位相同。>> 运算符针对这两种操作数的类型进行了重载：数值和 BigInt。对于数值，该运算符返回一个 32 位整数；对于 BigInt 类型，该运算符返回一个 BigInt。右移运算符首先将两个操作数强制转换为数值并测试它们的类型。如果两个操作数都转换成 BigInt，则执行 BigInt 右移；否则，它将两个操作数都转换为 32 位整数并执行数值右移。如果一个操作数变为 BigInt 而另一个变为数值，则会抛出 TypeError。虽然将任何数字 x 右移 0 可以将 x 转换为 32 位整数，但不要使用 >> 0 将数字截断为整数，而是使用 Math.trunc() 代替。
+
+**无符号右移运算符（>>>）**（零填充右移）将左操作数计算为无符号数，并将该数字的二进制表示形式移位为右操作数指定的位数，取模 32。向右移动的多余位将被丢弃，零位从左移入。其符号位变为 0，因此结果始终为非负数。对于非Number类型会先转换为number再进行无符号右移，其中NaN >>> 0 === 0。
+
+### 逗号运算符
+
+expr1, expr2, expr3/* , … */，逗号运算符对它的每个操作数或表达式从左到右求值，并返回最后一个操作数或表达式的值。
+
+### 扩展运算符
+
+展开语法（...）, 可以在函数调用/数组构造时，将**可迭代对象**比如数组表达式或者string**在语法层面展开**（myFunction(...iterableObj)与[...iterableObj, '4', ...'hello', 6]）；还可以在构造字面量对象时，将**对象表达式按 key-value 的方式展开**（{ ...obj }）。展开语法和 Object.assign一样执行的都是浅拷贝，区别在于Object.assign() 函数会触发 setters，而展开语法则不会。展开语法和剩余参数的区别在于展开语法将数组展开为其中的各个元素，而剩余语法则是将多个元素收集起来并“凝聚”为单个元素。
+
+### 解构赋值
+
+解构赋值语法是一种 Javascript 表达式。可以将数组中的值或对象的属性取出，赋值给其他变量。每个解构属性都可以有一个默认值，当且属性不存在或值为 undefined 时，将使用默认值，默认值是惰性的，可以是任何表达式，仅在需要使用时才计算。在从赋值语句右侧指定的长度为 N 的数组解构的数组中，如果赋值语句左侧指定的变量数量大于 N，则只有前 N 个变量被赋值。其余变量的值将是 undefined。
+
+对于对象和数组的解构，**有两种解构模式：绑定模式和赋值模式**。
+
+在绑定模式中，模式以声明关键字（var、let 或 const）开始。然后，每个单独的属性必须绑定到一个变量或进一步解构，所有变量共享相同的声明。
+
+在赋值模式中，模式不以关键字（var、let 或 const）开头。每个解构属性都被赋值给一个赋值目标（指出现在赋值表达式左侧的东西）——这个赋值目标可以事先用 var 或 let 声明，也可以是另一个对象的属性。当使用对象字面量解构赋值而不带声明时，在赋值语句周围必须添加圆括号运算符。如果编码风格是不包括尾随分号，则圆括号运算符表达式前面需要有一个分号，否则它可能用于执行前一行的函数。
+
+可以使用剩余属性（...rest）结束解构模式，此模式会将对象（或数组）的所有剩余属性存储到新的对象rest（或数组rest）中，剩余属性必须是模式中的最后一个，并且不能有尾随逗号。
+
+可以在一个解构表达式中交换两个变量的值。没有解构赋值的情况下，交换两个变量需要一个临时变量。
+
+数组解构时可以通过使用多余的逗号忽略部分值。数组解构赋值的剩余属性可以是另一个数组或对象绑定模式，这些绑定模式甚至可以嵌套，相反对象解构赋值只能有一个标识符作为剩余属性。
+
+数组解构调用右侧的迭代协议（可迭代协议和迭代器协议）。因此，任何可迭代对象（不一定是数组）都可以解构，但不可迭代对象不能解构为数组。
+
+至于对象赋值，解构语法允许新变量具有与原始属性相同或不同的名称，这尤其在被解构属性是不是有效的 JavaScript 标识符时很有用，并为原始对象未定义属性的情况分配默认值（对象解构const { p: foo = pDefault } = o，可以从对象o中提取属性p，并将其赋值给名称与对象属性不同的变量foo，指定一个默认值pDefault，以防获取的值为 undefined）。对象字面量中的计算属性名key，如const { [key]: a } = obj，可以被解构。传递给函数参数的对象也可以提取到变量中，然后可以在函数体内访问这些变量。
+
+对象解构几乎等同于属性访问。这意味着，如果尝试解构基本类型的值，该值将被包装到相应的包装器对象中，并且在包装器对象上访问该属性。与访问属性相同，解构 null 或 undefined 会抛出 TypeError错误，即使左侧是空模式（比如const {} = null）。而且，当解构一个对象时，如果属性本身没有被访问，它将沿着原型链继续查找。
+
+for...in 和 for...of 循环中的循环变量、函数参数、catch 绑定变量等语法中也可以使用解构模式。
+
+![](../../../public/front-end/basics/javascript/128.png)
+
+**利用数组解构交换两个变量的值**：
+
+![](../../../public/front-end/basics/javascript/129.png)
+
+### 逻辑运算符
+
+逻辑或运算符（“OR”即 **||** ）、逻辑与（“AND”即 **&&**）运算符、空值合并运算符（??）、可选链（?.）运算符和条件（三元）运算符均是“短路的”，短路是指后续表达式或操作数不计算或不执行。
+
+**逻辑或运算符（expr1 || expr2）**，如果 expr1 可以转换为 true，则返回 expr1；否则，返回 expr2，而且逻辑或运算符被truthy值短路。要将其返回值显式转换为相应的布尔值，需要使用双 NOT 运算符（!!）或Boolean构造函数。逻辑与运算符的优先级高于逻辑或。bCondition1 && bCondition2等同于!(!bCondition1 || !bCondition2)；bCondition1 || bCondition2等同于!(!bCondition1 && !bCondition2)；bCondition1 && (bCondition2 || bCondition3)等同于bCondition1 && (bCondition2 || bCondition3)。
+
+**逻辑与（expr1 && expr2）**，如果 expr1 可以转换为真，则返回 expr2；否则，返回 expr1，而且逻辑与运算符被falsy值短路。由于逻辑与运算符的优先级高于逻辑或，因此bCondition1 || (bCondition2 && bCondition3)等同于bCondition1 || bCondition2 && bCondition3。
+
+**空值合并运算符（leftExpr ?? rightExpr）**，当左侧的操作数为 null 或者 undefined 时，返回其右侧操作数，否则返回左侧操作数，而且空值合并运算符在左侧操作数不是 null 或者 undefined时短路。与逻辑或运算符的区别在于，逻辑或运算符会在左侧操作数为falsy值时返回右侧操作数。如果不使用圆括号运算符明确优先级，空值合并运算符不能与逻辑与运算符、逻辑或运算符一起使用，否则会抛出 SyntaxError异常，原因可能是空值合并运算符和其他逻辑运算符之间的运算优先级/运算顺序是未定义的。
+
+**可选链（obj.val?.prop、obj.val?.[expr]、obj.func?.(args)）运算符**，允许读取位于连接对象链深处的属性的值，而不必明确验证链中的每个引用（obj.val、obj.val、obj.func）是否有效，具体来说是可选链左侧的引用为空（null或undefined）的情况下不会引起错误，表达式短路计算并返回undefined。因此，对于函数调用，如果左侧的引用(obj.func)存在但不是一个函数，则仍会抛出TypeError异常（is not a function）。可选链运算符不能用于赋值。空值合并运算符可以在可选链表达式返回undefined时设置默认值。
+
+**条件（三元）运算符**，condition ? exprIfTrue : exprIfFalse是 JavaScript 唯一使用三个操作数的运算符，如果条件condition为真值，则执行 exprIfTrue表达式；若条件为假值，则执行exprIfFalse表达式。条件运算符的结果是执行对应表达式的结果。条件运算符可以形成条件运算符链：
+
+![](../../../public/front-end/basics/javascript/130.png)
+
+### 算数运算符
+
+x + y，加法（+）运算符计算数字操作数或字符串连接的总和。在求值时，它首先将两个操作数强制转换为基本类型。然后，如果有一方是字符串，另一方则会被转换为字符串，并且它们连接起来；如果双方都是 BigInt，则执行 BigInt 加法。如果一方是 BigInt 而另一方不是，会抛出 TypeError；否则，双方都会被转换为数字，执行数字加法。加法强制将表达式转为基本类型，如果表达式有 @@toPrimitive 方法，字符串连接时会用 "default" 作为 hint 调用它，如果没有@@toPrimitive则优先调用 valueOf()；模板字符串和 String.prototype.concat() 则强制将表达式转为字符串，如果表达式有 @@toPrimitive 方法，模板字符串则用 "string"作为 hint 调用它，如果没有 @@toPrimitive 方法，优先调用 toString()。。建议不要使用 "" + x 来执行字符串强制转换。
+
+x - y，减法（-）运算符将两个操作数相减，并产生两者之差。减法运算符将两个操作数转换为数值，并根据两个操作数的类型执行数字减法或 BigInt 减法。不能在减法中混合使用 BigInt 和数字操作数，否则抛出 TypeError。
+
+x / y，除法（/）运算符计算两个操作数的商，其中左操作数是被除数，右操作数是除数。
+
+x * y， 乘法（*）运算符计算操作数的乘积。
+
+x % y，取余（%）运算符返回左侧操作数除以右侧操作数的余数。它总是与被除数的符号保持一致。如果其中的任意一个操作数为 NaN，或 n 为正负无穷（±Infinity），又或者 d 为 ±0，则该运算返回 NaN。否则，如果 d 为正负无穷（±Infinity），或 n 为 ±0，则返回被除数 n。**在JavaScript 中没有取模运算符**，取余运算与取模运算的区别在于，对于不同号的两个操作数，取模运算结果的符号和总是与除数同号：
+1. 取余计算公式：x % y = x - y * p，其中p是 x / y 的整数部分。
+2. 取模：x mod y = x - y * p，其中p是 x / y 的向下取整，即p = Math.floor(x/y)。
+
+x ** y，幂（**）运算符返回第一个操作数取第二个操作数的幂的结果。它等价于 Math.pow()，不同之处在于，它还接受 BigInt 作为操作数。在JavaScript中，不能将一元运算符（+/-/~/!/delete/void/typeof）放在底数之前，否则会导致语法错误。NaN ** 0（或Math.pow(NaN, 0)）是 NaN 不通过数学运算传播的唯一情况——尽管操作数是 NaN，但它返回 1。此外，base 为 1 且 exponent 为非有限（±Infinity 或 NaN）的行为与 IEEE 754 指定结果应为 1，而 JavaScript 返回 NaN 以保持与其原始行为的向后兼容性。
+
+### 一元加（+）/减（-）运算符
+
+-x，一元减（-）运算符在其操作数之前，并对其正负性取反。如果操作数不是数字会先将其转换为数字。
+
++x，一元加（+）运算符（和Number(x)效果同）在其操作数之前。如果操作数不是数字会先将其转换为数字，如果无法转换操作数，它将计算为 NaN。对 BigInt 值使用该运算符会引发 TypeError。
+
+### 赋值运算符（=）
+
+简单赋值运算符（=）用于给变量赋值，运算顺序是从右到左。赋值表达式本身的值为要赋值的值。因此，给多个变量赋相同值可以链式使用赋值运算符（比如x=y=z=2）。
+
+### 比较运算符
+
+小于（<）运算符在左操作数比右操作数小时返回 true，否则返回 false。
+
+大于运算符（>）在左操作数大于右操作数时返回 true，否则返回 false。
+
+小于等于运算符（<=）在左操作数小于等于右操作数时返回 true，否则返回 false。
+
+大于等于运算符（>=）在左操作数大于等于右操作数时返回 true，否则返回 false。
+
+比较运算符（<, > , <=, >=）经过多轮强制比较它的操作数（操作数可以是数字，字符串，逻辑，对象值）并返回一个基于表达式是否为真的布尔值。强制比较总结如下：
+1. 首先，通过依次调用其 [@@toPrimitive]()（以 "number" 作为提示）、valueOf() 和 toString() 方法，将对象转换为原始类型。左边的操作数总是在右边的操作数之前被强制转换。请注意，尽管 [@@toPrimitive]() 被调用时带有 "number" 的提示（意味着有一点倾向于将对象变成数字），但返回值并没有转换为数字，因为字符串仍然被特别处理”
+2. 如果两个值都是字符串，则根据它们所包含的 Unicode 码位的值，将它们作为字符串进行比较。
+3. 否则，JavaScript 会尝试将非数值类型转化为数值类型：
+    1. 布尔值 true 和 false 分别转化为 1 和 0。
+    2. null 转化为 0。
+    3. undefined 转化为 NaN。
+    4. 字符串根据其包含的值进行转换，如果不包含数字值，则转换为 NaN。
+4. 如果任意一个值为 NaN，则运算符返回 false。
+5. 否则，这些值将作为数值进行比较。BigInt 和数值可以一起比较。
+6. 如果其中一个操作数被转换为 BigInt，而另一个被转换为无法转换为 BigInt 值的字符串（当传递给 BigInt()时，它会抛出语法错误）。
+7. 如果其中一个操作数被转化为 NaN（比如不能转化为数字的字符串或 undefined）。
+
+`比较运算符（<, > , <=, >=, ===, ==, !==, !=）`表达式由于始终返回boolean，因此可以简化以下赋值：
+
+![](../../../public/front-end/basics/javascript/131.png)
+
+### for...in 和 for...of
+
+for...in 语句以任意顺序迭代一个对象的除Symbol以外的可枚举属性，包括继承的可枚举属性。for...of 语句遍历可迭代对象（包括 Array，Map，Set，String，TypedArray，arguments 对象、NodeList（和其他 DOM 集合）、生成器函数生成的生成器，以及用户自己定义的可迭代对象）定义要迭代的数据。
+
+### 运算符优先级
+
+运算符的优先级决定了表达式中运算执行的先后顺序。优先级高的运算符会作为优先级低的运算符的操作数。
+
+![](../../../public/front-end/basics/javascript/132.png)
+
+![](../../../public/front-end/basics/javascript/133.png)
+
+![](../../../public/front-end/basics/javascript/134.png)
+
+![](../../../public/front-end/basics/javascript/135.png)
+
+![](../../../public/front-end/basics/javascript/136.png)
 
 ## 严格模式
 
@@ -1594,13 +2136,343 @@ JavaScript 的严格模式（strict mode）是使用受限制的 JavaScript 的�
 
 ## BOM 相关
 
+BOM 即浏览器对象模型，提供除处理DOM外所有内容的属性与方法。**BOM、DOM以及Javascript Object 构成浏览器主机环境的所有操作，都是根对象window子属性。**
+
+![](../../../public/front-end/basics/javascript/137.png)
+
+**navigator 对象**提供了有关浏览器和操作系统的背景信息，其中属性navigator.platform — 关于平台（可以帮助区分 Windows/Linux/Mac 等）。
+1. navigator.userAgent — 关于当前浏览器。
+2. navigator.connection 是只读的，返回网络连接状态 NetworkInformation 对象，包括以下属性：
+    1. downlink（网络下行速度）：以 Mb/s 为单位的有效带宽，并保留该值为 25kb/s 的最接近的整数倍。该值基于最近监测的保持活跃连接的应用层吞吐量，排除了到私有地址空间的连接。当缺少最近的带宽测量数据时，该属性由底层连接技术属性决定。因此会动态更新。
+    2. effectiveType（网络类型）：连接的有效类型，表示“slow-2g”、“2g”、“3g”或“4g”之一。该值是使用最近观察到的rtt和downlink值来确定的。
+    3. onchange（有值代表网络状态变更）
+    4. rtt（估算的往返时间）：当前连接下评估的往返时延（RTT, round-trip time），并保留该值为25千分秒的最接近的整数倍。该值基于最近使用中被监测的最近保持活跃连接的应用层上的 RTT 测量值。它排除了到私有地址空间的连接。如果没有最近的测量数据，该值就基于底层连接技术的属性。因此会动态更新。
+    5. saveData（打开/请求数据保护模式）：boolean类型，如果用户设备上设置了减少数据使用的选项时返回 true。
+
+navigator.connection.onchange 事件在连接信息发生变化时触发，该事件由 NetworkInformation 对象接收。
+
+navigator.onLine：boolean类型，浏览器的在线状态，true 表示在线，false 表示离线。当浏览器获得网络访问权限并且navigator.onLine的值切换为 true 时，将触发 window 的的online事件。当浏览器无法访问网络并且navigator.onLine的值切换为 false 时，会触发 window 的offline事件。online事件和offline事件的eventTarget也可以是HTMLBodyElement 或 HTMLFrameSetElement 或 SVGSVGElement。
+
+**location 对象**提供有关url处理的属性和方法:
+1. location.href 读取或设置当前url，设置即发生页面跳转
+2. location.hash 读取或设置当前url的hash（包括#，如果设置第一个不是#会自动加上，如果设置多个#即多个#），设置即发生页面内锚定位
+3. location.search 读取或设置当前url的查询部分（包括?，和hash一样会自动加上并可多个显示），设置即发生页面请求和跳转
+4. location.reload() 重新载入当前文档，location.replace() **替换**当前文档，location.assign()加载新的文档，都不存在后退至当前文档。
+
+### window.postMessage
+
+window.postMessage() 方法可以安全地实现跨域通信。当前窗口可以获得对另一个窗口targetWindow的引用（比如 iframe 的 contentWindow 属性、执行window.open返回的窗口对象、或者是window.frames中的某一个）。
+1. 在需要发送消息的所在页面调用 targetWindow.postMessage() 方法给targetWindow发送MessageEvent 消息。即targetWindow.postMessage(message, targetOrigin[, transfer])：
+    1. message将要发送到其他 window 的数据。它将会被结构化克隆算法序列化。
+    2. targetOrigin指定哪些页面的窗口能接收到消息事件，其值可以是字符串"*"（表示无限制）或者一个 URI，最好是使用明确的URI。目标窗口所在页面的协议、主机地址或端口这三者的任意一项不匹配 targetOrigin 提供的值，那么消息就不会被发送；用来防止消息被恶意的第三方截获。
+    3. transfer，可选，是一串和 message 同时传递的 Transferable 对象。这些对象的所有权将被转移给消息的接收方，而发送一方将不再保有所有权。
+2. 接收消息的窗口所在页面内使用targetWindow可以使用window.addEventListener监听message事件并接收MessageEvent消息。即window.addEventListener(‘message’, receiveMessage, false)，其中receiveMessage方法的参数event的属性有：
+    1. data：从其他 window 中传递过来的对象。
+    2. origin：调用 postMessage 时消息发送方窗口所在页面的URI
+    3. source对发送消息所在页面的window的引用;
+
+### window.open
+
+window.open(url, target, windowFeatures)用指定的名称将指定的资源加载到新的或已存在的浏览上下文（标签、窗口或 iframe）中。返回一个 WindowProxy 对象。只要符合同源策略安全要求，返回的引用就可用于访问新窗口的属性和方法。如果浏览器无法打开新的浏览上下文，例如因为它被浏览器弹出窗口阻止程序阻止，则返回 null，因为现代浏览器已内置弹出窗口阻止程序，将弹出窗口的打开限制在直接响应用户输入的情况下，而在点击之外打开的弹出窗口可能会显示通知，让用户选择启用或放弃。远程 URL 不会立即加载。当 window.open() 返回时，窗口始终包含 about:blank。URL 的实际获取会被推迟，并在当前脚本块执行完毕后开始。窗口的创建和引用资源的加载是异步完成的。参数如下：
+1. url：可选，一个字符串，表示要加载的资源的 URL 或路径。如果指定空字符串（""）或省略此参数，则会在目标浏览上下文中打开一个空白页。如果新打开的浏览上下文不共享相同的源，则打开脚本将无法与浏览上下文的内容进行交互（读取或写入）。
+2. target：可选，一个不含空格的字符串，用于指定加载资源的浏览上下文的名称。如果该名称无法识别现有的上下文，则会创建一个新的上下文，并赋予指定的名称。还可以使用特殊的 target 关键字：_self、_blank、_parent 和 _top。该名称可用作 `<a>` 或 `<form>` 元素的 target 属性。使用 "_blank" 作为 target 属性值会在用户桌面上创建多个新的无名窗口，这些窗口无法循环使用或重复使用。请尝试为 target 属性提供一个有意义的名称，并在页面上重复使用这样的 target 属性，这样点击另一个链接就可以在一个已经创建和渲染的窗口中加载引用的资源（因此可以加快用户的操作速度）。
+3. windowFeatures：可选，一个字符串，包含以逗号分隔的窗口特性列表，形式为 name=value，布尔特性则仅为 name。这些特性包括窗口的默认大小和位置、是否打开最小弹出窗口等选项，windowFeatures 中要求的位置（top、left）和尺寸（width、height）值，如果其中任何一个值不允许在用户操作系统应用程序的工作区内呈现整个浏览器弹出窗口，则将被更正。即新弹出窗口的任何部分最初都不能置于屏幕之外。：
+    1. popup：如果启用此特性，则要求使用最小弹出窗口。弹出窗口中包含的用户界面功能将由浏览器自动决定，一般只包括地址栏。如果未启用 popup，也没有声明窗口特性，则新的浏览上下文将是一个标签页。在 windowFeatures 参数中指定除 noopener 或 noreferrer 以外的任何特性，也会产生请求弹出窗口的效果。要启用该功能，可以不指定popup，或者将其设置为 yes、1 或 true。比如，popup=yes、popup=1、popup=true 和 popup 都具有相同的结果。
+    2. width 或 innerWidth：指定内容区域（包括滚动条）的宽度。最小要求值为 100。
+    3. height 或 innerHeight：指定内容区域（包括滚动条）的高度。最小要求值为 100。
+    4. left 或 screenX：指定从用户操作系统定义的工作区左侧到新窗口生成位置的距离（以像素为单位）。
+    5. top 或 screenY：指定从用户操作系统定义的工作区顶部到新窗口生成位置的距离（以像素为单位）。
+    6. noopener：如果设置了此特性，新窗口将无法通过 Window.opener 访问原窗口，并返回 null。使用 noopener 时，在决定是否打开新的浏览上下文时，除 _top、_self 和 _parent 以外的非空目标名称会像 _blank 一样处理。
+    7. noreferrer：如果设置了此特性，浏览器将省略 Referer 标头，并将 noopener 设为 true。
+
+最好不要使用 window.open()，因为：
+1. 现代浏览器提供弹出窗口阻止功能
+2. 现代浏览器提供选项卡浏览功能，而支持选项卡功能的浏览器用户在大多数情况下更喜欢打开新选项卡，而不是打开新窗口。
+3. 用户可以使用浏览器的内置功能或扩展功能来选择在新窗口、同一窗口、新标签页、同一标签页或后台打开链接。使用 window.open() 强制以特定方式打开链接会使用户感到困惑，并忽略他们的习惯。
+4. 弹出窗口没有菜单工具栏，而新标签页使用浏览器窗口的用户界面；因此，许多用户更喜欢标签页浏览，因为界面保持稳定。
+
 ## DOM相关
+
+DOM 即文档对象模型（document，属性 nodeType=9），提供更改或创建页面上任何内容的属性与方法。HTML标签（**元素节点，属性** nodeType=1）都是可操作的JavaScript对象，同时标签内文本（**文本节点，属性** nodeType=3）也是对象（document.body， document.head分别对应body标签和head标签）。
+
+DOM节点的原型链（注意这些都是构造函数，原型链上是指他们的prototype对象）：DOM节点对象=> HTMLSpecificElement（提供特定于具体类别元素的属性，Specific比如是Input/Body/Anchor） => HTMLElement（提供了通用（common）的 HTML 元素方法（以及 getter 和 setter）） => Element（提供通用（generic）元素方法） => Node （提供通用 DOM 节点属性）=> EventTarget（为事件（包括事件本身）提供支持） => Object。 console.log(element) 显示元素的 DOM 树。 console.dir(element) 将元素显示为 DOM 对象，非常适合探索其属性。
+
+![](../../../public/front-end/basics/javascript/138.png)
+
+文本节点即DOM树的叶子，document即DOM树的根（声明 + `<html>`）。`<html> = document.documentElement`。`<head> </head>`之前的空格和换行符均被忽略，`<body></body>`后的文本内容（包括空格和换行符均会被移到其内末尾）。`<table></table>`标签即使没写`<tbody></tbody>`也有`<tbody></tbody>`，因为浏览器会自动创建。
+
+![](../../../public/front-end/basics/javascript/139.png)
+
+**注意**：脚本若是在 `<head>` 中，那么脚本是访问不到 document.body 元素的（返回null）
+**常用节点**：文档节点、元素节点、属性节点、文本节点、注释节点
+元素标签上的特性 （attributes）和DOM对象属性（properties）并不完全是一一对应，对于元素的标准特性存在DOM 属性，非标准特性则不存在对应DOM属性。**但所有特性都可以通过使用以下方法进行访问**：
+
+element.hasAttribute(name) — 检查特性是否存在。
+
+element.getAttribute(name) — 获取这个特性值。
+
+element.setAttribute(name, value) — 设置这个特性值。
+
+element.removeAttribute(name) — 移除这个特性。
+
+element.attributes：读取所有特性集合——每个特性是具有 name 和 value 的对象。
+
+`element.dataset.*`：非标准特性data-*对应的 DOM属性。
+
+element.className ：获取或设置 "class" 特性（attribute），设置时替换类中的整个字符串
+
+element.classList：获取element的类可迭代集合。具有方法：
+1. add/remove(class)：添加/移除类。
+2. toggle(class)：如果类不存在就添加类，存在就移除它。
+3. contains(class)：检查给定类，返回 true/false。
+
+element.style.*：仅获取或设置**对应于标签上** "style" 特性（attribute）的样式key的值，多词（multi-word）属性，使用驼峰式 camelCase；对于样式的移除，应设置为空字符串。多样式设置，可用特殊属性 element.style.cssText/element.setAttribute来设置（此方法完全替换原有样式），而不是设置只读对象element.style。
+
+getComputedStyle(element,[pseudo])：获取element的CSS样式对象（不仅是标签的"style" 特性（attribute）），返回对象的属性值是解析样式值，为避免访问失效，访问该对象的属性的名字应是完整名。**注意：该对象无法访问:visited伪类，目的是为了防止不好的网站检测用户是否访问过链接。此方法获取的width/height值是CSS-width/height，会取决于box-sizing样式，同时会受到浏览器差异影响，因此元素的宽高应该使用DOM几何属性（clientWidth/clientHeight等）来代替获取**。
+
+当一个标准特性被修改，对应的DOM属性自动会更新，反之亦然（存在特例：input.value 只能从特性同步到属性，反之不行）。DOM 属性和方法的行为与常规的 Javascript 对象一样。DOM属性值类型是多种的，而元素特性值一定是字符串类型。对于href特性值是标签上的值，而对应的DOM属性href值总是完整url。
+
+**节点的导航API**：
+
+element.childNodes：返回element的直接子节点可迭代类数组（包括文本节点），其实是集合，集合遍历应使用for...of...而不是for...in...,但最好建议使用子节点的nextSibling属性循环遍历，比使用childNodes类数组效率高。DOM集合是只读且实时的，
+
+element.hasChildNodes()：判断element是否具有直接子节点
+
+element.firstChild 和 lastChild:分别访问第一个和最后一个直接子节点
+
+element.previousSibling和nextSibling：分别访问element的上一兄弟节点和下一兄弟节点
+
+element.parentNode：访问element的父节点
+
+element.children ：仅返回作为直接子元素节点。
+
+element.firstElementChild，lastElementChild ：第一个和最后一个子元素节点。
+
+element.previousElementSibling，nextElementSibling ：兄弟元素节点。
+
+element.parentElement：返回父元素节点
+
+![](../../../public/front-end/basics/javascript/140.png)
+
+node.nodeName 或者 element.tagName 属性中读取它的标签名（返回值都是全大写），后者只能用于元素节点。
+
+element.innerHTML: 获取或设置element元素内的HTML内容（即使是 += 也是完全重写——移除之前的HTML，再写入旧HTML+新HTML的HTML），此方法设置的script不会执行，标签作为HTML处理（即不存在XSS攻击）。
+
+element.outerHTML：获取包括元素本身的HTML内容，设置此属性不会修改element，而是替换，访问element仍然还是原来的元素。
+
+nonElement.nodeValue/data：访问或设置非元素节点（文本、注释）内的内容，建议使用后者 data。
+
+element.textContent：获取元素内除去所有标签的文本内容，设置此属性时标签作为文本内容处理。
+
+element.hidden：设置元素是否可见（和 display：none等价，但更简洁），作为 HTML特性即写在标签上默认值为true——隐藏。
+
+**table元素更多API（除上述之外）**：
+tableElemt.rows：`<tr>` 元素的集合。
+
+table.caption/tHead/tFoot ：引用元素 `<caption>，<thead>，<tfoot>`。
+
+table.tBodies ： `<tbody>`元素的集合（只要有tabel节点，至少会有一个—浏览器自动生成）。
+
+tr.cells：在给定 `<tr>` 中的 `<td>` 和 `<th>` 单元格的集合。
+
+tr.sectionRowIndex — 给定的 `<tr>` 在封闭的 `<thead>/<tbody>/<tfoot>` 中的位置（索引）。
+
+tr.rowIndex — 在整个表格中 `<tr>` 的编号（包括表格的所有行）。
+
+td/th.cellIndex — 在封闭的 `<tr>`或 `<td>`  中单元格的编号。
+
+**按选择器搜索元素节点API**：
+
+document.getElementById(id) 或者只使用 id：后者不建议使用（因为可能造成命名冲突），设置在元素标签上属性id=’ ‘ 应唯一，否则方法搜索返回的可能是该id的一个随机元素，**注意没有 element.getElementById()**。
+
+element.querySelectorAll(css)和element.querySelector(css)：分别返回指定CSS选择器匹配的所有元素静态集合和第一个元素，后者虽结果和element.querySelectorAll(css)[0]相同，但效率更高。
+
+element.closest(css):查找与 CSS 选择器匹配的最近的祖先。element自己也会被搜索。
+
+element.matches(css):不会查找任何内容，它只会检查 element 是否与给定的 CSS 选择器匹配。它返回 true 或 false。可用于过滤元素。
+
+element.getElementsByTagName(tag)：查找具有给定标签的元素，并返回它们的实时集合。tag 参数也可以是对于“任何标签”的星号 "*"。
+
+element.getElementsByClassName(className)：返回具有给定CSS类的元素实时集合。
+
+document.getElementsByName(name) ：返回在文档范围内具有给定 name 特性的元素实时集合。很少使用。
+
+**DOM 节点创建方法**：
+1. document.createElement(tag)：根据给定标签创建元素节点
+2. document.createTextNode(text)：根据给定文本创建文本节点
+
+**DOM节点插入方法（这5个均支持插入多个）**：
+1. node.append(...nodes or strings) ：在 node 末尾 插入节点或字符串
+2. node.prepend(...nodes or strings) ： 在 node 开头 插入节点或字符串
+3. node.before(...nodes or strings) ： 在 node 前面 插入节点或字符串
+4. node.after(...nodes or strings) ：在 node 后面 插入节点或字符串
+5. node.replaceWith(...nodes or strings) ：将 node 替换为给定的节点或字符串。
+
+这5种方法的字符串插入表现都与element.textContent相同，不会进行标签转义。
+
+element.insertAdjacentHTML(where, html):将html作为HTML字符串插入到where指定的位置。element.insertAdjacentText(where, text)和
+
+element.insertAdjacentElement(where, element)和它语法一样，只是前者作为	文本插入，后者插入元素。参数 where 必须是其中之一：
+
+![](../../../public/front-end/basics/javascript/141.png)
+
+**DOM节点移除方法**：
+
+node.remove()：移除node节点
+
+对于以上所有的插入方法，**在移动元素插入另一位置的时候都会自动从旧位置删除该节点，不必手动**remove()。
+
+**DOM节点克隆方法**：
+element.cloneNode(true/false): true即深克隆（所有特性和子元素），false即浅克隆（不包括子元素）
+
+DocumentFragment 是一个特殊的传递节点列表的包装器的 DOM 节点。可向其附加节点，当它被作为节点插入时是插入这些附加的节点。
+
+**文本合成事件**
+
+Element.compositionstart当文本合成系统（例如输入法编辑器）启动新的合成会话（拼音输入）时，会触发该事件。
+
+Element.compositionupdate当在由文本合成系统（例如输入法编辑器）控制的文本合成会话（拼音输入）的上下文中接收到新字符时，将触发该事件。
+
+Element.compositionend当文本合成系统（例如输入法编辑器）完成或取消当前合成会话（拼音输入）时，将触发该事件。
+
+其中Chrome浏览器的触发顺序为 compositionstart ->input ->compositionend，其他浏览器为compositionstart ->compositionend ->input。
+
+![](../../../public/front-end/basics/javascript/142.png)
+
+**元素滚动相关**
+
+Element. scrollIntoView(alignToTop)或Element. scrollIntoView(scrollIntoViewOptions) 方法会滚动元素的父容器，使调用 scrollIntoView() 的元素对用户可见。可选参数alignToTop如果为 true，元素的顶端将和其所在滚动区的可视区域的顶端对齐，即可选参数scrollIntoViewOptions取值为{block: "start", inline: "nearest"}。如果为 false，元素的底端将和其所在滚动区的可视区域的底端对齐。即可选参数scrollIntoViewOptions取值为{block: "end", inline: "nearest"}。而可选参数scrollIntoViewOptions是包含以下属性的对象：
+1. behavior：可选，定义动画过渡效果，auto 或 smooth 之一。默认为 auto。
+2. block：可选，定义垂直方向的对齐，start、center、end 或 nearest 之一。默认为 start。
+3. Inline： 可选定义水平方向的对齐，start、center、end 或 nearest 之一。默认为 nearest。
+
+### NodeList
+
+NodeList 类数组对象是节点的集合，通常是由属性或方法返回的。Node.childNodes 返回实时集合，意味着如果文档中的节点树发生变化，NodeList 也会随之变化；而document.querySelectorAll返回的是静态 NodeList，意味着随后对文档对象模型的任何改动都不会影响集合的内容。
+
+### HTMLCollection
+
+HTMLCollection 接口表示一个包含了元素（元素顺序为文档流中的顺序）的通用集合（与 arguments 相似的类数组 (array-like) 对象），还提供了用来从该集合中选择元素的方法和属性。HTML DOM 中的 HTMLCollection 是即时更新的（live）；当其所包含的文档结构发生改变时，它会自动更新。因此，最好是创建副本（例如，使用 Array.from）后再迭代这个数组以添加、移动或删除 DOM 节点。
+
+### Element
+
+**Element.scrollHeight /Element.scrollWidth只读属性**是元素内容**高度/宽度**的度量，包括由于溢出导致的视图中不可见内容，包括元素的padding、伪元素的高度/宽度但不包括border、margin和**水平/垂直**滚动条。如果元素不需要**垂直/水平**滚动条就可以容纳，则**Element.scrollHeight / Element.scrollWidth等于Element.clientHeight / Element.clientWidth**。该属性将会对值round(四舍五入)取整，如果需要小数值，使用 Element.getBoundingClientRect()。
+
+![](../../../public/front-end/basics/javascript/143.png)
+
+**Element.scrollLeft / Element.scrollTop 属性获取或设置**元素内容从其左/上边缘即水平/垂直滚动的像素数，默认是整数，然而在使用显示比例缩放的系统上，scrollLeft/scrollTop可能会是一个小数。如果元素不能滚动（比如：元素没有溢出或有"non-scrollable"属性），那么scrollLeft 的值是 0。如果给scrollLeft / scrollTop设置的值小于 0，那么scrollLeft / scrollTop 的值将变为 0。如果给scrollLeft / scrollTop设置的值大于元素内容最大宽度，那么scrollLeft / scrollTop的值将被设为元素最大宽度。当在根元素（`<html>`元素）上使用scrollTop时，将返回窗口的scrollY。如果元素的内容排列方向（direction）是rtl (right-to-left) ，那么滚动条会位于最右侧（内容开始处），并且scrollLeft值为 0。此时，当从右到左拖动滚动条时，scrollLeft 会从 0 变为负数。
+
+**Element.clientWidth / Element.clientHeight只读属性**是元素内部的宽度（以像素为单位），不包括由于溢出导致的视图中不可见内容。对于内联元素以及没有 CSS 样式的元素为 0。该属性包括内边距（padding），但不包括边框（border）、外边距（margin）和垂直/水平滚动条（如果存在）。在根元素（`<html>` 元素）或怪异模式下的 `<body>` 元素上使用 clientWidth 时，该属性将返回视口宽度（不包含任何滚动条）。**Element.clientWidth** = CSS width + CSS padding - 垂直滚动条宽度；**Element.clientHeight** = CSS height + CSS padding - 水平滚动条高度。该属性将会对值round(四舍五入)取整，如果需要小数值，使用 Element.getBoundingClientRect()。
+
+![](../../../public/front-end/basics/javascript/144.png)
+
+**Element.clientLeft / Element.clientTop只读属性**表示元素的左/上边框的宽度（以像素为单位），不包括左/上外边距和左/上内边距。如果元素的文本方向是从右向左（RTL, right-to-left），并且由于内容溢出导致左边出现垂直滚动条，则该属性包括滚动条的宽度。
+
+**HTMLElement.offsetWidth / HTMLElement.offsetHeight只读属性**，返回元素的布局宽度。典型的（各浏览器的 offsetWidth / offsetHeight可能有所不同）offsetWidth / offsetHeight 是测量包含元素的边框 (border)、水平/垂直线上的内边距 (padding)、竖直/水平方向滚动条 (scrollbar)（如果存在的话）、以及 **CSS 设置的宽度/高度 (width/height) 的值**，但不包含:before 或:after 等伪类元素的宽度/高度。如果元素被隐藏（display：none），则返回0。该属性将会对值round(四舍五入)取整，如果需要小数值，使用 Element.getBoundingClientRect()。
+
+![](../../../public/front-end/basics/javascript/145.png)
+
+**Element.getBoundingClientRect()方法**返回一个 DOMRect 对象，是考虑transform后的包含整个元素的最小矩形（包括 padding 和 border-width）。该对象使用以像素为单位的只读属性的 left、top、right、bottom、x、y（IE 浏览器不支持x、y）、width 和 height 描述整个矩形的位置和大小。除了 width 和 height 以外的属性是相对于视图窗口的左上角来计算的。width 和 height 属性是包含了 padding 和 border-width 的，而不仅仅是内容部分的宽度和高度。在标准盒子模型中，这两个属性值分别与元素的 width/height + padding + border-width 相等。而如果是 box-sizing: border-box，两个属性则直接与元素的 width 或 height 相等。
+
+![](../../../public/front-end/basics/javascript/146.png)
 
 ## WebAPI
 
+### URL API
+
+URL 接口用于解析，构造，规范化和编码 URL（统一资源定位符Uniform Resource Locator，是指定在 Internet 上可以找到资源的位置的文本字符串，在 HTTP 的上下文中，URL 被叫做”网络地址“或“链接”。浏览器在其地址栏显示 URL。URL也可用于文件传输（FTP）、电子邮件（SMTP）和其他应用）。
+
+**new URL(url [, base])构造函数**返回一个新创建的 URL 对象，如果绝对url（或者base + 相对url）是一个无效的 URL 链接则会抛出TypeError错误。
+1. 参数url是一个表示绝对或相对 URL 的 DOMString。如果url 是相对 URL，则会将 base 用作基准 URL。如果 url 是绝对 URL，则无论参数base是否存在，都将被忽略。
+2. 参数base是一个表示基准 URL 的 DOMString，在 url 是相对 URL 时，它才会起效。如果未指定，则默认为''。
+
+**URL的静态方法（均在Web Worker中可用）**：
+1. URL.createObjectURL(object)方法会创建一个 DOMString，其中包含一个表示参数中给出的对象object的 URL。这个 URL 的生命周期和创建它的窗口中的 document 绑定。这个新的 URL 对象表示指定的 File 对象或 Blob 对象。在 Service Worker 中不可用，因为它有可能导致内存泄漏。在每次调用 createObjectURL() 方法时，都会创建一个新的 URL 对象，即使已经用相同的对象作为参数创建过。当不再需要这些 URL 对象时，每个对象必须通过调用 URL.revokeObjectURL() 方法来释放。浏览器在 document 卸载的时候，会自动释放它们，但是为了获得最佳性能和内存使用状况，应该在安全的时机主动释放掉它们。
+2 .URL.revokeObjectURL(objectURL)方法用来释放一个之前已经存在的、通过调用 URL.createObjectURL() 创建的 URL 对象。
+
+**URL原型属性与方法（均在Web Worker中可用）**：
+1. URL.prototype.hash 属性返回一个 USVString，其中会包含 URL 标识中的 '#' 和 fragment 标识符，fragment 不会经过百分比编码（URL 编码）。如果 URL 中没有 fragment，该属性会包含一个空字符串 —— ""。
+2. URL.prototype.host 属性是一个 USVString 值，包含了主机信息，也就是主机名（hostname），冒号 ':' 和 URL 的 端口（port）。
+3. URL.prototype.hostname 属性是一个 USVString 值，包含有 URL 中的域名。
+4. URL.prototype.href 属性是一个包含完整 URL 的 USVString 值。
+5. URL.prototype.origin只读属性返回一个 USVString 类型值，包含 URL 源经过 Unicode 序列化之后的值：
+    1. 对于使用 http 或者 https 协议的 URL, 返回协议名，然后是 '://', 然后是域，然后是 ':', 最后是端口号 (默认端口是 80 和 443);
+    2. 对于使用 file: 协议的 URL，返回值因浏览器而异;
+    3. 对于使用 blob: 协议的 URL，返回值是 blob: 后跟随的源地址。比如"blob:https://mozilla.org" 将会返回 "https://mozilla.org"
+6. URL.prototype.password 属性为USVString，其中包含在域名之前指定的密码。如果在未设置username属性的情况下进行访问，默认失败。
+7. URL.prototype.username 属性是USVString ，其中包含域名前指定的username。
+8. URL.prototype.pathname 属性是一个USVString，包含一个 '/' （域名后的首个）和 URL 的路径，如果没有路径，则pathname为空字符串。
+9. URL.prototype.属性是包含了 URL 的端口号信息的USVString值，如果 URL 中不包含明确的端口号，这个属性将为''
+10. URL.prototype.protocol 属性是一个包含 URL 协议的USVString值，而且包含协议后的':'。
+11. URL.prototype.search属性是一个搜索字符串，也称为查询字符串，这是一个包含一个'?'后面跟着 URL 的参数的USVString。现代浏览器提供URL.prototype.searchParams属性，以便轻松解析查询字符串中的参数。
+12. URL.prototype.searchParams 属性返回一个 URLSearchParams 对象，这个对象包含当前 URL 中解码后的 GET 查询参数。
+    1. URLSearchParams对象可以由new URLSearchParams(init)构造函数创建，其中参数init是一个一个 USVString。URLSearchParams 构造函数不会解析一个完整 URL，但是如果字符串起始位置有 ? 的话会被去除。
+    2. URLSearchParams.prototype.append(name, value)添加一个新的name=value的查询参数。
+    3. URLSearchParams.prototype.delete(name)删除指定name的所有查询参数。
+    4. URLSearchParams.prototype.entries()方法返回一个iterator，每个键值对是[name, value]查询参数
+    5. URLSearchParams.prototype..forEach(callback(value, name, searchParams))方法 forEach 允许通过回调函数callback来遍历 URLSearchParams 实例对象上的键值对。
+    6. URLSearchParams.prototype.get(name)方法返回第一个与name对应的查询参数的value，如果没找到，返回 null.。
+    7. URLSearchParams.prototype.getAll(name)方法以数组的形式返回与name对应的所有查询参数的value。
+    8. URLSearchParams.prototype.has(name)返回一个 Boolean 表示一个指定的键名name对应的value值是否存在。
+    9. URLSearchParams.prototype.keys()返回一个包含所有name的iterator。
+    10. URLSearchParams.prototype.values()返回一个包含所有value的iterator。
+    11. URLSearchParams.prototype.toString()返回在 URL 中使用的查询字符串，不包括“?”。
+    12. URLSearchParams.prototype.set(name, value) 方法用于设置或修改name对应的value。
+    13. URLSearchParams.prototype.sort() 方法对包含在对象中的所有键/值对进行排序，并返回 undefined。排序顺序是根据键的 Unicode 代码点，并且相等键的键/值对之间的相对顺序不变。
+13. URL.prototype.toJSON() 方法返回一个USVString，其中包含一个序列化的 URL 版本。和URL.prototype.href结果同。
+14. URL.prototype.toString() 字符串化方法返回一个包含完整 URL 的 USVString。它的作用等同于只读的 URL.prototype.href。
+
 ## JSON
 
+JSON（JavaScript Object Notation）是一种语法，用来序列化对象、数组、数值、字符串、布尔值和 null 。它基于 JavaScript 语法，但与之不同：JavaScript 不是 JSON，JSON 也不是 JavaScript。
+
+**JavaScript 与 JSON 的区别**：
+1. **对象和数组（JSONObject和JSONArray）**：属性名称必须是**双引号**的字符串；最后一个属性后不能有逗号。
+2. **数值（JSONNumber）**：禁止出现前导零（JSON.stringify 方法自动忽略前导零，而在 JSON.parse 方法中将会抛出 SyntaxError）；如果有小数点，则后面至少跟着一位数字。
+3. **字符串（JSONString）**：只有有限的一些字符可能会被转义；禁止某些控制字符；Unicode 行分隔符（U+2028）和段分隔符（U+2029）被允许，JavaScript中则不允许; 字符串必须用双引号。
+4. **JSON 仅支持的空白字符**：制表符（U+0009），回车（U+000D），换行（U+000A）以及空格（U+0020），这些可以出现在JSONNumber之外。
+
+![](../../../public/front-end/basics/javascript/162.png)
+
+**JSON对象，继承自Object，包含两个方法**：
+1. **用于解析 JSON字符串的 JSON.parse(text[, reviver])**：
+    1. text：要被解析成 JavaScript 值的字符串。
+    2. reviver：转换器，解析值本身以及它所包含的所有属性，会按照从最里层的属性开始往外到顶层即解析值本身的顺序分别调用 reviver 函数，在调用过程中，当前属性所属的对象会作为 this 值，当前属性名和属性值会分别作为第一个和第二个参数传入 reviver 中。如果 reviver 返回 undefined，则当前属性会从所属对象中删除，如果返回了其他值，则返回的值会成为当前属性新的属性值。当遍历到最顶层的值（解析值）时，传入 reviver 函数的参数会是空字符串 ""（因为此时已经没有真正的属性）和当前的解析值。当前的 this 值会是 {"": 修改过的解析值}。
+    3. 返回值Object 类型，对应给定 JSON 文本的对象/值。
+    4. 若传入的字符串不符合 JSON 规范，则会抛出 SyntaxError 异常。
+2. **用于将对象/值转换为 JSON 字符串的JSON.stringify(value[, replacer [, space]])**：
+    1. value将要序列化成 一个 JSON 字符串的值。
+    2. replacer ：如果该参数是一个函数，则在序列化过程中，被序列化的值的每个属性都会经过该函数的转换和处理；如果该参数是一个数组，则只有包含在这个数组中的属性名才会被序列化到最终的 JSON 字符串中；如果该参数为 null 或者未提供，则对象所有的属性都会被序列化。
+    3. space：指定缩进用的空白字符串，用于美化输出（pretty-print）；如果参数是个数字，它代表有多少的空格；上限为 10。该值若小于 1，则意味着没有空格；如果该参数为字符串（当字符串长度超过 10 个字母，取其前 10 个字母），该字符串将被作为空格；如果该参数没有提供（或者为 null），将没有空格。
+    4. 被转换值如果有 toJSON() 方法，将是该方法返回的值被序列化。
+    5. 非数组对象的属性不能保证以特定的顺序出现在序列化后的字符串中。
+    6. 布尔值、数字、字符串的包装对象在序列化过程中会自动转换成对应的原始值。
+    7. undefined、任意的函数以及 symbol 值，在序列化过程中会被忽略（出现在非数组对象的属性值中时）或者被转换成 null（出现在数组中时）。函数、undefined 被单独转换时，会返回undefined，如JSON.stringify(function(){}) or JSON.stringify(undefined).
+    8. 对包含循环引用的对象（对象之间相互引用，形成无限循环）执行此方法，会抛出错误。
+    9. 所有以 symbol 为属性键的属性都会被完全忽略掉，即便 replacer 参数中强制指定包含了它们。
+    10. Date 日期调用了 toJSON() 将其转换为了 string 字符串（同 Date.toISOString()），因此会被当做字符串处理。
+    11. NaN 和 Infinity 格式的数值及 null 都会被当做 null。
+    12. 其他类型的对象，包括 Map/Set/WeakMap/WeakSet，仅会序列化可枚举的属性。
+    13. 当在循环引用时会抛出异常TypeError。
+    14. 当尝试去转换 BigInt 类型的值会抛出TypeError（BigInt 值不能 JSON 序列化）。
+3. JSON 文件的文件类型是 .json。
+4. JSON 文本的 MIME 类型是 application/json。
+
 ## Javascript 动画
+
+setInterval(callback, delay) 特定时间间隔进行变化，每秒24帧以上的变化即看起来流畅。传统动画是通过 setTimeout 和 setInterval 进行实现，缺点是动画的时间间隔不好确定而且会受到UI线程忙碌的阻塞。
+
+window.requestAnimationFrame(callback) 告诉浏览器希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画，因此，若需要在连续帧中不断更新动画，那么回调函数自身必须再次调用 window.requestAnimationFrame(callback)。该回调函数会被传入DOMHighResTimeStamp参数，该参数与performance.now()的返回值相同，它表示requestAnimationFrame() 开始去执行回调函数的时刻，是从页面加载开始经过的毫秒数。返回值是非零的long整数，可以传入window.cancelAnimationFrame() 以取消回调函数。该函数的回调将与其他 requestAnimationFrame 回调组合起来，在每帧只会有一次重绘或回流。在连续帧中，回调函数执行次数通常是每秒 60 次，但在大多数遵循 W3C 建议的浏览器中，回调函数执行次数通常与浏览器屏幕刷新次数相匹配。而且当requestAnimationFrame() 运行在后台标签页或者隐藏的iframe 里时，会被暂停调用以提升性能和电池寿命。
+
+**基于 requestAnimationFrame 的通用动画函数**：
+
+![](../../../public/front-end/basics/javascript/163.png)
+
+**Flip 动画**，是 First、Last、Invert和 Play四个步骤的缩写：
+1. First，记录元素的初始状态；
+2. Last，记录该元素发生变化后的结束状态；
+3. Invert，将元素变到初始状态；
+4. Play，使用动画还原元素到结束状态。
 
 ## 书写基本规范
 
@@ -1620,12 +2492,290 @@ for.. in 循环中的变量应该使用let/const等关键字等限定作用域�
 
 ## 模块化
 
+模块化所要解决的问题：
+1. **全局污染问题**：随着JS文件数量和代码量的增加，全局变量同名的几率将会陡然上升，开发人员不得不耗费大量的精力来规避。
+2. **依赖混乱的问题**：规划JS的引入顺序，以及不同版本的依赖关系。
+
+模块化把复杂的系统分解将程序分解成离散功能块（discrete chunks of functionality），而且块的内部数据相对而言是私有的，只是向外部暴露一些接口与外部其他模块通信。模块具有比完整程序更小的接触面，使得校验、调试、测试更容易。 模块化方便代码维护，提高代码复用性，降低代码耦合度。
+
+### 模块化历史方案
+
+#### 全局模式
+
+全局模式是把将不同的功能封装成不同的全局函数，容易命名冲突，造成全局变量污染。
+
+![](../../../public/front-end/basics/javascript/164.png)
+
+#### 单例模式
+
+单例模式是简单对象封装，数据和方法都是对象的属性，不安全，可以直接修改模块内部的数据。
+
+![](../../../public/front-end/basics/javascript/165.png)
+
+#### IIFE 模式增强
+
+IIFE模式增强即利用立即执行函数表达式和闭包，支持引入依赖和暴露，是现代模块实现的基石。数据是私有的，外部只能通过暴露的方法操作。存在的问题有：
+1. 一个页面需要引入多个 JS 文件；
+2. 而且一个 `<script>` 标签就是一次请求；
+3. 无法直接看出模块间的依赖关系；
+4. 如果内部依赖关系混乱就会难以维护。
+
+![](../../../public/front-end/basics/javascript/166.png)
+
+### 现代模块化方案
+
+#### CommonJS
+
+CommonJS 是服务器端模块的规范，Node.js 采用，但提前编译打包号也可用于浏览器端。**特点**：
+1. 运行时动态同步加载依赖的模块，有缓存；
+2. 可复用于 Node 环境；
+3. 有成熟的第三方模块社区。关键在于引入和暴露：
+
+    引入模块使用require(url)（url 为路径参数，自定义模块必须以 ./ 或者 ../ 开头，第三方模块/内置模块/核心模块路径直接使用模块名称），引入的是module.exports 这个对象。
+
+    暴露模块使用exports或module.exports，exports是对module.exports的引用，在编写模块时，可以使用exports.a =’xxx’, exports.b = function(){} 或module.exports = { a:’xxx’, b: function() {} }添加属性或方法，本质上它也添加在 module.exports 所指向的对象身上。但不能直接 对exports赋值，这就将 exports 重新指向新值，和 module.exports 就不是指向同一个对象，而引入模块时引入的时module.exports对象。exports和module.exports的内部实现如下：
+
+    ![](../../../public/front-end/basics/javascript/167.png)
+
+CommonJS 规范加载模块是同步的，只有加载完成，才能执行后面的操作。由于 NodeJS 主要用于服务器编程，模块文件一般都已经存在于本地硬盘，加载起来比较快，所以同步加载没有问题。但是如果是浏览器端，同步加载很容易阻塞。
+
+#### AMD
+
+**AMD（异步模块定义）**是异步加载依赖的模块，有缓存，允许指定回调函数，可在不转换代码的情况下直接在浏览器运行，可以并行加载多个模块，也可运行在 Node 环境。AMD主要是在浏览器使用的。require.js 遵循的是 AMD（异步模块定义）规范。
+
+![](../../../public/front-end/basics/javascript/168.png)
+
+#### CMD
+
+CMD（通用模块定义）是根据 CommonJS 和 AMD 基础上提出的，异步加载依赖的模块，有缓存，sea.js 遵循的是 CMD （通用模块定义）规范。和 require.js 一样主要在浏览器中使用。但其实这两个一般都很少使用，实际上使用的更多的是CommonJs和ES Module。
+
+![](../../../public/front-end/basics/javascript/169.png)
+
+#### ES6 Module
+
+ES6 Module旨在成为浏览器和服务器通用的模块解决方案，主要针对浏览器端的，特点是动态引入（按需加载），没有缓存。Babel 将 ES6+ 转换为 ES5- （ES6 的模块化语法编译成 commonjs，然后再编译为浏览器支持的语法）。自动采用严格模式，无论是否有在模块头部加上 'use strict'，`严格模式的限制参考下文`。每个模块都有自己的顶级作用域（top-level scope），即一个模块中的顶级作用域变量和函数在其他脚本中是不可见的。模块代码只执行一次，而且导出仅创建一次，然后会在导入之间共享。模块默认是延迟解析的（deferred）。
+
+**ECMAScript 规范中的模块化方案提供了四种引入模块的方式**：
+1. **命名导入（Named Imports）**：从源模块导入其原始名称的特定项，支持在导入时使用关键字 as指定自定义名称对变量重命名。即import { name1, name2 } from ‘./module.js’
+2. **命名空间导入（Namespace Import）**：将源模块中的除默认导出的所有内容作为对象导入，将所有源模块的命名导出公开为该对象的属性和方法，即import * as module from './module.js'。
+3. **默认导入（Default Import）**：导入源文件的默认导出，即import module from './module.js'。可以同时将 default 语法与命名空间导入或命名导入一起使用。在这种情况下，default 导入必须首先声明。
+4. **空的导入（Empty Import）**：加载模块代码，但不创建任何新对象，即import './module.js'。
+
+**Import/export的特性有**：
+1. **只读性**，import 命令导入的变量都是只读的，即不允许在加载模块的脚本里面，改写对变量重新赋值，但改写该变量的属性是可以的，而且也会影响到其他模块，因此建议不要修改。
+2. **模块路径**，import 后面的 from 指定模块文件的位置，可以是相对路径，也可以是绝对路径，.js 后缀可以省略。如果只是模块名，不带有路径比如import React from ‘react’，那么必须有配置文件（通常从引入模块目录下 package.json 中查找）告诉 JavaScript 引擎该模块的位置。
+3. **模块提升**，注意，import 命令具有提升效果，import 命令无论写在文件中的哪一行，都会提升到整个模块的头部，首先执行。本质是，import 命令是编译阶段执行的，在代码运行之前。
+4. **静态执行**，整个语句中不能使用需要在运行时才能得到结果的语法结构，比如表达式或变量。目前import 命令无法取代 require 的 动态加载功能，关键字 import 可以像调用函数一样来动态的导入模块。以这种方式调用，将返回一个 promise，支持await，支持解构赋值获取模块输出的接口。目前import支持动态导入处于stage4阶段。以下是可能会需要动态导入的场景：
+    1. 当静态导入的模块很明显的降低了代码的加载速度且被使用的可能性很低，或者并不需要马上使用它。
+    2. 当静态导入的模块很明显的占用了大量系统内存且被使用的可能性很低。
+    3. 当被导入的模块，在加载时并不存在，需要异步获取。
+    4. 当导入模块的说明符，需要动态构建。（静态导入只能使用静态说明符）
+    5. 当被导入的模块有副作用（这里说的副作用，可以理解为模块中会直接运行的代码），这些副作用只有在触发了某些条件才被需要时。（原则上来说，模块不能有副作用，但是很多时候，你无法控制你所依赖的模块的内容）
+5. **重复加载**，多次重复执行同一句 import 语句，那么只会执行一次，而不会执行多次。import 语句是 Singleton 模式。
+6. **模块化隔离**，虽然通过 Babel 转码，CommonJS 模块的 require 命令和 ES6 模块的 import 命令可以写在同一个模块之中，但是不建议，因为import 在静态解析阶段执行，而require是在运行时。
+7. **对应关系**，export 语句输出的接口，与其对应的值是动态绑定关系，即通过该接口，可以取到模块内部实时的值。export 后只能跟着 default、函数声明、变量声明，{}，而不能是变量。
+8. **模块顶层导出**，import/export 命令只能出现在模块的顶层作用域。
+
+**ECMAScript 规范中的模块化方案提供了两种导出模块的方式**：
+1. **命名导出（Named Exports）**：在声明的变量前添加 export 关键字或声明后在最后统一作为对象属性即可将相对应的变量导出。同样支持在导出时使用as关键字对导出变量重命名。对应以对象的解构赋值的方式来接收值，即import {模块暴露的内容} from '模块路径' 或import * as  from '模块路径'。**允许每一个模块中定义多个命名导出**。
+2. **默认导出（Default Export）**：导出一个值作为源模块的默认导出，对应于默认的导入，**每个模块只允许有一个默认导出**。**本质上，export default 就是输出一个叫做 default 的变量或方法，因此后面不能跟变量声明语句（const/let/var）**。仅当源模块只有一个导出时，才建议使用此做法。将默认导出和命名导出组合在同一个模块中是不好的做法，尽管它是规范允许的。
+
+导入并转发导出的写法：
+
+![](../../../public/front-end/basics/javascript/170.png)
+
+### 模块化与组件化
+
+先有模块化，后有组件化，模块化是组件化的基石，两者均是 “分而治之 ”的思想。组件化更加倾向于 UI 层面上，是一个独立的可视/可交互的区域。模块化更加倾向于功能或者数据的封装。
+
+JS 模块是独立算法和数据单元，CSS 模块是独立的功能性样式单元，页面是应用中某个界面状态，是 UI 组件的容器，应用是整个项目或整个站点，由多个页面组成。一个应用由多个页面组成。一个页面由多个组件组合，组件由子组件组合，组件中可依赖模块，模块之间可互相依赖。
+
+![](../../../public/front-end/basics/javascript/171.png)
+
+非组件化开发模式存在的问题：
+1. 页面作为开发单元过大；
+2. 重复区域难以抽离。
+
+组件的意义：
+1. 降低了开发粒度，从而降低了整体复杂的。
+2. 减少了重复代码，提升了开发效率和可维护性。
+3. 更有利于团队协作。4. 更容易抽离为公共库。 
+
+如何高质量的封装组件？应该分离关注点，使得UI与功能解耦，展示组件只负责页面的展示，不处理数据逻辑；而由不同的容器组件负责不同数据逻辑。
+
 ## 控制语句
 
 JavaScript 没有 goto 语句。**label标记语句**可以且只能和 break 或 continue 语句一起使用，来指示程序是否中断循环或继续执行。标记就是在一条语句前面加个可以引用的标识符（identifier）。
+
+![](../../../public/front-end/basics/javascript/172.png)
 
 label是任何不属于保留关键字的 JavaScript 标识符。在严格模式中，你不能使用“let”作为label名称。它会抛出一个 SyntaxError（因为 let 是一个保留的标识符）。
 statement是JavaScript 语句。break 可用于任何标记语句，而 continue 可用于循环标记语句。在严格模式中，标记函数声明会抛出 SyntaxError（SyntaxError: functions cannot be labelled）。无论是否处于严格模式下，生成器函数都不能被标记。
 使用标记的循环或语句块非常罕见。通常情况下，可以使用函数调用而不是（基于标记的）循环跳转。
 
 ## 手写实现相关
+
+### 深拷贝（deepCopy）
+
+**对象浅拷贝可用 Object.assign,或展开运算符...，数组的浅拷贝可以使用slice和concat，而对象或数组的深拷贝简单场景可使用JSON.parse(JSON.stringify(object))解决**（缺陷是：
+1. 会忽略 undefined 
+2. 会忽略 symbol 
+3. 不能序列化函数即无法拷贝函数 
+4. 不能解决循环引用的对象 5.无法拷贝特殊对象RegExp, Date, Set, Map）。
+
+![](../../../public/front-end/basics/javascript/173.png)
+
+### 数组扁平化（flatten）
+
+数组扁平化是指将多维数组转化为一维数组（可以直接写在Array.prototype上）。
+
+**扁平化二维数组**：
+
+![](../../../public/front-end/basics/javascript/174.png)
+
+**扁平化更高维度数组**：
+
+![](../../../public/front-end/basics/javascript/175.png)
+
+### 数组去重
+
+![](../../../public/front-end/basics/javascript/176.png)
+
+### 循环打印红黄绿
+
+红灯 3s 亮一次，绿灯 1s 亮一次，黄灯 2s 亮一次；如何让三个灯不断交替重复亮灯？
+
+![](../../../public/front-end/basics/javascript/177.png)
+
+### 每隔一秒打印 0，1，2，3，4
+
+![](../../../public/front-end/basics/javascript/178.png)
+
+### 实现图片懒加载
+
+**实现思路**：
+1. 页面放置img标签元素；
+2. 初始化img标签 data-src =真实图片地址，同时设置alt, width, height以及,默认的src （代替的小图片）；
+3. JavaScript判断img元素是否出现在窗口内，是则设置src = data-src。
+
+**方式一**：
+1. document.documentElement.clientHeight || window.innerHeight 获取可视窗口的高度，两者区别在于前者除去滚动条的高度，也是为了浏览器之间兼容
+2. document.documentElement.scrollTop || document.body.scrollTop 获取根元素滚动的距离，（或者使用只读属性window.pageXOffset/pageYOffset ）
+3. element.offsetTop 获取元素对于其 offsetParent 元素的顶部内边距的距离。
+
+**注意**：offsetParent是指向**包含层级上最近的包含该元素**的**定位元素（position：absolute/relative/fixed）**或者**最近的 table,td,th,body元素**。当元素的 style.display 设置为 "none" 时，offsetParent 返回 null。如果元素存在fixed定位，offsetParent为null（firefox浏览器例外是body），因为fixed定位的元素包含层级的父元素为null（firefox为body）。
+补充：
+
+JavaScript操作页面的坐标系分为页面坐标（自称为pageY/pageX）和窗口坐标（自clientY/clientX），分别相对于文档左上角和可视窗口左上角。
+
+**获取文档完整高度/宽度**：
+Math.max(document.body.scrollHeight/width,document.documentElement.scrollHeight/width,document.body.offsetHeight/width,document.documentElement.offsetHeight/width,document.body.clientHeight/width,document.documentElement.clientHeight/width );
+JavaScript操作页面滚动须等 DOM 完全构建好：
+1. 方法 scrollBy(x,y) 将页面滚动至相对于当前位置的 (x, y) 位置；
+2. 方法 scrollTo(x-coord, y-coord) 将页面滚动至相对调用对象（element或window）的左上角的指定坐标位置；或scrollTo(options)，其中包含以下参数的字典：
+    1. top指定沿 Y 轴滚动窗口或元素的像素数。
+    2. left指定沿 X 轴滚动窗口或元素的像素数。
+    3. behavior确定滚动是即时的还是平滑的动画。此选项是一个字符串，必须采用以下值之一：
+        1. smooth：滚动动画应该流畅
+        2. instant：滚动应该在一次跳跃中立即发生
+        3. auto：滚动行为由scroll-behavior计算值决定
+3. 方法element.scrollIntoView(top) 将element元素滚动至窗口顶部（top=true）或底部（top=false）；
+4. 方法element.style.overflow = "hidden"，禁止element的滚动（使用时配合padding来防止滚动条消失页面抖动）
+
+document.elementFromPoint(x, y)：返回当前文档上处于指定坐标（相对于窗口左上角可见区域的坐标，否则返回null）位置最顶层的元素。
+
+```javascript
+// 在img元素定位不是fixed的情况下且display不为none且不是table,td,th 的子元素的时候适用
+// 3 - 2 < 1 的时候，元素在可视区域
+const isVisible = function(element) {
+let windowVisibleHeight = document.documentElement.clientHeight || window.innerHeight
+let documentScrollHeight = document.documentElement.scrollTop || document.body.scrollTop
+let elTopToDocument = element.offsetTop
+if (elTopToDocument === null) throw new Error(’the position of element is non-compliant’)
+    return elTopToDocument - documentScrollHeight < windowVisibleHeight
+}
+const lazyLoadImg = function(element) {
+    if (isVisible(element)) {
+        element.src = element.dataset.src
+    }
+}
+```
+
+**方式二**：
+
+那么**相对于文档左上角坐标**：pageY/pageX = clientY / clientX + 文档的垂直/水平滚动出的部分的高度/宽度。clientY / clientX 由getBoundingClientRect()获得。
+
+```javascript
+const isVisible = function(element) {
+    let windowVisibleHeight = document.documentElement.clientHeight || window.innerHeight
+    return element.getBoundingClientRect().top <= windowVisibleHeight + 50
+}
+const lazyLoadImg = function(element) {
+    if (isVisible(element)) {
+        element.src = element.dataset.src
+    }
+}
+```
+
+**方式三**：IntersectionObserver异步自动观察元素是否在视口内
+1. new IntersectionObserver(callback[, options])
+2. callback是当元素可见比例超过指定阈值调用的回调函数，回调函数接受两个参数：
+    1. entries：与root可视区域的交叉状态描述IntersectionObserverEntry对象（对象的target即被观察者）构成的数组
+    2. observer：被调用的IntersectionObserver实例，注意这不是被观察者，而是观察者。
+3. options是配置observer实例的对象，默认为{ root : 文档对象，rootMargin：undefiend, threshold：0}：
+    1. root是作为监听被观察者的视口元素，是否可见是相对于root元素的，在root元素可见区域内之外均视为不可见
+    2. rootMargin 用于扩大root元素视口范围
+    3. threshold：规定被监听元素与root可见区域的交叉比例值阈值，被监听元素完全出现在root可见区域中为1，完全在之外为0
+
+```javascript
+const lazyLoadImg = function(element) {
+	element.src = element.dataset.src
+}
+const callback = (entries, observer) => { // 交叉状态对象数组和观察者
+entries.forEach((entry) => {
+      let element = entry.target // 被观察者
+    lazyLoadImg(element) //替换真实src
+    observer.unobserve(element) //移除执行过回调的被观察者 
+  })
+}
+const lazyLoadImgObserver = new IntersectionObsever(callback) //观察者
+// 使用观察者观察指定元素
+elements = document.querySelectorAll(selectorOfElement)
+elements.forEach((element) => {
+   lazyLoadImgObserver.obseve(element)  //观察每个元素
+}
+```
+
+### 比较两个版本号的大小
+
+`比较两个应用版本的大小，如果v1 > v2返回1；如果v1 < v2返回0；如果 v1 = v2返回0。比如，1.2.4 < 1.3.0.alpha.1 < 1.3.0.alpha.2 < 1.3.0.beta.1 < 1.3.0.rc.1 < 1.3.0`；
+
+![](../../../public/front-end/basics/javascript/179.png)
+
+### 生成指定长度随机字符串
+
+![](../../../public/front-end/basics/javascript/180.png)
+
+### 使用 setTimeout 实现 setInterval
+
+![](../../../public/front-end/basics/javascript/181.png)
+
+### 实现 range 函数
+
+![](../../../public/front-end/basics/javascript/182.png)
+
+### 实现 lodash 的 countBy 函数
+
+![](../../../public/front-end/basics/javascript/183.png)
+
+### 实现 canvas 简易版手写签名
+
+![](../../../public/front-end/basics/javascript/184.png)
+
+### 实现 add(1)(2)(3)(4)()
+
+![](../../../public/front-end/basics/javascript/185.png)
+
+### 实现远程调用加法
+
+![](../../../public/front-end/basics/javascript/186.png)
