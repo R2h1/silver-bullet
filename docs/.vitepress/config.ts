@@ -15,6 +15,7 @@ export default defineConfig({
       dark: "dark-plus",
     },
   },
+  ignoreDeadLinks: true,
   themeConfig: {
     logo: '/logo.png',
     search: {
