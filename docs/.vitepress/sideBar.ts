@@ -44,6 +44,15 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
       {
         text: 'javascript',
         link: '/front-end/basics/javascript/index',
+        collapsed: true,
+        items: [
+          { text: '数据类型', link: '/front-end/basics/javascript/data-type' },
+          { text: '函数相关', link: '/front-end/basics/javascript/function' },
+          { text: '运算符相关', link: '/front-end/basics/javascript/operator' },
+          { text: 'Web API', link: '/front-end/basics/javascript/web-api' }, 
+          { text: '模块化', link: '/front-end/basics/javascript/module' },
+          { text: '手写实现相关', link: '/front-end/basics/javascript/handwrite' },
+        ]
       },
     ]
   },
