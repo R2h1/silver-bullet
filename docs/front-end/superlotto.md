@@ -5,6 +5,15 @@ const result = ref(generateSuperlotto());
 function update() {
   result.value = generateSuperlotto();
 }
+
+function copy() {
+  const text = result.value.flat().join(' ');
+  window.navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      window.alert("已复制");
+    })
+}
 </script>
 
 # 超级大乐透生成器
@@ -23,7 +32,11 @@ function update() {
     </div>
   </div>
 </div>
-<button :class="$style.button" @click="update">随机生成一注</button>
+<div :class="$style.operateArea">
+  <button :class="$style.button" @click="update">随机生成一注</button>
+  <button :class="$style.button" @click="copy">一键复制</button> 
+</div>
+
 
 <style module>
 
@@ -49,7 +62,8 @@ function update() {
 }
 
 .frontArea,
-.backArea {
+.backArea,
+.operateArea {
   display: flex;
   align-items: center;
   gap: 15px;
