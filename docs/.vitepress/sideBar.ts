@@ -72,7 +72,9 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     link: '/front-end/frame/index',
     collapsed: true,
     items: [
-      
+      { text: 'jquery', link: '/front-end/frame/jquery/index' },
+      { text: 'vue', link: '/front-end/frame/vue/index' },
+      { text: 'react', link: '/front-end/frame/react/index' },
     ]
   },
   {
