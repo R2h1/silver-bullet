@@ -40,7 +40,7 @@ const copyText = async (val) => {
 
 function copy() {
   const text = result.value.flat().join(' ');
-  copyText().then(() => {
+  copyText(text).then(() => {
       window.alert("已复制");
     })
 }
