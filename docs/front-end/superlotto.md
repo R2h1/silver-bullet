@@ -1,16 +1,46 @@
 <script setup>
 import { ref } from 'vue';
-import generateSuperlotto from '../../src/数组/生成大乐透号码/generateSuperlotto.js';
-const result = ref(generateSuperlotto());
+import generateSuperLotto from '../../src/数组/生成大乐透号码/generateSuperlotto.js';
+const result = ref(generateSuperLotto());
 function update() {
-  result.value = generateSuperlotto();
+  result.value = generateSuperLotto();
 }
+
+const copyText = async (val) => {
+  try {
+    // 使用现代 API 尝试复制
+    if (navigator.clipboard && navigator.permissions) {
+      await navigator.clipboard.writeText(val);
+      return; // 如果成功，直接返回
+    }
+
+    // 降级方案
+   const textArea = document.createElement('textArea') 
+   textArea.value = val 
+   textArea.style.width = 0 
+   textArea.style.position = 'fixed' 
+   textArea.style.left = '-999px' 
+   textArea.style.top = '10px' 
+   textArea.setAttribute('readonly', 'readonly')
+   document.body.appendChild(textArea) 
+   textArea.select()
+
+    // 尝试执行复制操作
+    const success = document.execCommand('copy');
+    if (!success) {
+      throw new Error('无法复制文本');
+    }
+
+    // 清理
+    document.body.removeChild(textArea);
+  } catch (err) {
+    console.error('复制失败:', err);
+  }
+};
 
 function copy() {
   const text = result.value.flat().join(' ');
-  window.navigator.clipboard
-    .writeText(text)
-    .then(() => {
+  copyText(text).then(() => {
       window.alert("已复制");
     })
 }
@@ -33,7 +63,7 @@ function copy() {
   </div>
 </div>
 <div :class="$style.operateArea">
-  <button :class="$style.button" @click="update">随机生成一注</button>
+  <button :class="$style.button" @click="update">立即生成</button>
   <button :class="$style.button" @click="copy">一键复制</button> 
 </div>
 
