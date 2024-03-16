@@ -83,6 +83,14 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
     items: []
   },
   {
+    text: 'lottie',
+    link: '/front-end/lottie',
+  },
+  {
+    text: '前端性能优化',
+    link: '/front-end/performance-optimization',
+  },
+  {
     text: '微前端',
     link: '/front-end/micro-front-end',
     items: []
