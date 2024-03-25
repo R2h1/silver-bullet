@@ -118,6 +118,12 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
       { text: 'eslint', link: '/front-end/engineering/eslint' },
       { text: 'esbuild', link: '/front-end/engineering/esbuild' },
       { text: 'pnpm', link: '/front-end/engineering/pnpm' },
+      { text: 'npm', link: '/front-end/engineering/npm' },
+      { text: 'vite', link: '/front-end/engineering/vite' },
     ]
-  }
+  },
+  {
+    text: '扩展开发',
+    link: '/front-end/browser-extension',
+  },
 ];

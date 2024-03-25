@@ -5,10 +5,10 @@
  * @param divide 分割符号
  * @returns
  */
-export function splitNum(num: number, divide = '.') {
+export function splitNum(num: number, divide = ',') {
   num = Number(num);
   if (isNaN(num)) {
-    throw new TypeError('num 必须是一个有效数字');
+    throw new TypeError('num 必须是一个有效数字字符串');
   }
   let s = (num || 0).toString();
   let sign = '';

@@ -106,3 +106,42 @@
 2. 混淆分辨率则是更改 `documentElement.clientHeight`、`documentElement.clientWidth`。
 3. 混淆 WebGL 则要更改 `WebGLbufferData` `getParameter` 方法等等。
 4. 混淆 Canvas 指纹则需要更改 `toDataURL` 方法，比如 先使用 `toDataURL()` 将整个 canvas 的内容导出，通过 getImageData() 复制画布上指定矩形的像素数据并修改然后通过 `putImageData()` 将图像数据放回，然后再使用 `toDataURL()` 导出的图片，完成混淆。
+
+## 重绘、回流、合成
+
+**回流即重排（reflow）**，当渲染树中的一部分或者全部因为元素的尺寸、布局、隐藏等改变而需要重新构建的时候，这时候就会发生回流。
+具体操作包括：
+1. DOM节点的尺寸，边距，填充内容，宽高改变；
+2. DOM节点display显示与否；
+3. DOM 节点的增删，位置改变；
+4. 浏览器窗口尺寸变化（resize）；
+5. 读写 offset族、scroll族和client族和width，height属性时（浏览器为了获取这些值，需要进行回流操作）；
+6. 调用 window.getComputedStyle（该方法返回指定元素的对象，通过对象的getPropertyValue方法获取指定css属性的最终计算值）和window.currentStyle 方法；
+7. 页面第一次渲染。
+
+因此，对DOM的操作应该**减少回流次数**和**降低回流的规模即节点数**。
+
+reflow 过程图：
+
+![](../public/front-end/browser/1.png)
+
+**reflow 的本质**就是重新计算布局树。当进行了会影响布局树的操作后，需要重新计算布局树，会引发布局。相当于重新进行DOM的解析和合成，开销相当大。为了避免连续的多次操作导致布局树反复计算，浏览器默认会合并这些操作，当 JS 代码全部完成后再进行统一计算（但对于 window.getComputedStyle精确计算会强行刷新队列，无法优化），所以，改动属性造成的 reflow 是异步完成的。然而，如果JS 获取属性则浏览器会立即同步 reflow，否则当 JS 获取布局属性时，就可能造成无法获取到最新的布局信息。
+
+**重绘（repaint）是当修改导致了非几何属性的样式变化时触发，根据新的渲染树重新绘制改变的部分的过程**。重绘过程（**只计算样式和绘制列表**）：
+
+![](../public/front-end/browser/2.png)
+
+repaint 的本质就是重新根据分层信息计算了绘制指令。当改动了可见样式后，就需要重新计算，会引发 repaint。由于元素的布局信息也属于可见样式，所以回流一定会引起重绘。重绘不一定回流。
+
+**合成即在DOM的修改是 CSS3 的 transform、opacity、filter 属性时触发**。合成过程中，调用线程池完成分块，然后使用 **GPU（擅长处理位图数据）**开启多个线程快速将块信息生成位图（光栅化），由于使用的是非主线程的**合成线程**，即使主线程卡住，也可以流畅的展示。
+
+![](../public/front-end/browser/3.png)
+
+因此，可以**利用重绘、回流、合成原理改进渲染过程**：
+1. 避免频繁使用 style，而是采用修改或添加class的方式；而对于确实需要动态修改多个style可使用element.style.cssText
+2. 使用createDocumentFragment文档碎片进行批量的 DOM 操作。
+3. 先display:none（不存在渲染树内），中间进行多个不可避免的回流操作，再display:block。
+4. 读写 offset族、scroll族和client族和width，height属性时尽量做变量缓存
+5. 涉及动画操作时，尽量绝对定位脱离文档流，来降低对父级元素回流影响
+6. 对于 resize、scroll 等进行防抖/节流处理（浏览器默认也会进行）。
+7. 添加 will-change: transform ，让渲染引擎为其单独实现一个图层，当这些变换发生时，仅仅只是利用合成线程去处理这些变换，而不牵扯到主线程，大大提高渲染效率。当然这个变化不限于 transform, 任何可以实现合成效果的 CSS 属性都能用will-change来声明。
