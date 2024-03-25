@@ -1,0 +1,1 @@
+import{_ as t,o as e,c as s}from"./chunks/framework.buEibnTs.js";const f=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"soft-skill/EQ.md","filePath":"soft-skill/EQ.md","lastUpdated":1711373428000}'),a={name:"soft-skill/EQ.md"};function o(r,c,n,l,i,d){return e(),s("div")}const _=t(a,[["render",o]]);export{f as __pageData,_ as default};

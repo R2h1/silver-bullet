@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as a}from"./chunks/framework.buEibnTs.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"back-end/redis.md","filePath":"back-end/redis.md","lastUpdated":1711373428000}'),r={name:"back-end/redis.md"};function s(d,c,n,o,i,p){return t(),a("div")}const f=e(r,[["render",s]]);export{m as __pageData,f as default};

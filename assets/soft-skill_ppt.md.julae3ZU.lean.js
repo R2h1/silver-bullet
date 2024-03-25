@@ -1,0 +1,1 @@
+import{_ as t,o as e,c as s}from"./chunks/framework.buEibnTs.js";const f=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"soft-skill/ppt.md","filePath":"soft-skill/ppt.md","lastUpdated":1711373428000}'),a={name:"soft-skill/ppt.md"};function o(p,r,c,n,l,i){return e(),s("div")}const _=t(a,[["render",o]]);export{f as __pageData,_ as default};
