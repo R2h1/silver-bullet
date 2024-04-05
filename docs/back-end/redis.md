@@ -2,7 +2,7 @@
 
 Redis 是基于内存的数据库，基于C语言实现，访问内存快于磁盘。每种数据类型具有读取和存储高效的数据结构实现。
 
-![](../public/back-end/redis/1.png)
+![](../public/back-end/redis/1.png);
 
 ## redis基础
 
