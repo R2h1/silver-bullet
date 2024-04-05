@@ -1,1 +1,0 @@
-import{_ as e,o as t,c as a}from"./chunks/framework.buEibnTs.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"back-end/mysql.md","filePath":"back-end/mysql.md","lastUpdated":1711373428000}'),s={name:"back-end/mysql.md"};function c(n,r,o,d,m,l){return t(),a("div")}const i=e(s,[["render",c]]);export{_ as __pageData,i as default};
