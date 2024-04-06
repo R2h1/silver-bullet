@@ -320,7 +320,10 @@ cookie和session均可用于存储用户信息。
 
 ![](../public/basics/http/100.png)
 
-![](../public/basics/http/101.png)
+<!-- ![](../public/basics/http/101.png) -->
+服务端可以设置 Cookie 的所有选项：Expires、Domain、Path、Secure、HttpOnly，一个 Set-Cookie 字段只能设置一个 Cookie, 当需要设置多个 Cookie 时，需要添加同样多的 Set-Cookie 字段。
+
+客户端可以设置 Cookie 的选项：Expires、Domain、Path、Secure(有条件：只有在 HTTP 协议的网页中，客户端设置 Secure 类型的 Cookie 才能成功)，但无法设置 HttpOnly 选项。
 
 **Session**：保存在服务器，敏感的信息用session存储更安全，session可以存放在文件/数据库/内存中，但是会增加服务器的压力。
 
@@ -977,11 +980,24 @@ CSP 是一种由开发者定义的安全性政策性申明，通过 CSP 所约�
 
 Content-Security-Policy中可以设置report-uri 用来告诉浏览器，应该把注入行为使用POST方法报告给该网址：
 
-![](../public/basics/http/129.png)
+```json
+{
+    "csp-report": {
+        "document-uri": "http://example.org/page.html",
+        "referrer": "http://evil.example.com/",
+        "blocked-uri": "http://evil.example.com/evil.js",
+        "violated-directive": "script-src 'self' https://apis.google.com",
+        "original-policy": "script-src 'self' https://apis.google.com; report-uri http://example.org/my_amazing_csp_report_parser"
+    }
+}
+```
 
 **开启 CSP 可用**：
 
-![](../public/basics/http/130.png)
+网络服务器返回 Content-Security-Policy HTTP 头部，或者：
+```html
+<meta http-equiv="Content-Security-Policy" />
+```
 
 ### HTTP 安全相关标头（Security）
 

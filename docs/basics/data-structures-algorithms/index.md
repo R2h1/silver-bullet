@@ -8,4 +8,4 @@
 
 **面向函数（Function Oriented）**：即函数式编程。它将程序看作是函数的集合，强调函数的使用和复用，将函数作为程序的基本构建块，通过组合和转换函数实现复杂的计算过程，并且不会对外部状态进行修改。FOP（Functional Oriented Programming）通常适用于处理数学运算、数据转换等问题。
 
-![](../../public/basics/dsa-2.png)
+![](/basics/dsa-2.png)
