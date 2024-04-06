@@ -542,14 +542,49 @@ transform 可以用来尝试处理移动端1px的问题（画0.5px的线）：
     1. @import 语句末尾的分号是必需的；
     2. @import 规则一定先于除了 @charset的其他任何规则，且使用 @import 无法引入超过 35 条的样式表。
 2. 用media= 属性为`<style>, <link>, <source>`和其他HTML元素指定特定的媒体类型。如：
+
 ```html
 <link rel="stylesheet" src="styles.css" media="screen" />
 <link rel="stylesheet" src="styles.css" media="print" />
 ```
+
 3. 在JavaScript中使用Window.matchMedia() 和MediaQueryList.addListener() 方法来测试和监控媒体状态。
 
-![](/front-end/basics/css/63.png)
+```JavaScript
+// window.matchMedia 其唯一参数为一个合法的媒体查询字符串，false：
+const isWideScreen = window.matchMedia('(min-width: 960px)');
+// 是否匹配 true | false(媒体查询条件不匹配 或 媒体查询字符串语法错误 或 浏览器不支持该查询特性)
+console.log(isWideScreen.matches);
+// "(min-width: 960px)"
+console.log(isWideScreen.media);
 
+// 监听媒体的更改
+function toggleClass(mq) {
+  if (mq.matches) {
+    document.body.classList.add('widescreen');
+  } else {
+    document.body.classList.remove('widescreen');
+  }
+}
+
+// 添加监听
+isWideScreen.addListener(toggleClass);
+// 移除监听
+isWideScreen.removeListener(toggleClass);
+
+// 使用 CSSMediaRuleCSS 对象模型接口访问使用 @media 创建的规则
+@media (min-width: 500px) {
+  body {
+    color: blue;
+  }
+}
+const myRules = document.styleSheets[0].cssRules;
+// media 是一个 MediaList， 是实时列表，使用下面列出的属性或方法更新列表将立即更新文档的行为
+console.log(myRules[0].media);
+media.mediaText; // 以文本形式表示 MediaList, 也可以通过这个属性设置新的 MediaList
+MediaList.appendMedium(medium: string); // 向 MediaList 中添加一个媒体查询
+MediaList.deleteMedium(medium: string); // 从 MediaList 中移除一个媒体查询
+```
 
 使用@media规则指定一个媒体查询和一个 CSS 块，当且仅当该媒体查询与正在使用其内容的设备匹配时，该 CSS 块才能应用于该文档。@media可以放在在 CSS 的最顶层，也可以放在@规则的条件规则组中。
 
@@ -557,9 +592,24 @@ transform 可以用来尝试处理移动端1px的问题（画0.5px的线）：
 
 **媒体类型与媒体特性嵌套**:
 
-![](/front-end/basics/css/64.png)
-
-
+```css
+/* 媒体类型嵌套媒体特性 */
+@media screen {
+  @media (min-width: 20em) {
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+  @media (min-width: 40em) {
+    img {
+      display: inline-block;
+      max-width: 300px;
+    }
+  }
+}
+```
 
 当**媒体类型**（可选且默认为all，使用not 或 only 逻辑操作符则必须指定）与在其上显示文档的**设备匹配并且所有媒体功能表达式都计算为 true** 时，媒体查询将计算为 true，CSS内容才适用。涉及未知媒体类型的查询始终为 false。即使媒体查询返回 false，带有媒体查询附加到其`<link>`标记的样式表仍将下载。**媒体类型有**：
 1. all：用于所有设备；
@@ -569,7 +619,21 @@ transform 可以用来尝试处理移动端1px的问题（画0.5px的线）：
 
 **媒体特性（Media features）描述了 user agent、输出设备，或是浏览环境的具体特征是否存在、值为多少。媒体特性表达式是完全可选的，但都必须置于括号中**。在测试接受范围的任何特性时允许更简洁的媒体查询（比如 400px <= width <= 700px、height > 600px），或者利用支持添加 max- 和 min- 前缀的媒体特性来进行范围检测：
 
-![](/front-end/basics/css/65.png)
+```css
+/* 0 ~ 30 rem */
+@media (max-width: 30rem) {
+  nav li {
+    display: block;
+  }
+}
+
+/* 30 rem ~ 100 rem */
+@media (max-width: 100rem) {
+  nav li {
+    display: inline-block;
+  }
+}
+```
 
 为了最好地调整网站文本大小，当使用长度值`<length>[em,rem,px]`进行媒体查询时，单位建议使用rem。
 
@@ -583,11 +647,77 @@ transform 可以用来尝试处理移动端1px的问题（画0.5px的线）：
 
 **利用媒体查询实现自适应**：
 
-![](/front-end/basics/css/69.png)
+```html
+<!-- 针对高分屏的媒体查询 -->
+<style>
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* retina 屏幕下的样式 */
+}
+</style>
+
+<style>
+/* 引入外部文件时的媒体查询 */
+@import url(typography.css) screen, print;
+
+@import url(hi-res-icon.css) (min-resolution: 1.5dppx), (min-resolution: 96dpi);
+</style>
+
+<!-- 即使媒体查询不符，样式文件总会被下载 -->
+<link rel="stylesheet" href="styles.css" type="text/css" media="screen and (max-width: 480px)" />
+
+<!-- 在 style 标签上的媒体查询 -->
+<style type="text/css" media="screen and (max-width: 480px)">
+  body {
+    font-size: 20px;
+  }
+</style>
+
+<!-- 利用媒体查询实现图片自适应 -->
+<picture>
+  <source 
+    src="large.jpg"
+    media="((min-device-pixel-ratio: 1.5) and (min-width: 20.001em) and (max-width: 35.999em)) 
+    or ((max-device-pixel-ratio: 1.5) and (min-width: 120.001em)) 
+    or ((min-device-pixel-ratio: 1.5) and (min-width: 60.001em))"
+  
+  />
+  <source 
+    src="medium.jpg"
+    media="((max-device-pixel-ratio: 1.5) and (min-width: 20.001em) and (max-width: 35.999em)) 
+    or ((max-device-pixel-ratio: 1.5) and (min-width: 60.001em)) 
+    or ((min-device-pixel-ratio: 1.5) and (min-width: 10.001em))"
+  
+  />
+  <source src="small.jpg"/>
+  <!-- fallback -->
+  <img src="small.jpg" alt="" />
+</picture>
+```
 
 **background-image用 image-set() 设置响应式的背景图片**：
 
-![](/front-end/basics/css/70.png)
+```css
+body {
+  /* 没有image-set 的浏览器的降级处理 */
+  background-image: url('large-balloons.jpg');
+  background-image: image-set(
+    "large-balloons.avif" type("image/avif"),
+    "large-balloons.jpg" type("image/jpeg"),
+  )
+}
+
+body {
+  /* 为普通屏幕使用 pic-1.jpg
+     为高分屏使用 pic-2.jpg
+     如果更改分辨路则使用 pic-3.jpg, 比如印刷
+  */
+  background-image: image-set(
+    url(../images/pic-1.jpg) 1x,
+    url(../images/pic-2.jpg) 2x,
+    url(../images/pic-3.jpg) 600dpi,
+  );
+}
+```
 
 **`<img>`标签用 srcset 和 sizes 实现更好的图片自适应**：
 1. 带x的由浏览器只是计算出正在显示的显示器的分辨率，然后提供srcset引用的最适合的图像
@@ -597,11 +727,52 @@ transform 可以用来尝试处理移动端1px的问题（画0.5px的线）：
 
 **Bootstrap中使用媒体查询**：
 
-![](/front-end/basics/css/72.png)
+```css
+/* 在 Bootstrap 中控制 .container 的宽度和内边距 */
+@media(min-width: 1200px) {
+  .container {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+}
+@media(min-width: 768px) {
+  .container {
+    width: 720px;
+    max-width: 100%;
+  }
+}
+
+@media(min-width: 576px) {
+  .container {
+    width: 540px;
+    max-width: 100%;
+  }
+}
+
+/* 在 Bootstrap 中控制 grid */
+@media(min-width: 1200px) {
+  .col-md-1 {
+    max-width: 8.33333%;
+  }
+  .col-md-2 {
+    max-width: 16.66667%;
+  }
+  .col-md-3 {
+    max-width: 25%;
+  }
+  ...
+}
+```
 
 **媒体查询可以用来尝试处理移动端1px的问题（画0.5px的线）**：
 
-![](/front-end/basics/css/73.png)
+```html
+<!-- 媒体查询处理移动端1px问题： 不同分辨率输出对应 viewport 同时设置对应 viewport 的 rem 基准值 -->
+<!-- devicePixelRatio = 2; -->
+<meta name="viewport" content="initial-scale=0.5, maximum-scale=0.5, user-scalable=no" />
+<!-- devicePixelRatio = 3 -->
+<meta name="viewport" content="initial-scale=0.3333333333333333, maximum-scale=0.3333333333333333, user-scalable=no" />
+```
 
 **any-hover媒体特性**可以用来测试是否有任意可用的输入机制可以在元素上 hover。取值有：
 1.none：可用的输入机制里没有机制可以方便地 hover，或者不存在定点输入机制；
@@ -695,11 +866,131 @@ Flex项（Flex Item）是Flex 容器（块级元素设置display: flex或行内�
 
 Flex容器创建Flex格式上下文，内部浮动失效，排除外部浮动，不存在外边距折叠。浏览器兼容方面，IE 10需要使用 -ms- 前缀，webkit内核比如UC 浏览器需要使用 -webkit- 前缀。
 
-**Flexbox应用梳理**：
+**FlexBox应用梳理**：
 
-![](/front-end/basics/css/84.png)
+```css
+/* 1. 表单控件，input 撑满 */
+.wrapper {
+  display: flex;
+}
+.wrapper input {
+  flex: 1;
+}
 
-![](/front-end/basics/css/85.png)
+/* 2. 绝对顶部或绝对底部 */
+.flexible-auto-fill {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  height: 56px;
+}
+
+.footer {
+  height: 40px;
+}
+
+.main {
+  flex-grow: 1;
+}
+
+/* 3. 媒体对象：一侧具有图片或其他元素，另一侧具有文本 */
+.media {
+  display: flex;
+  align-items: flex-start;
+}
+.media.flipped {
+  flex-direction: row-reverse;
+}
+.media .content {
+  flex: 1;
+  padding: 10px;
+}
+
+/* 4. 水平垂直居中 */
+.box {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.box>div {
+  width: 100px;
+  height: 100px; 
+}
+
+/* 5. 平均分布并且可换行 */
+.container {
+  display: flex;
+  display: -webkit-flex;
+  justify-content: space-between;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+/* 6. 九宫格 */
+flexible-nine-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background-color: blue;
+
+  width: 360px;
+  height: 360px;
+
+  .grid-item {
+    width: 32%;
+    height: 32%;
+    text-align: center;
+    background-color: yellow;
+
+    &:nth-child(-n+6) {
+      margin-bottom: 2%;
+    }
+
+    &:nth-child(3n+1),
+    &:nth-child(3n+2) {
+      margin-right: 2%;
+    }
+  }
+}
+
+/* 7. 自适应布局 */
+.parent {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 300px;
+    height: auto;
+    min-height: 200px;
+    background-color: blue;
+  }
+
+.child {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /*  flex-grow: 1 ，表示自动延展到最大宽度 */
+  flex: 1 1 150px; 
+  /* No stretching: */
+  flex: 0 1 150px;
+  margin: 5px;
+  background-color: yellow;
+}
+
+/* 8. margin-left 设置为 auto，剩余空间由 margin 来占据； */
+nav ul {
+  display: flex;
+}
+
+.push-right {
+  margin-left: auto;
+}
+```
 
 ##  grid网格布局（CSS3）
 
@@ -729,7 +1020,7 @@ grid 容器（块级元素设置display: grid或行内级元素设置 display: 
 
 ![](/front-end/basics/css/91.png)
 
-IE11 不支持网格单元的自动布置。除非显式地注释 -ms-grid-column 和 -ms-grid-row，否则所有单元都会在网格的第一行/列结束，可以使用提供自动注释的工具：**![css_grid_annotator](https://github.com/motine/css_grid_annotator)**。
+IE11 不支持网格单元的自动布置。除非显式地注释 -ms-grid-column 和 -ms-grid-row，否则所有单元都会在网格的第一行/列结束，可以使用提供自动注释的工具：**[css_grid_annotator](https://github.com/motine/css_grid_annotator)**。
 
 **gap 属性**是用来设置网格行与列之间的间隙（gutters），该属性是 row-gap 和 column-gap 的简写形式。<'column-gap'> 是可选的，假如 <'column-gap'> 缺失的话，则会被设置成跟 <'row-gap'> 一样的的值。其他布局中row-gap和column-gap初始值normal的间隔为0，多列布局中column-gap默认值normal的默认间隔为 1em。间隙距离可以用任何长度单位包括百分比来表示，但不能使用fr单位。间距所使用的空间会在使用弹性长度fr的轨道的空间计算前就被留出来。gap属性曾经有一个grid-前缀，可加可不加。
 
@@ -755,44 +1046,122 @@ IE11 不支持网格单元的自动布置。除非显式地注释 -ms-grid-colu
 
 grid布局应用：
 
-![](/front-end/basics/css/94.png)
+```css
+/* 1. 媒体查询 + gird 响应式布局 */
+.wrapper {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-areas:
+    "header"
+    "nav"
+    "content"
+    "sidebar"
+    "ad"
+    "footer";
+}
+@media (min-width: 500px) {
+  .wrapper {
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+      "header  header"
+      "nav     nav"
+      "sidebar content"
+      "ad      footer";
+  }
+  nav ul {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+@media (min-width: 700px) {
+  .wrapper {
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-areas:
+      "header header  header"
+      "nav    content sidebar"
+      "nav    content ad"
+      "footer footer  footer";
+  }
+  nav ul {
+    flex-direction: column;
+  }
+}
 
-![](/front-end/basics/css/95.png)
+/* 2. 12 列网格系统 */
+.wrapper {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(12, [col-start] 1fr);
+}
 
-![](/front-end/basics/css/96.png)
+/* 3. 三列布局使用 */
+.header,
+.footer {
+  grid-column: col-start / span 12;
+}
+.side-left {
+  grid-column: col-start / span 3;
+  grid-row: 2 / span 10;
+}
+.content {
+  grid-column: col-start 4 / span 6;
+  grid-row: 2 / span 10;
+}
+.side-right {
+  grid-column: col-start 10 / span 3;
+  grid-row: 2 / span 10;
+}
+
+/* 4. 绝对底部 */
+.wrapper {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* 
+<div class="wrapper">
+  <header class="page-header">header</header>
+  <article class="page-body"></article>
+  <footer class="page-footer" >footer</footer>
+</div> 
+*/
+```
 
 ## 隐藏元素、内容
 
-屏幕阅读器：一种可以将电脑、手机屏幕上的内容通过文本转语音（TTS）朗读出的软件，该类软件的受众人群主要是视力障碍人群。
-判断指标：
+屏幕阅读器：一种可以将电脑、手机屏幕上的内容通过文本转语音（TTS）朗读出的软件，该类软件的受众人群主要是视力障碍人群。**判断指标**：
+1. 是否支持动画;
+2. 可访问性（屏幕阅读器）
+3. 是否触发事件
+4. 是否影响布局
+5. 是否会渲染
 
-![](/front-end/basics/css/97.png)
-
-1. **display:none**
+### display:none
 
 完全隐藏元素，元素会从渲染树、无障碍树中移除，仅存在于DOM树上，导致该元素和其所有后代元素无法被屏幕阅读器访问，隐藏过程不支持动画，会触发页面的重排和重绘，性能较差。隐藏后不会渲染也不影响布局，无法触发绑定的事件（比如点击）。如果作用的是img标签，由于解析到标签的时候，样式还没应用，所以图像会下载，相反使用background设置的图像，图像不会下载，同样是因为样式没应用。
 
-2. **position：absolute; left: -9999px;**
+### position：absolute; left: -9999px;
 
 absolute绝对定位，使用top、bottom、left、right 将元素移除屏幕来隐藏。隐藏过程会触发重排和重绘制，支持动画。隐藏后脱离文档正常流渲染不影响布局，无法被点击，屏幕阅读器可访问。
 
-3. **visibility: hidden;**
+### visibility: hidden;
 
 视觉上隐藏元素而不更改文档的布局，隐藏过程支持动画，会触发重绘。隐藏后无法触发事件，无法被屏幕阅读器访问。
 
-4. **opacity: 0和filter: opacity(0)和rgba(255,255,255,0)**
+### opacity: 0 和 filter: opacity(0)和rgba(255,255,255,0)
 
 设置透明度为0来隐藏元素，不更改文档的布局，隐藏过程支持动画，会触发重绘。隐藏后可以触发事件和被屏幕阅读器访问。
 
-5. **z-index: -9999px;**
+### z-index: -9999px;
 
 对已经定位的元素（position不是static）设置负层级来隐藏，隐藏过程支持动画，会触发重排和重绘，隐藏后无法触发事件，可以被屏幕阅读器访问。
 
-6. **transform: scale(0, 0);**
+### transform: scale(0, 0);
 
 对元素进行缩放到0进行隐藏，隐藏过程支持动画，会触发重排和重绘，隐藏后无法触发事件，可以被屏幕阅读器访问。
 
-7. **clip-path：circle(0)**
+### clip-path：circle(0)
 
 裁剪出元素可见区域，隐藏过程支持动画，触发重绘，隐藏后占据空间，无法触发事件，可以被屏幕阅读器访问。
 
@@ -846,7 +1215,7 @@ absolute绝对定位，使用top、bottom、left、right 将元素移除屏幕�
 
 ## 伪类与伪元素
 
-**伪类（:pseudo-class）**是添加到选择器的开头为冒号关键字，用于指定所选元素的特殊状态（比如鼠标悬停、链接状态、表单状态、第几个元素等）。
+**伪类**（:pseudo-class）是添加到选择器的开头为冒号关键字，用于指定所选元素的特殊状态（比如鼠标悬停、链接状态、表单状态、第几个元素等）。
 
 ![](/front-end/basics/css/103.png)
 
@@ -1270,1164 +1639,3 @@ Houdini 是一组底层 API，它们公开了 CSS 引擎的各个部分，从而
 
 ### CSS 属性和值 API
 CSS 属性和值 API允许开发者显式地定义它们的 **CSS 自定义属性**（值使用var() 函数访问），允许设置属性类型检查、默认值以及是否可继承其值。
-
-## 几何图形绘制
-
-## 布局
-
-### 居中布局
-
-水平且垂直居中只需要将同时满足水平居中和垂直居中即可。
-
-#### 水平居中
-
-1. 行内级元素（inline， inline-block， inline-flex， inline-table）和文本在设置 text-align；center的非inline元素内水平居中。
-2. 设置 margin-left：auto；margin-right：auto；的固定宽度的块级元素，在父容器内水平居中。
-3. 设置 position：absolute; left：0; right：0；margin-left：auto；margin-right：auto的固定宽度块级元素，在 position：relative 的父容器内水平居中。
-4. 单个 flex 项在设置 justify-content：center；的 flex 容器内水平居中。
-5. 设置 margin-left：auto；margin-right：auto 的flex 项在 flex 容器内水平居中。
-6. 设置 position：absolute；left： 50%；margin-left：-0.5 * width；的固定宽度块级元素，在position：relative；的父容器内水平居中。
-7. 设置 position：absolute； left：50%；transform：translateX（-50%）；的块级元素，在position：relative；的父容器内水平居中。
-8. 设置margin-left：auto；margin-right：auto；的grid 项在网格区域内水平居中。
-9. grid项在设置为 justify-items：center；的 grid 容器的网格区域内水平居中。
-10. 设置 justify-self：center；的grid 项 在网格区域内水平居中。
-
-#### 垂直居中
-
-1. 单行文本或行内级元素在设置 line-height：height；的固定高度块级元素内垂直居中。
-2. 设置position；absolute；top：50%；margin-top：-0.5 * height；的固定高度块级元素在设置position：relative的父元素内垂直居中。
-3. 单行 flex 项在设置 align-items：center 的flex 容器内垂直居中。
-4. 设置 margin-top：auto；margin-bottom：auto；的单行 flex 项在 flex 容器内垂直居中。
-5. 设置 position：absolute；top：50%；transform：translateY（-50%）；的块级元素在设置position：relative；的父元素内垂直居中。
-6. 设置 display：table-cell；vertical-align：middLe的元素在设置 display：table 的父元素内垂直居中。
-7. 设置 position：absolute；top：0；bottom：0；margin-top：auto；margin-bottom；auto的固定高度块级元素在设置position：relative的父元素内垂直居中。
-8. 设置vertical-align：middle的行内级元素与高度100%，宽度为0的伪元素对齐，在父元素内垂直居中。
-9. 设置vertical-align：middle的行内级元素在设置 line-height：height；font-size：0；的父元素内垂直居中。
-10. 设置 margin-top：auto；margin-bottom：auto；的 grid 项在网格区域内垂直居中
-11. grid项在设置align-items：center的网格区域内垂直 。
-
-### 三栏布局
-
-指实现两侧栏固定宽度，中间栏自适应。
-
-#### 浮动（float）实现
-
-第一个为左栏元素左浮动float：left和设置固定宽度width；
-
-第二个为右栏元素右浮动float: right和设置固定宽度width；
-
-最后一个为中间栏元素设置外边距margin = 左或右的固定宽度 + 额外外边距：
-
-```html
-<style>
-.left,
-.right,
-.center {
-  height: 100%;
-}
-.left {
-  float: left;
-  width: 20%;
-  background-color: red;
-}
-.right {
-  float: right;
-  width: 25%;
-  background-color: blue;
-}
-.center {
-  margin-left: 20%;
-  margin-right: 25%;
-  background-color: green;
-}
-</style>
- 
-<!-- 中间区域放在最后，因为靠后的正常流块盒会无视前面的浮动元素，否则中间区域会独占一行导致右侧区域到下面去了 -->
-<div class="container">
-  <div class="left"></div>
-  <div class="right"></div>
-  <div class="center"></div>
-</div>
-```
-
-当 container 宽度 < 左侧区域宽度 + 右侧区域宽度时，右侧区域会被挤到左侧区域下方。
-
-#### 浮动实现（圣杯布局）
-
-容器设置左右padding分别为左右栏的宽度；
-
-三栏均设置左浮动float：left和相对定位position: relative; 中间栏为第一个元素优先加载。
-
-左侧栏设置margin-left为-100%（和中间栏同一行并左侧对齐） 和 right为自己负宽度向左移动而不挡住中间栏。
-
-右侧元素设置margin-left为自己负宽度（和中间栏同一行并右侧对齐）和left设置为自己负宽度向右移动而不挡住中间栏。
-
-**注意：当中间栏部分比两边的任一侧栏宽度小布局就会乱掉（要用双飞翼布局来解决）**
-
-```html
-<style>
-.container {
-  padding: 0 200px 0 100px;
-}
-.left,
-.right,
-.center {
-  position: relative;
-  float: left;
-}
-.center {
-  width: 100%;
-  background: green;
-}
-.left {
-  width: 100px;
-  margin-left: -100%; /* 包含块的内容区宽度，使得和 center 同一行且左侧对齐 */
-  right: 100px;   /* 再利用相对定位与 right，移动自身宽度 */
-  background: red;
-}
-.right {
-  width: 200px;
-  margin-left: -200px; /* 负自身宽度的外边距，和 center 同一行且右侧对齐） */
-  left: 200px; /* 再利用相对定位与 left，移动自身宽度 */
-  background: blue;
-}
-</style>
- 
-<div class="container">
-  <div class="center"></div>
-  <div class="left"></div>
-  <div class="right"></div>
-</div>
-```
-
-#### 浮动实现（双飞翼布局）
-
-与圣杯布局不同的是，双飞翼布局不在父元素设置padding，而是在中间栏内创建一个子容器放中间栏的内容，使用子容器的margin来给左右两侧栏留出空间。
-
-三栏均设置左浮动float：left；中间栏为第一个元素优先加载。
-
-左侧栏设置margin-left为-100%（和中间栏同一行并与三栏的父容器左侧对齐）;
-
-右侧元素设置margin-left为自己负宽度（和中间栏同一行并与三栏的父容器右侧对齐）；
-
-```html
-<style>
-.left,
-.right,
-.center {
-  float: left;
-}
-.center {
-  width: 100%;
-}
-.center .content {
-  margin-left: 100px;
-  margin-right: 200px;
-  background: green;
-}
-.left {
-  width: 100px;
-  margin-left: -100%; /* 包含块的内容区宽度，使得和 center 同一行且和容器左侧对齐 */
-  background: red;
-}
-.right {
-  width: 200px;
-  margin-left: -200px; /* 负自身宽度的外边距，和 center 同一行且和容器右侧对齐） */
-  background: blue;
-}
-</style>
- 
-<div class="container">
-  <div class="center">
-    <div class="content"></div> <!-- 实际存放中间区域内容，利用 margin 避开左右区域 -->
-  </div>
-  <div class="left"></div>
-  <div class="right"></div>
-</div>
-```
-
-#### 绝对定位（absolute）实现
-
-外部容器设置相对定位 position: relative
-
-左右两侧设置绝对定位 position: absolute 和 top: 0;
-
-两侧栏设置固定宽度 width;
-
-两侧分别设置至两侧边距 left: 0 和 right: 0
-
-中间栏左右设置外边距margin = 左或右的固定宽度 + 额外外边距：
-
-```html
-<style>
-.container {
-  position: relative;
-}
-.left,
-.right {
-  position: absolute;
-  top: 0;
-}
-.left {
-  left: 0;
-  width: 20%;
-  background-color: red;
-}
-.center {
-  margin-left: 20%;
-  margin-right: 25%;
-  background-color: green;
-}
-.right {
-  right: 0;
-  width: 25%;
-  background-color: blue;
-}
-</style>
- 
-<div class="container">
-  <div class="left"></div>
-  <div class="center"></div>
-  <div class="right"></div>
-</div>
-```
-
-#### 表格（table）实现
-
-容器设置 display: table和width: 100%；
-
-三栏设置 display: table-cell
-
-两侧栏设置固定宽度 width
-
-注意：table-cell的子元素margin是无效的。
-
-```html
-<style>
-.container {
-  display: table;
-  width: 100%;
-}
-.left,
-.right,
-.center {
-  display: table-cell;
-  top:0;
-}
-.left {
-  width: 20%;
-  background-color: red;
-}
-.center {
-  background-color: green;
-}
-.right {
-  width: 25%;
-  background-color: blue;
-}
-</style>
- 
-<div class="container">
-  <div class="left"></div>
-  <div class="center"></div>
-  <div class="right"></div>
-</div>
-```
-
-#### Flex实现
-
-容器弹性布局 display: flex
-
-两侧栏设置固定宽度 width
-
-中间栏设置占主轴空间 flex: 1
-
-```html
-<style>
-.container {
-  display: flex;
-}
-.left {
-  width: 20%;
-  background-color: red;
-}
-.center {
-  flex: 1;
-  background-color: green;
-}
-.right {
-  width: 25%;
-  background-color: blue;
-}
-</style>
- 
-<div class="container">
-  <div class="left"></div>
-  <div class="center"></div>
-  <div class="right"></div>
-</div>
-```
-
-#### 网格grid实现
-
-容器设置 display: grid
-
-容器设置两侧栏固定，中间栏自适应 grid-template-columns: width auto width
-
-```html
-<style>
-.container {
-  display: grid;
-  grid-template-columns: 20% 1fr 25%;
-}
-.left {
-  background-color: red;
-}
-.center {
-  background-color: green;
-}
-.right {
-  background-color: blue;
-}
-</style>
- 
-<div class="container">
-  <div class="left"></div>
-  <div class="center"></div>
-  <div class="right"></div>
-</div>
-```
-
-### 响应式布局
-
-响应式布局（responsive web design，RWD）是一套允许网页改变其布局和外观以适应不同分辨率、屏幕宽度等的实践。而自适应布局的特点是分别为不同的屏幕分辨率定义布局，即创建多个静态布局，每个静态布局对应一个屏幕分辨率范围。
-
-为了处理移动端，首先页面头部必须有 `<meta>` 声明 viewport：
-
-![](/front-end/basics/css/154.png)
-
-```html
-<!-- 
-  width 定义布局视口的宽度
-  initial-scale 定义初始缩放比例
-  maximum-scale 定义最大缩放比例
-  minimum-scake 定义最小缩放比例
-  user-scalable 定义是否允许用户手动缩放页面
- -->
-<meta 
-  name="viewport"
-  content="initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, width=device-width, user-scalable=no"  
-/>
-```
-
-#### 百分比布局实现
-
-当浏览器的宽度或者高度发生变化时，通过百分比单位，可以使得浏览器中的组件的宽和高随着浏览器的变化而变化，从而实现响应式的效果。但是如果过多的使用百分比，会照成布局的复杂度，所以不建议使用百分比来实现响应式。
-
-#### 网格布局实现
-
-Grid 布局可以自动判断容器大小，无论大小，屏幕自动撑满并均分。
-
-```css
-/* 
-  repeat: 用以 N 整分
-  auto-fit: 表示自动填充
-  minmax: 轨道最小宽度为 300px
- */
-.container {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-```
-
-#### 媒体查询实现：
-
-通过 CSS3 @media 规则设置不同分辨率下的样式属性，来适配不同尺寸的屏幕设备。
-
-```css
-/* iPhone6 iPhone7 iPhone8 */
-body {
-  background-color: yellow;
-}
-/* iPhone5 */
-@media screen and (max-width: 320px) {
-  body {
-    background-color: black;
-  }
-}
-/* iPhoneX */
-@media screen and (min-width: 375px) and (-webkit-device-pixel-ratio: 3) {
-  body {
-    background-color: orange;
-  }
-}
-/* iPhone6Plus iPhone7Plus iPhone8Plus */
-@media screen and (min-width: 414px) {
-  body {
-    background-color: black;
-  }
-}
-/* iPad */
-@media screen and (min-width: 768px) {
-  body {
-    background-color: black;
-  }
-}
-/* iPad Pro */
-@media screen and (min-width: 1024px) {
-  body {
-    background-color: black;
-  }
-}
-/* PC */
-@media screen and (min-width: 1100px) {
-  body {
-    background-color: black;
-  }
-}
-```
-
-#### REM 布局实现
-
-由于页面的 rem 单位的样式值都是根据 `<html>` 元素的 font-size 样式属性值进行动态计算，因此可以利用媒体查询或JavaScript，在不同分辨率下给 `<html>` 元素的 font-size 赋值。
-
-```css
-html {
-  font-size: 24px;
-}
-@media (max-width: 320px) {
-  html {
-    font-size: 16px;
-  }
-}
-@media (max-width: 375px) {
-  html {
-    font-size: 20px;
-  }
-}
-```
-
-标准分辨率或低分辨率显示 dpr  = 1，高分辨率显示，dpr = 2 或 3 或者更高，其中 dpr = 设备像素 ：CSS 像素。
-
-**对于图片高清显示**，高分辨率的屏幕（dpr = 2），单个位图像素对应于4个设备像素，由于单个位图像素不可以再进一步分割，所以只能就近取色，从而导致图片模糊；因此，为了使这张图高清显示，最好的解决方案是借助scrset在不同的dpr下加载不同dpr的图片。
-
-**对于网页高清显示**，就需要对视口进行缩放，使得视觉视口的像素和理想视口的像素1：1。此时的缩放比例也就是scale = 1 / dpr。设置缩放比以后，获取的视口宽度 dpr * 理想视口，计算根元素上的基准font-size即可。
-
-**对于文本的显示**，不建议使用rem，因为希望文本能够流动，使得在大屏手机能看到更多的文本，而不是文本因为 rem 等比缩放使得大字号显得突兀；同样也不希望在小屏手机字体因为等比缩放显得太小，所以应该根据不同的 dpr 动态设置固定字号的字体：
-
-```css
-div {
-  width: 1rem;
-  height: 0.4rem;
-  font-size: 12px; /* DPR 为 1 的设备的 font-size 默认值 */
-}
-[data-dpr="2"] div {
-  font-size: 16px;
-}
-[data-dpr="3"] div {
-  font-size: 20px;
-}
-```
-
-#### vw/vh实现
-
-1vw/vh是布局视口宽度 window.innerWidth /布局视口高度 window.innerHeight 的1%，1vmin/vmax则分别是当前 vw 和 vh 中较小值的1%和较大值的1%。postcss-loader的postcss-px-to-viewport可以自动实现 px 到 vw/vh 的转化。因此，px 转换成 vw/vh  不一定能完整整除，因此有一定的像素差。
-
-### 两栏布局
-
-指其中一栏固定，另外一栏自适应。
-
-#### 浮动实现
-
-固定宽度一栏浮动，自适应一栏触发BFC 即可，或者使用浮动侧margin大于固定宽度栏。
-
-```css
-/* 1. 浮动 + BFC 实现两栏布局 */
-.float-bfc-two-columns .left {
-  float: left;
-  width: 25%; /* 左侧宽度固定 */
-  background-color: red;
-}
- 
-.float-bfc-two-columns .right {
-  display: flow-root; /* 或 overflow: hidden */
-  background-color: green;
-}
- 
-/* 2. 浮动 + margin 实现两栏布局 */
-.float-margin-two-columns .left {
-  float: left;
-  width: 25%; /* 左侧宽度固定 */
-  background-color: red;
-}
- 
-.float-margin-two-columns .right {
-  margin-left: 25%;
-  background-color: green;
-}
-```
-
-#### 绝对定位实现
-
-父元素设置 position：relative；
-
-固定宽度栏放在left侧，另一自适应栏left: 固定宽度放在right侧。
-
-```css
-/* 绝对定位实现两栏布局 */
-.absolute-two-columns {
-  position: relative;
-}
-.absolute-two-columns .left,
-.absolute-two-columns .right {
-  position: absolute;
-  top: 0;
-}
-.absolute-two-columns .left {
-  left: 0;
-  width: 25%;
-  background-color: red;
-}
-.absolute-two-columns .right {
-  left: 25%;
-  right: 0;
-  background-color: green;
-}
-```
-
-#### 表格实现
-
-父容器设置 display：table; 且宽度100%；
-
-两栏均设置 display：table-cell；
-
-其中一栏固定宽度即可。
-
-```css
-.table-two-columns {
-  display: table;
-  width: 100%;
-}
-.table-two-columns .left,
-.table-two-columns .right {
-  display: table-cell;
-}
-.table-two-columns .left {
-  width: 25%;
-}
-```
-
-#### flex实现
-
-父容器display：flex；
-
-自适应栏flex：1；
-
-```css
-/* flex 实现两栏布局 */
-.flex-two-columns {
-  display: flex; 
-}
-.flex-two-columns .left {
-  width: 25%; /* 左边栏宽度固定 */
-}
-  
-.flex-two-columns .right {
-  flex: 1; /* 全分父容器剩余空间 */
-  margin-left: 5%;
-}
-```
-
-#### grid实现：
-
-父元素设置 display: grid; grid-template-columns: 固定宽度 1fr；即可
-
-```css
-/* grid 实现两栏布局 */
-.grid-two-columns {
-  display: grid;
-  grid-template-columns: 25% 1fr;
-}
-```
-
-### 瀑布流布局
-
-瀑布流布局分为等宽瀑布流和等高瀑布流，实现方式类似。以等宽瀑布流为例
-
-![](/front-end/basics/css/155.png)
-
-#### 多列实现
-
-```css
-/* 多列实现瀑布流：顺序是先从上往下，再从左往右，因此不适合滚动动态加载添加数据 */
-.multi-columns-masonry {
-  column-count: 3;
-  column-gap: 10px;
-}
-.multi-columns-masonry .item {
-  margin-bottom: 10px;
-  border: 1px solid #999;
-  break-inside: avoid; /* 内容在列与列之间不强制断开 */
-}
-.multi-columns-masonry .item img {
-  width: 100%;
-}
-```
-
-#### flex实现
-
-```html
-<!-- flex 实现瀑布流布局 -->
-<script type="text/javascript">
-  const column = 3;
-  const data = new Array(column).map(item => []);
-  imgList.forEach((img, index) => {
-    data[index % column].push(img);
-  });
-</script>
- 
-<style>
-.flex-masonry {
-  display: flex;
-  flex-direction: row;
-}
-.flex-masonry .column {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 0 2px;
-}
-.flex-masonry .column .item {
-  margin-bottom: 5px;
-  width: 100%;
-}
-</style>
- 
-<div class="flex-masonry">
-    <!-- 第一列放 data[0] -->
-    <div class="column">
-        <div class="item"></div>
-        <!-- more items-->
-    </div>
-    <!-- 第二列放 data[1] -->
-    <div class="column">
-        <div class="item"></div>
-        <!-- more items-->
-    </div>
-    <!-- 第三列放 data[2] -->
-    <div class="column">
-        <div class="item"></div>
-        <!-- more items-->
-    </div>
-</div>
-```
-
-#### grid实现
-
-使用grid-template-rows: masonry可直接grid中实现等宽瀑布流布局（grid-template-columns: repeat(3,1fr)）；但是此功能仅在 Firefox 中实现，且需要通过在 about:config 中将标志 layout.css.grid-template-masonry-value.enabled 设置为 true 来启用。
-
-```html
-<!-- grid 实现瀑布流布局 -->
-<script type="text/javascript">
-  // js 动态设置图片占据单元格数：imgElements 是设置 url 为图片资源地址的图片元素集合
-  Array.from(imgElements).forEach((imgElement, index) => {
-    const url = imgElement.getAttribute('url');
-    // 加载图片
-    const image = new Image();
-    image.src = url;
-    image.onload = () => {
-      // 根据图片元素的宽高等比例计算显示高度；
-      const height = Math.round(image.height * imgElement.width / image.width);
-      imgElement.src = url;
-      // 设置当前跨越几个单元格（每个单元格 10px)
-      imgElement.style.gridRowEnd = `span ${~~(height / 10)}`;
-    }
-  });
-</script>
- 
-<style>
-.grid-masonry {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 5px;
-  grid-auto-rows: 10px; /* 隐式网格行尺寸 */
-}
-.grid-masonry .item {
-  grid-row-start: auto; /* 网格起始线设置为自动*/
-}
-</style>
- 
-<div class="grid-masonry">
-    <div class="item"></div>
-    <!-- more items-->
-</div>
-```
-
-#### 绝对定位实现
-
-首先根据整个容器宽度和设置的图片宽度与间隙计算出能展示的列数。使用一个长度为列数的数组存储每一列当前已放图片的高度和。图片设置为绝对定位，然后计算出每个图片的top，left值：每张图片都放到最短的一列下面即对应于数组中高度和最小的那一项，**top = 数组中首个最小值所在列的值，left = 数组中首个最小值所在列索引 * 列宽 + 间隙**。然后增加数组中此列高度，此时列的高度发生变化，下张图片又会寻找其他最短的列。最后就是监听窗口的改变，重新计算一遍所有图片top，left值。
-
-
-### 九宫格布局（自适应）
-
-#### grid实现
-
-```css
-/* grid 实现九宫格 */
-.grid-nine-grid-container {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  background-color: red;
-}
-.grid-nine-grid-container .item {
-  position: relative; /* item 的子元素使用绝对定位 */
-  padding-bottom: 100%;
-  text-align: center;
-  background-color: coral;
-}
-```
-
-#### flex实现
-
-```css
-/* flex 实现九宫格 */
-.flex-nine-grid-container {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  background-color: red;
-}
-.flex-nine-grid-container .item {
-  position: relative; /* item 的子元素使用绝对定位 */
-  width: calc(calc(100% - 10px * 2) / 3);
-  padding-bottom: calc(calc(100% - 10px * 2) / 3);
-  padding-bottom: 100%;
-  margin-right: 10px;
-  margin-bottom: 10px;
-}
-/* n = 0, 1, 2... 则 3n = 3, 6..., 其中 n=0 时，3n=0，而第 0 个元素不存在*/
-.flex-nine-grid-container .item::nth-of-type(3n) {
-  margin-right: 0;
-}
-/* n = 0, 1, 2... 则 n+7 = 7, 8, 9..., 其中 n > 2 时，n+7 > 9，而只有 9 个元素存在*/
-.flex-nine-grid-container .item:nth-of-type(n+7) {
-  margin-bottom: 0;
-}
-```
-
-#### table实现
-
-```css
-/* table 实现九宫格 */
-.table-nine-grid-container {
-  width: 100%;
-  height: 100%;
-  display: table;
-  border-spacing: 10px; /* border-spacing 属性指定相邻单元格边框之间的距离 */
-  background-color: red;
-}
-.table-nine-grid-container .row {
-  width: 100%;
-  display: table-row;
-}
-.table-nine-grid-container .row .item {
-  position: relative; /* item 的子元素使用绝对定位 */
-  width: calc(calc(100% - 10px * 2) / 3);
-  padding-bottom: calc(calc(100% - 10px * 2) / 3);
-  display: table-cell;
-  text-align: center;
-  background-color: coral;
-}
-```
-
-## 几何图形绘制
-
-### 三角形
-
-#### border 实现
-
-首先将元素内容宽高设置为 0，设置每个border 宽和样式后是四个三角形。
-
-```css
-.border-triangle {
-  width: 0;
-  height: 0;
-  border-top: 20px solid green;
-  border-right: 20px solid blue;
-  border-bottom: 20px solid red;
-  border-right: 20px solid black;
-}
-```
-![Alt text](/front-end/basics/css/image-1.png)
-
-然后删除指定方向对侧的 border：
-
-```css
-.border-triangle {
-  width: 0;
-  height: 0;
-  /* border-top: 20px solid green; */
-  border-right: 20px solid blue;
-  border-bottom: 20px solid red;
-  border-right: 20px solid black;
-}
-```
-![Alt text](/front-end/basics/css/image-2.png)
-
-最后将非指定方向上的 border 设置为透明： 
-
-```css
-.border-triangle {
-  width: 0;
-  height: 0;
-  /* border-top: 20px solid green; */
-  border-left: 20px solid transparent;
-  border-bottom: 20px solid red;
-  border-right: 20px solid transparent;
-}
-```
-![Alt text](/front-end/basics/css/image-3.png)
-
-**等边三角形**：通过设置border宽度比为：指定方向 / 非指定方向 = ![Alt text](/front-end/basics/css/image.png) 即可。
-
-**角落三角形**：只设置相邻两个border的宽度，且其中一个设置为transparent。
-
-#### 线性渐变实现
-
-实现一个45°方向的线性渐变容器，在50%的位置向后设置为透明：
-
-```css
-.linear-gradient-triangle {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(45deg, #ff1493, #ff1493 50%, transparent 50%, transparent 100%);
-}
-```
-![Alt text](/front-end/basics/css/image-4.png)
-
-#### 圆锥渐变实现
-
-首先圆心点设置于 50% 0即 center top（容器最上方的中间），设置转动初始方向是90deg。转动45deg即可，后面都是透明（多出来的 0.1deg 是为了简单消除渐变产生的锯齿的影响）：
-
-```css
-.conic-gradient-triangle {
-  width: 100px;
-  height: 50px;
-  background: conic-gradient(from 90deg at 50% 0, deeppink 0, deeppink 45deg, transparent 45.1deg)
-}
-```
-
-![Alt text](/front-end/basics/css/image-5.png)
-
-#### rotate旋转实现
-
-首先父容器设置相对定位，子元素绝对定位，设置子元素的旋转中心在左下角 left bottom，然后进行旋转到相应角度即可
-
-```css
-.transform-rotate-triangle {
-  position: relative;
-  width: 100px;
-  height: 50px;
-  overflow: hidden;
-}
-.transform-rotate-triangle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: deeppink;
-  transform-origin: left bottom;
-  transform: rotate(45deg);
-}
-```
-
-![Alt text](/front-end/basics/css/image-6.png)
-
-#### clip-path剪切实现
-
-clip-path创建剪切区域。区域内的显示，区域外的隐藏。
-
-```css
-.clip-path-triangle {
-  width: 50px;
-  height: 50px;
-  background-color: deeppink;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-}
-```
-
-![Alt text](/front-end/basics/css/image-7.png)
-
-#### 十进制 Unicode字符实现
-
-通过transform旋转 （rotate ）或者缩放（scale） ，来改变三角形的方向和大小。
-
-```css
-/*
-  三角形字符：
-    ◄ : &#9668;
-    ► : &#9658;
-    ▼ : &#9660;
-    ▲ : &#9650;
-    ⊿ : &#8895;
-    △ : &#9651;
-*/
-.unicode-triangle {
-  font-size: 50px;
-  color: deeppink;
-}
-```
-
-![Alt text](/front-end/basics/css/image-8.png)
-
-#### 阴影三角形
-
-利用十进制 Unicode 字符实现三角形，并添加文字阴影。
-
-```css
-.shadow-triangle {
-  display: inline-block;
-  transform: scaleX(2.5);
-  color: #bada55;
-  text-shadow: 0 2px 2px rgba(255, 255, 255, 0.7), 0 10px 4px rgba(0, 0, 0, 0.5);
-  font-size: 32px;
-  cursor: pointer;
-}
- 
-.shadow-triangle:hover {
-  transition: all 0.2s ease;
-  transform: scaleX(2.5) translateY(4px);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-}
-```
-
-![Alt text](/front-end/basics/css/image-9.png)
-
-### 梯形
-
-#### border实现
-
-在三角形border实现中，通过只修改元素的一个方向的尺寸（宽或高）可以将该方向上的border变成梯形：
-
-```css
-.trapezoid {
-  width: 100px;
-  height: 0;
-  border-left: 20px solid transparent;
-  border-bottom: 20px solid #ff6b6b;
-  border-right: 20px solid transparent;
-}
-```
-
-![Alt text](/front-end/basics/css/image-10.png)
-
-通过设置元素的宽度，可以同时修改梯形的上下底长度；通过设置 border-left-width 和 border-right-width 可以修改底角大小，border 越宽，底角越小。另外还可以设置 border-bottom-width，从而控制梯形的高度。如果要改变梯形的方向，则应该改变元素 height 的值，元素 width 保持为 0。
-
-### 正方形
-
-#### vw 实现
-
-将盒子的宽高设置为相同的数值和计量单位 vw 或 vh（一般使用 vw）。
-
-```css
-.vw-square {
-  width: 10vw;
-  height: 10vw;
-  background-color: skyblue
-}
-```
-
-![Alt text](/front-end/basics/css/image-11.png)
-
-#### padding 实现
-
-由于 margin 和 padding 的百分比数值是相对于包含块的宽度的。将元素垂直方向的一个 padding 值设定为与 width 相同的百分比即可。但是会导致在元素上设置 max-height 属性失效。
-
-```css
-.padding-square {
-  width: 10%;
-  /* 解决内容将元素撑高的问题 */
-  height: 0;
-  padding-bottom: 10%;
-  background-color: skyblue;
-}
-```
-
-![Alt text](/front-end/basics/css/image-13.png)
-
-#### 伪元素实现
-
-若利用 margin，容器与伪元素在垂直方向发生了外边距折叠，需要在父元素即容器上触发 BFC，padding 则不需要：
-
-```css
-.pseudo-square {
-  width: 10%;
-  /* 伪元素使用 margin-top 时，需要触发 BFC, padding 则不需要 */
-  overflow: hidden; /* 最好使用 display: flow-root */
-  background-color: skyblue;
-}
- 
-.pseudo-square::before {
-  content: '';
-  display: block;
-  /* margin 百分比相对于包含块宽度计算 */
-  margin-top: 100%;
-}
-```
-
-![Alt text](/front-end/basics/css/image-12.png)
-
-### 同心圆
-
-#### 单个元素 box-shadow 实现
-
-```css
-.box-shadow-circle {
-  width: 20px;
-  height: 20px;
-  margin: 16px;
-  border-radius: 50%;
-  box-shadow: 0 0 0 10px red, 0 0 0 10px blue, 0 0 0 10px green;
-}
-```
-
-![Alt text](/front-end/basics/css/image-15.png)
-
-#### 单个元素 repeat-radial-gradient 重复径向渐变实现
-
-```css
-.repeat-radial-gradient-circle {
-  width: 20px;
-  height: 20px;
-  margin: 16px;
-  border-radius: 50%;
-  background: repeat-radial-gradient(red, yellow 10%, green 15%);
-}
-```
-
-![Alt text](/front-end/basics/css/image-16.png)
-
-### 五角星
-
-五角星可以看作是由三个三角形拼接而成的。
-
-```css
-.vw-square {
-  width: 10vw;
-  height: 10vw;
-  background-color: skyblue
-}
-.pseudo-pentagram {
-  width: 0;
-  height: 0;
-  color: red;
-  margin: 50px 0;
-  position: relative;
-  display: block;
-  border-left: 100px solid transparent;
-  border-right: 100px solid transparent;
-  border-bottom: 70px solid red;
-  transform:rotate(35deg);
-}
- 
-.pseudo-pentagram::before {
-  width: 0;
-  height: 0;
-  border-left: 30px solid transparent;
-  border-right: 30px solid transparent;
-  border-bottom: 80px solid red;
-  position: absolute;
-  top: -45px;
-  left: -65px;
-  color: white;
-  display: block;
-  content: "";
-  transform:rotate(-35deg);
-}
- 
-.pseudo-pentagram::after {
-  width: 0;
-  height: 0;
-  display: block;
-  position: absolute;
-  color: red;
-  top: 3px;
-  left: -105px;
-  border-left: 100px solid transparent;
-  border-right: 100px solid transparent;
-  border-bottom: 70px solid red;
-  content: "";
-  transform:rotate(-70deg);
-}
-```
-
-![Alt text](/front-end/basics/css/image-17.png)
-
-### 正六边形
-
-**方法一**：把正六边形分成三部分，左中右分别是：before 伪元素部分，div 部分，after 伪元素部分：
-
-```css
-.pseudo-hexagon {
-  position: relative;
-  width: 50px;
-  height: 86.6px;
-  margin: 0 auto;
-  background-color: red;
-}
-.pseudo-hexagon::before,
-.pseudo-hexagon::after {
-  content: '';
-  display: block;
-  width: 0;
-  height: 0;
-  position: absolute;
-  border-top: 43.3px solid transparent;
-  border-bottom: 43.3px solid transparent;
-}
-.pseudo-hexagon::before {
-  right: 50px;
-  border-right: 43.3px solid transparent;
-}
-.pseudo-hexagon::after {
-  left: 50px;
-  border-left: 43.3px solid transparent;
-}
-```
-
-![Alt text](/front-end/basics/css/image-18.png)
-
-**方法二**：正六边形分成三个宽高相同的 div，然后使用定位以及 css3 transform:rotate 分别向左右旋转 60deg 形成正六边形。
-
-```css
-.transform-hexagon {
-  position: relative;
-  width: 100px;
-  margin: 0 auto;
-}
-.transform-hexagon .rectangle1,
-.transform-hexagon .rectangle2,
-.transform-hexagon .rectangle3 {
-  width: 50px;
-  height: 86.6px;
-  border-top: 1px solid red;
-  border-bottom: 1px solid red;
-}
-.transform-hexagon .rectangle2,
-.transform-hexagon .rectangle3 {
-  position: absolute;
-  top: 0;
-  left: 25px;
-}
-.transform-hexagon .rectangle2 {
-  transform: rotate(60deg);
-}
-.transform-hexagon .rectangle3 {
-  transform: rotate(-60deg);
-}
-```
-
-![Alt text](/front-end/basics/css/image-19.png)
