@@ -1221,7 +1221,7 @@ absolute绝对定位，使用top、bottom、left、right 将元素移除屏幕�
 
 为了可以正确地渲染链接元素的样式，:link，:hover，:active，:visited这四个伪类选择器需要遵循 LVHA 的先后顺序。而:focus伪类选择器常伴随在:hover伪类选择器左右，需要根据想要实现的效果确定它们的顺序。
 
-**伪元素（::pseudo-element）**是附加至选择器末的开头为双冒号的关键字，允许对被选择元素的特定部分应用样式。一条选择器语句之后只能使用一个伪元素，伪元素选择器不能匹配任何真实存在的 html 元素。早期的伪元素曾使用单冒号的语法，现代的浏览器为了保持向后兼容，也支持早期的带有单双冒号语法的伪元素。::before、::after、::marker伪元素与content属性的共同使用，在 CSS 中被叫做“生成内容”。
+**伪元素**（::pseudo-element）是附加至选择器末的开头为双冒号的关键字，允许对被选择元素的特定部分应用样式。一条选择器语句之后只能使用一个伪元素，伪元素选择器不能匹配任何真实存在的 html 元素。早期的伪元素曾使用单冒号的语法，现代的浏览器为了保持向后兼容，也支持早期的带有单双冒号语法的伪元素。::before、::after、::marker伪元素与content属性的共同使用，在 CSS 中被叫做“生成内容”。
 
 ![](/front-end/basics/css/104.png)
 
@@ -1302,7 +1302,16 @@ y = (1−t)^2 * y1 + 2(1−t)ty2 + t^2 * y3
 **transition注意事项？**
 1. 改变 display: none或插入元素（.appendChild()）可能不能和transition一起使用。因为元素将视为没有开始状态，始终处于结束状态，后续对属性改变则不会有过渡动画，解决办法是用 window.setTimeout() 延迟几毫秒再改变后续属性。
 
-![](/front-end/basics/css/110.png)
+```javascript
+btn.addEventListener('click', () => {
+  btn.style.display = "block";
+  setTimeout(function() {
+    btn.style.backgroundColor = 'red';
+    btn.style.width = '200px';
+    btn.style.height = '200px';
+  }, 5);
+});
+```
 
 2. 解决闪动问题，使用3D属性perspective、backface-visibility、translate3d(0,0,0)
 3. 缺点适合简单动画，JavaScript动画更灵活实现任何动画逻辑
@@ -1316,7 +1325,54 @@ y = (1−t)^2 * y1 + 2(1−t)ty2 + t^2 * y3
 
 ![](/front-end/basics/css/112.png)
 
-![](/front-end/basics/css/113.png)
+```css
+/* 关键帧中出现的 !important 的属性设置将会被会忽略 */
+@keyframes important {
+  from {
+    margin-top: 50px;
+    margin-bottom: 100px;
+  }
+  top {
+    margin-top: 150px !important; /* 此行会被忽略 */
+    margin-bottom: 50px;
+  }
+}
+
+/* 如果某一个关键帧中没有出现其他关键帧中的属性，那么该属性将使用插值（不能使用插值的属性会被忽略掉） */
+@keyframes identifier {
+  0% {
+    top: 0;
+    left: 0;
+  }
+  30% {
+    top: 50px;
+  }
+  68%, 72% {
+    left: 50px; 
+  }
+  100% {
+    top: 100px;
+    left: 100%;
+  }
+}
+
+/* 某一个关键帧出现了重复的定义，且重复的关键帧中的 CSS 属性值不同，则后面的该属性的设置覆盖前面的 */
+@keyframes identifier {
+  0% {
+    top: 0;
+  }
+  50% {
+    top: 30px; 
+    left: 20px;
+  }
+  50% {
+    top: 10px; /* top 以此为准 */
+  }
+  100% {
+    top: 0;
+  }
+}
+```
 
 2. **animation-duration属性**规定元素动画播放完成一个周期所持续时间，以秒或毫秒计量。默认为 0 表示没有动画效果。
 3. **animation-delay 属性**规定执行动画前的等待时间，默认为 0。负值，表示跳过对应时长进入动画 。
@@ -1342,6 +1398,40 @@ y = (1−t)^2 * y1 + 2(1−t)ty2 + t^2 * y3
 **CSS animation支持性检测**：
 
 ![](/front-end/basics/css/116.png)
+```javascript
+function animationFeatureDetection() {
+  let animation = false;
+  let animationStr = 'animation';
+  let keyframePrefix = '';
+  let domPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
+  let prefix = '';
+
+  const element = document.createElement('div');
+  const prop = 'animationName';
+
+  if (element.style[prop] !== void 0) {
+    animation = true;
+  };
+
+  if (animation === false) {
+    for (const domPrefix of domPrefixes) {
+      if (`${element.style[domPrefix]}${prop.charAt(0).toUpperCase() + prop.slice(1)}` !== void 0) {
+        prefix = domPrefix;
+        animationStr = prefix + 'Animation';
+        keyframePrefix = '-' + prefix.toLowerCase() + '-';
+        animation = true;
+        break;
+      } 
+    }
+  }
+
+  return {
+    animation,
+    keyframePrefix,
+    animationString,
+  }
+}
+```
 
 ## 属性书写顺序
 
@@ -1410,17 +1500,122 @@ Base64（基底64）是一种基于64个可打印字符来表示二进制数据�
 
 **原理**：img 和 srcipt 标签的 error 并不会冒泡，但是会经历捕获阶段和处于目标阶段。直接给 img元素添加 onerror 监听的方案就是利用处于目标阶段触发事件函数，但onerror已经废弃，因此可以在捕获阶段截获并触发函数，从而减少性能损耗。
 
-**具体实现**：为每个img标签额外添加一个data-retry-times计数属性，捕获到错误，当重试超过限制次数后就用表示网络异常的base64图片作为兜底。
+**具体实现**：为每个img标签额外添加一个data-retry-times计数属性，捕获到错误，当重试超过限制次数后就用表示网络异常的 base64 图片作为兜底。
 
-![](/front-end/basics/css/128.png)
+```javascript
+// 在捕获阶段进行图片兜底处理
+document.addEventListener('error', (event) => {
+  const { target } = e;
+  const { tagName = '' } = target;
+  const curCounts = Number(target.dataset.retryCounts) || 0;
+  if (tagName.toLowerCase === 'img') {
+    if (curCounts >= 3) {
+      // 网络异常：重试次数超过 3 次，就使用代表网络异常的 base64 图片进行兜底
+      target.src = 'data:image/png;base64,xxxxxx';
+    } else {
+      // 原始图片异常：使用原始图片或者默认图片都行
+      target.dataset.retryCounts = curCounts + 1;
+      target.src = target.src; // 重复赋值，会再请求一次
+    };
+  };
+  target = null;
+}, true);
+```
 
 如果图片使用CDN，也就可能是CDN存在节点覆盖不全的问题，使得DNS查询超时导致图片加载失败，可以通过切换domain来尝试：
 
-![](/front-end/basics/css/129.png)
+```javascript
+// 1. 主动去嗅探可用的 cdn 域名
+
+// 初始 cdn 域名
+export const originDomain = 'https://sf6-xxxx.xxxx.com'
+
+// 防止嗅探图片存在缓存，添加时间戳保持新鲜度
+export const imgUri = `/img/xxxxx?timestamp=${Date.now()}${Math.random()}`;
+ 
+// 可采用配置下发的方式
+export const cdnDomains = [
+  'https://sf1-xxxx.xxxx.com',
+  'https://sf3-xxxx.xxxx.com',
+  'https://sf9-xxxx.xxxx.com',
+];
+ 
+export const validateImageUrl = (url: string) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    // 由于 Image图片加载没有超时机制，promise 的状态不可变性，借助 setTimeout 模拟超时
+    const timer = setTimeout(() => {
+      clearTimeout(timer);
+      reject(new Error('Image Load Timeout'));
+    }, 5000);
+    img.onload = () => {
+      resolve(url);
+    };
+    img.onerror = (e: string | Event) => {
+      reject(e);
+    };
+    img.src = url;
+  });
+};
+ 
+export const setCDNDomain = () => {
+  const cdnLoop = () => {
+    return Promise.race(
+      cdnDomains.map((domain: string) => validateImageUrl(domain + imgUri)),
+    ).then(url => {
+      window.shouldReplaceDomain = true;
+      const urlHost = url.split('/')[2];
+      window.replaceDomain = urlHost;
+    });
+  };
+ 
+  return validateImageUrl(`${originDomain}${imgUri}`)
+    .then(() => {
+      window.shouldReplaceDomain = false;
+      window.replaceDomain = '';
+    })
+    .catch(() => {
+      return cdnLoop();
+    });
+};
+ 
+// 图片出现异常的时候，调用此方法替换 URL
+export const replaceImgDomain = (src: string) => {
+  if (src && window.shouldReplaceDomain && window.replaceDomain) {
+    return src.replace(originDomain.split('/')[2], window.replaceDomain);
+  }
+  return src;
+};
+
+// 2. 直接不主动嗅探，改为直接由服务器获取的用的 cdn
+getUsefulDomain().then(e => {
+  window.imgDomain = e.data.imgDomain || ''
+})
+```
 
 而对于背景图像background-image，背景图元素没有 error 事件，本身也就无法捕获 error 事件，或者可以使用合适的background-color，在背景图像加载失败时兜底。或者创建自定义事件，嗅探图片资源嗅的情况并抛出错误事件即可：
 
-![](/front-end/basics/css/130.png)
+```javascript
+// 自定义 background-image error 事件
+const event = new Event('bgImgError');
+
+// 适合背景图像较少的场景
+validateImageUrl('xxx.png').catch(e => {
+  let ele = document.getElementById('bg-img');
+  if (ele) {
+     ele.dispatchEvent('bgImgError');
+  }
+  ele = null;
+});
+ 
+document.addEventListener(
+    'bgImgError',
+    e => {
+        e.target.style.backgroundImage = "url(data:image/png;base64,xxxxxx)";
+    },
+    true
+);
+```
 
 ##  CSS 预编译器（Less）/ 后处理器（PostCSS）
 
@@ -1470,7 +1665,47 @@ PostCSS，通常被视为在完成的样式表中根据CSS规范处理CSS，让�
 
 ![](/front-end/basics/css/137.png)
 
-![](/front-end/basics/css/138.png)
+```javascript
+// 用 从 can I use 网站获取的数据为 CSS 规则添加特点厂商的前缀：Autoprefixer 自动获取浏览器的流行度和能够支持的属性，并根据这些数据来自动为 CSS 规则添加前缀
+import postcss from 'postcss';
+
+// 假设这是从 Can I Use 网站获取的浏览器兼容数据
+const mockPrefixConfig = {
+  // 需要添加厂商前缀的属性名
+  key: ['transform', 'opacity'],
+  // 需要添加厂商前缀的属性值
+  values: [{
+    name: display,
+    preValue: 'flex',
+    newValue: ['-webkit-box', '-webkit-flex', '-moz-box', '-ms-flexbox']
+  }]
+}
+ 
+const myPrefixPlugin = postcss.plugin('myPrefixPlugin', (opt) => {
+  return (ast) => {
+    opt = opt || {};
+    ast.each((node) => {
+      /* node 是每一个 selector 的节点 */
+      node.each((declaration => {
+        /* declaration 是当前 selector 的每一条规则声明(属性：值) */
+        const { prop, value, cloneBefore } = declaration;
+        if (mockPrefixConfig.key.includes(prop)) {
+          // 克隆规则声明节点并将生成的节点插入到当前节点之前
+          cloneBefore({ prop: `-webkit-${prop}`;
+        }
+        const item = mockPrefixConfig.values.find((value) => value.name === prop);
+        const isReplace = item
+        item && item.preValue === value && item.newValue.forEach((newVal) => {
+          // 克隆规则声明并将生成的克隆节点插入到当前节点之前
+          cloneBefore({ value: newVal });
+        });
+      }
+    }
+  }
+});
+ 
+export default myPrefixPlugin;
+```
 
 ## 设备与视口
 
@@ -1510,7 +1745,25 @@ CSS 像素单位表示的布局视口宽高获取：
 
 **实现示例**：
 
-![](/front-end/basics/css/145.png)
+```javascript
+// 动态切换 link 样式表的源
+function setTheme(theme: 'light' | 'dark' = 'light') {
+  const linkId = '#theme-link';
+  const link = document.querySelector(linkId);
+  const href = `/theme/${theme}.css`;
+
+  if (link) {
+    link.href = href;
+  } else {
+    const head = document.querySelector('head');
+    link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = href;
+    head.appendChild(link);
+  }
+}
+```
 
 ### CSS 变量切换
 
@@ -1520,9 +1773,80 @@ CSS 像素单位表示的布局视口宽高获取：
 
 **实现示例**：
 
-![](/front-end/basics/css/146.png)
-
-![](/front-end/basics/css/147.png)
+```ts
+/* 方式 1. 在 theme.css 中定义好 css 变量, 然后在 themeUtil.ts 中编写处理模式切换的工具函数 */
+// theme.css
+// 默认值： light
+:root {
+  --bg: #fff;
+  --color: rgb(51, 50, 50);
+  --img-bg: #ffffff;
+  --border-color: #d6d6d6;
+}
+[data-theme='dark'] {
+  --bg: rgb(49, 51, 51);;
+  --color: #ffffff;
+  --border-color: #ffffff;
+}
+// themeUtil.ts
+export default setTheme = (isLight = true) => {
+  document.body.style.setAttribute('data-theme', isLight ? 'light' : 'dark');
+}
+// index.css
+.header {
+  ...省略
+  color: var(--color);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg);
+}
+ 
+/* 方式 2. 考虑 CSS 变量兼容性处理，即利用 css-var-ponyfill 来处理在 theme.ts 中定义好的 css 变量集合 */
+// theme.ts
+// 字体变量
+const baseSize = {
+  "--font-size-large-x": "22px",
+  "--font-size-large": "18px",
+  "--font-size-medium": "14px",
+  "--font-size-medium-x": "16px",
+  "--font-size-small-s": "10px",
+  "--font-size-small": "12px"
+};
+// 浅色
+export const lightTheme = {
+  "--fill-1": "#fff",
+  "--text": "#3c3c3c",
+  "--text-1": "#757575",
+  "--text-2": "#222",
+  ...baseSize
+};
+// 深色 
+export const darkTheme = {
+  "--fill-1": "#222",
+  "--text": "#fff",
+  "--text-1": "rgba(255, 255, 255, 0.3)",
+  "--text-2": "#ffcd32",  
+  ...baseSize
+};
+// themeUtil.ts
+import { lightTheme, darkTheme } from './theme';
+import cssVars from 'css-vars-ponyfill';
+ 
+export const setTheme = (isLight = true) => {
+  document.body.style.setAttribute('data-theme', isLight ? 'light' : 'dark');
+  cssVars({
+    watch: true, // 添加、删除、修改 <link> 或 <style> 元素的 disable 属性或 href 属性时，或更改 <style> 元素的 textContent，ponyfill 将自行调用（利用 MutationObserver 来监听 <link> 和 <style> 的变化）
+    variables: isLight ? lightTheme : darkTheme, // variables 自定义属性名/值对的集合
+    onlyLegacy: false // false 默认将 css 变量编译为浏览器识别的 css 样式；true 当浏览器不支持 css 变量不支持 css 变量的时候将 css 变量编译为识别的 css
+  });
+}
+// index.css
+.header {
+  ...省略
+  color: var(--color);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg);
+}
+```
 
 ### CSS 样式覆盖
 
@@ -1532,13 +1856,118 @@ CSS 像素单位表示的布局视口宽高获取：
 
 对于已有项目，要支持换肤，若采用颜色变量的方式，需要手动将项目中所有颜色值手动替换为对应颜色变量，工作量巨大，有必要实现自动化替换。
 
-![](/front-end/basics/css/148.png)
+```css
+.edmi-write-btn {
+  color: white;
+  background: #eee;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+```
 
-![](/front-end/basics/css/149.png)
+**替换后：**
+
+```css
+.edmi-write-btn {
+  color: var(--color-white);
+  background: var(--color-tertiary-light-hover);
+  border: 1px solid var(--color-black);
+}
+```
 
 **原理**：使用 PostCSS 或者 Stylelint 解析识别 css/scss/stylus/less/Sass 等样式文件中的**颜色字面量（包括 颜色关键字、Hex、rgb, rgba, hsl, hsla,hwb,gray等函数）**。然后，使用chorma-js的chroma.distance计算识别出的颜色字面量和颜色变量对应的颜色值是否相同或相近来判断识别出的颜色字面量是否可以替换为某个颜色变量。
 
-![](/front-end/basics/css/150.png)
+```javascript
+const stylelint = require('stylelint');
+const chroma = require('chroma-js');
+const valueParser = require('postcss-value-parser');
+ 
+const { report, ruleMessages, validateOptions } = stylelint.utils;
+const name = 'edmi/color-no-literal'; // 规则名称
+// 规则提示消息
+const messages = ruleMessages(ruleName, {
+  expected: (unfixed, fixed) => `Expected '${unfixed}' to be '${fixed}'`
+});
+ 
+// 元数据
+const meta = {
+  url: 'https://github.com/R2h1/stylelint-color-no-literal/README.md'
+}
+ 
+const cssColorKeywords = [
+  'white',
+  'black',
+  'red',
+  ....
+];
+ 
+// 判断是否为颜色字面量
+const isColorLiteral = (value) => {
+  if (colorKeyWords.includes(value)) {
+    return true;
+  }
+  if (/^#[0-9a-fA-F]{3|6})$/.test(value)) {
+    return true;
+  }
+  if (/^rgba?|hsla?|rgb|hsl?)$/.text(value)) {
+    return true;
+  }
+  return false;
+}
+ 
+// 规则处理函数
+function rule(primary, secondary, context) {
+  return (root, result) => {
+ 
+    const validOptions = validateOptions(result, ruleName, 
+      {
+        actual: primary,  // 验证主要选项
+      },
+ 
+      {
+        actual: secondary // 验证辅助选项
+      }
+    );
+ 
+    if (!validOptions) { // 选项无效
+      return;
+    }
+ 
+    const isAutoFixing = Boolean(context.fix) && !secondary.fix;
+    
+    root.walkDecls((decl) => {
+      // decl 即 css 声明(例如 background-color: rgb(0, 0, 0))
+      // 对值进行解析
+      valueParser(decl.value).walk((node) => {
+          const { value, type } = node;
+          if (!isColorLiteral(value)) return;
+          /* 利用 chroma.js 找到相同或者相近的颜色，即 targetVal,  */
+          if (isAutoFixing) { // 自动修复模式下
+            const newValue = decl.value.replace(decl.value, targetVal);
+            if (decl.raws.value) {
+              decl.raws.value.raw = newValue;
+            } else {
+              decl.value = newValue;
+            }
+          } else {
+            report({
+              name,
+              message: message.expected(`${decl.value}`, `${targetVal}`),
+              result,
+              node: decl, // 指定报告的节点
+              word: decl.value, // 哪个词导致了错误？这将正确定位错误
+            });
+          }
+        });
+    });
+  };
+}
+ 
+rule.ruleName = name;
+rule.messages = messages;
+rule.meta = meta;
+ 
+module.exports = stylelint.createPlugin(name, rule);
+```
 
 **如何使用**：
 
