@@ -311,3 +311,255 @@ Google Chrome 要求对 notBefore 日期晚于 2018 年 4 月 30 日签发的证
 ### HTTP 3
 
 **HTTP3** 使用 QUIC 代替 TCP 作为传输层协议。QUIC 支持可靠传输，通过在 UDP 上运行多个流并为每个流独立实现数据包丢失检测和重传。首部执行 QPack压缩算法。仅需要 TLS1.3 的 1-RTT 握手，减少连接建立交互次数。
+
+## HTTP 标头
+
+**HTTP 标头**是用于 HTTP 请求或响应的字段，它传递关于请求或者响应的额外上下文和元数据。HTTP 标头由它的名称（不区分大小写）后跟随一个冒号（:），冒号后跟随它具体的值。该值之前的空格 (en-US)会被忽略。
+
+**通用标头**是过时的术语，其用于指代同时适用于请求和响应的消息，而不适用于内容本身（适用于内容的标头称为实体标头）的 HTTP 标头。取决于应用的上下文环境，通用标头可以是响应标头或者请求标头。当前的 HTTP/1.1 规范没有明确将标头归类为 "通用标头"。现在，根据上下文的不同，这些标头被简单地称为响应标头或请求标头。
+
+**实体标头（Entity header）**是描述 HTTP 报文有效载荷的 HTTP 标头。实体标头包括Content-Length, Content-Language, Content-Encoding, Content-Type, Expires等。实体标头可以出现在 HTTP 请求和响应报文中。当前的 HTTP/1.1 规范不再涉及实体、实体标头或实体主体，某些字段现在称为表示标头字段。
+
+**请求标头（request header）**可在 HTTP 请求中使用，其提供有关请求上下文的信息，以便服务器可以定制响应。根据规范，并非所有可以出现在请求中的标头都称为请求标头。例如，Content-Type 标头被称为表示标头。
+
+**响应标头（response header）**可以用于 HTTP 响应，且与响应消息主体无关。根据规范，并非所有可以出现在请求中的标头都称为响应标头。例如，Content-Type 标头被称为表示标头。
+
+**表示标头（representation header）**是用于描述 HTTP 消息body中发送资源的特定的表示形式的HTTP标头，包括：Content-Type、Content-Encoding、Content-Language 和 Content-Location。**所谓表示（representation）就是特定的资源不同的表示形式**。客户端指定它们希望在内容协商期间发送的格式（使用 Accept-* 标头），并且表示标头将实际收到的选定的表示形式传达给客户端。它们可能同时出现在 HTTP 请求和响应消息中，如果它们是作为 HEAD 请求的响应发送的，则描述了在实际请求资源时会选择的body内容。
+
+**CORS 安全列表请求标头（CORS-safelisted request header，旧称是简单标头（Simple header））**，包括Accept、Accept-Language、Content-Language、Content-Type。可以使用Access-Control-Allow-Headers 将其他标头添加到安全列表中，并在其中列出上述标头，以规避以下额外限制：
+1. 对于 Accept-Language 和 Content-Language：只能包含 0-9、A-Z、a-z、空格或 *,-;=。
+2. 对于 Accept 和 Content-Type：不能包含 CORS 不安全请求头字节：0x00-0x1F（0x09 (HT) 允许除外）、"():<>?@[\]{} 和 0x7F (DEL)。
+3. 对于Content-Type：其解析值 MIME 类型（忽略参数）必须是 application/x-www-form-urlencoded、multipart/form-data 或 text/plain。
+4. 对于任何标头：值的长度不能大于 128。
+
+**CORS 安全列表请求标头（CORS-safelisted response header，又称为简单响应标头（Simple response header））**，包括Cache-Control、Content-Language、Content-Length、Content-Type、Expires、Last-Modified、Pragma。可以使用Access-Control-Expose-Headers 将其他标头添加到安全列表中。这些标头被认为可以安全地向客户端脚本公开。
+
+**有效负荷标头（payload header）**从一个或多个消息中描述与安全传输和原始资源表示形式（representation）重建的相关的有效负荷信息。有效负荷标头包括Content-Length、Content-Range、Trailer 和 Transfer-Encoding。有效负荷标头可能存在于 HTTP 请求和响应消息中（即在任何携带有效载荷数据的消息中）。
+
+**禁止修改的标头（Forbidden header name）**指的是不能在代码中通过编程的方式进行修改的 HTTP 请求标头。禁止修改的标头包括以 Proxy- 和 Sec- 开头的标头和Accept-Charset、Accept-Encoding、Access-Control-Request-Headers、Access-Control-Request-Method、Connection、Content-Length、Cookie、Date、DNT、Expect、Permissions-Policy、Host、Keep-Alive、Origin、Referer、TE、Trailer、Transfer-Encoding、Upgrade、Via。因为用户代理保留对此类标头的完全控制权，所以它们被禁止修改。
+
+**禁止修改的响应标头（Forbidden response header name）**指的是不能在代码中通过编程的方式进行修改的 HTTP 响应标头。包括set-Cookie、Set-Cookie2。
+
+**Fetch 元数据请求标头（Fetch metadata request header）**其提供有关来自请求上下文的额外信息。Fetch 元数据请求标头包括Sec-Fetch-Site、Sec-Fetch-Mode、Sec-Fetch-User、Sec-Fetch-Dest。Sec-开头，因此属于禁止修改的标头，不能通过 JavaScript 进行修改。这允许服务器根据请求的来源和将要使用的方式，决定是否允许该请求。服务器借此可以实现资源隔离策略，允许额外的站点仅请求用于共享的资源并且适当的使用资源。可以帮助缓解常见的跨站点网络漏洞，例如 CSRF、跨站点脚本攻击（“XSSI”）、定时攻击和跨源消息攻击。
+
+**标头可以根据代理服务器处理它们的方式进行分组**：
+1. **端到端（End-to-end）标头**：必须被传输到最终的消息接收者（请求的服务器或者响应的客户端）。中间的代理必须重新转发这些未经修改的标头，并且必须缓存它们。
+2. **逐跳（Hop-by-hop）标头**：仅对单次传输连接有意义，并且不得由代理重传或者缓存。注意，只能使用 Connection 标头来设置逐跳标头。标准的逐跳标头包括Keep-Alive, Transfer-Encoding,TE,Connection,Trailer,Upgrade,Proxy-Authorization和Proxy-Authenticate。
+
+**质量价值（Quality values）亦称作 q 值**，其与 q 因子以逗号分隔的方式来描述值的优先级顺序，是 HTTP 消息头以及 HTML 中的特殊语法。值的重要性以一种后缀表示：';q='。该后缀紧接0到1间的数(可达小数点后三位)，值越大优先级越高。无此后缀时，默认为1。q 相同时，前面的值越具体，其优先级越高。
+
+### HTTP 控制相关标头（Control）
+
+**Max-Forwards 请求标头**（`Max-Forwards: <integer>`）被用于限制 TRACE 方法可经过的服务器（通常指代理服务器）数目。它的值是一个整数，指定可经过的服务器最大数目。服务器在转发 TRACE 请求之前，将递减 Max-Forwards 的值，直到到达目标服务器，或服务器接收到 Max-Forwards 的值为 0 的请求。而后直接返回一个 200 OK 的响应（可以包含一些标头）。如果 TRACE 请求中没有 Max-Forwards 标头，就可以认为，不限制可经过的服务器最大数目。
+
+**Expect 请求标头**包含一个期望条件，表示服务器只有在满足此期望条件的情况下才能妥善地处理请求。规范中只规定了一个期望条件，即Expect: 100-continue，表示通知接收方客户端要发送一个体积可能很大的消息体，期望收到状态码为100 (Continue) 的临时回复。服务器可做出的响应：
+1. 100-continue：如果消息头中的期望条件可以得到满足，使得请求可以顺利进行的话，
+2. 417 Expectation Failed：如果服务器不能满足期望条件的话；也可以是其他任意表示客户端错误的状态码（4xx）。
+
+### HTTP 下载相关标头（Downloads）
+
+**Content-Disposition 通用标头**在常规的 HTTP 应答中，指示回复的消息体该以何种形式展示，是以内联的形式（即第一个参数为inline，网页或者页面的一部分），还是以附件的形式下载并保存到本地（即第一个参数为attachment，大多数浏览器会呈现一个“保存为”的对话框，将指令 filename 的值预填为下载后的文件名）。在同源 URL情况下，Chrome 和 Firefox 82 以及更高的版本会优先使用 HTML 的 `<a>` 元素的 download 属性而不是 Content-Disposition: inline 参数来处理下载。而 Firefox 的早期版本则优先使用标头信息并内联显示内容。当使用 multipart/form-data 格式提交表单数据时，每个子部分（例如每个表单字段和任何与字段数据相关的文件）都需要提供一个 Content-Disposition 标头，以提供相关信息。标头的第一个指令始终为 form-data，并且还必须包含一个 name 参数来标识相关字段。额外的指令不区分大小写，并使用带引号的字符串语法在 = 号后面指定参数。多个参数之间使用分号（;）分隔。指令filename 和 filename* 同时出现时，应优先采用 filename*。
+
+### HTTP 代理相关标头（Proxies）
+
+**Forwarded 请求标头**（`Forwarded: by=<identifier>; for=<identifier>; host=<host>; proto=<http|https>`）包含反向代理服务器（负载均衡器、CDN 等）可能添加的信息，这些信息在代理服务器参与请求路径时会被更改或丢失。例如，如果客户端通过 HTTP 代理（或负载均衡器）连接到网络服务器，服务器日志将只包含代理的 IP 地址、主机地址和协议；该标头可用于识别原始请求的 IP 地址、主机和协议。该标头是可选的，可由服务器路径上的任何代理服务器添加、修改或删除。该标头用于调试、统计和生成与位置相关的内容。在设计上，它暴露了对隐私敏感的信息，如客户端的 IP 地址。因此，在部署此标头时必须注意用户的隐私。其他可用来替代的，既成标准的标头是 X-Forwarded-For 、 X-Forwarded-Host 以及X-Forwarded-Proto 。参与的指令可能有：
+1. `by=<identifier>`：该请求进入到代理服务器的接口。`<identifier>` 显示了在使用代理的过程中被修改或者丢失的信息。它们可以是以下几种形式：
+    1. 一个 IP 地址（V4 或 V6，端口号可选，ipv6 地址需要包含在方括号里面，同时用引号括起来），
+    2. 语意不明的标识符（比如 "_hidden" 或者 "_secret"）,
+    3. 或者是 "unknown"，当当前信息实体不可知的时候（但是依然想要说明请求被进行了转发）。
+2. `for=<identifier>`：发起请求的客户端以及代理链中的一系列的代理服务器。多值可用逗号分隔
+3. `host=<host>`：代理接收到的 Host 首部的信息。
+4. `proto=<http|https>`：表示发起请求时采用的何种协议（通常是 "http" 或者 "https"）。
+
+**Via 通用标头**（`Via: [ <protocol-name>"/"]<protocol-version> <host> [ ":" <port> ]或Via: [ <protocol-name> "/" ] <protocol-version> <pseudonym>`）是由代理服务器添加的，适用于正向和反向代理，可以用来追踪消息转发情况，防止循环请求，以及识别在请求或响应传递链中消息发送者对于协议的支持能力。每个值可能由以下几部分组成（多个值使用逗号分隔）：
+1. `<protocol-name>`是可选的，表示所使用的协议名称；
+2. `<protocol-version>`是所使用的协议版本号；
+3. `<host>`和`<port>`是公共代理的 URL 及端口号；
+4. `<pseudonym>`是内部代理的名称或别名。
+
+### HTTP 请求上下文相关标头（Request context）
+
+**From 请求标头**（`From: <email>`）中包含一个属于发送请求的用户代理的实际掌控者的人类用户的电子邮箱地址。在运行一个机器人代理程序（比如爬虫）时应该包含Form 首部，在服务器遇到问题的时候（比如，机器人代理发送了过量的、不希望收到的或者不合法的请求），站点管理员可以联系到。注意，不可以将 From 首部用于访问控制或者身份验证。
+
+**Host 请求标头**（`Host: <host>:<port>` 其中 `<host>` 是服务器的域名（用于虚拟主机）；`<port>` 可选，是服务器监听的 TCP 端口号）指明了请求将要发送到的服务器主机名和端口号。如果没有包含端口号，会自动使用被请求服务的默认端口（比如 HTTPS 使用 443 端口，HTTP 使用 80 端口）。所有 HTTP/1.1 请求报文中必须包含一个Host头字段。对于缺少Host头或者含有超过一个Host头的 HTTP/1.1 请求，可能会收到400（Bad Request）状态码。
+
+**Referer 请求标头**（`Referer: <url>` 其中 `<url>` 是当前页面被链接而至的前一页面的绝对路径或者相对路径，不包含fragments 和 user information，可能包含来源、路径和查询字符串（取决于Referrer-policy标头））包含了当前请求的来源页面的地址。当点击链接时，Referer是链接所在页面的地址。当向另一个域发出资源请求时，Referer 是使用所请求资源的页面地址。需要注意的是 referer 实际上是 "referrer" 误拼写。服务端使用 Referer 请求头识别访问来源，这些数据可用于分析、日志记录、优化缓存等，Referer 请求头可能暴露用户的浏览历史，涉及到用户的隐私问题。如果来源页面采用的协议为表示本地文件的 "file" 和"data" URI或者当前请求页面采用的是非安全协议而来源页面采用的是安全协议（HTTPS），则不会发送Referer。
+
+**Referrer-Policy响应标头**控制请求中应包含哪些访问来源信息（通过 Referer 标头发送）。可取的取值有：
+1. no-referrer：整个 Referer 首部会被移除。访问来源信息不随着请求一起发送。
+2. no-referrer-when-downgrade：默认值，在同等安全级别的情况下，引用页面的地址会被发送 (HTTPS->HTTPS)，但是在降级的情况下不会被发送 (HTTPS->HTTP)。
+3. origin：在任何情况下，仅发送文件的源作为引用地址。例如 https://example.com/page.html 会将 https://example.com/ 作为引用地址。
+4. origin-when-cross-origin：对于同源的请求，会发送完整的 URL 作为引用地址，但是对于非同源请求仅发送文件的源。
+5. same-origin：对于同源的请求会发送引用地址，但是对于非同源请求则不发送引用地址信息。
+6. strict-origin：在同等安全级别的情况下，发送文件的源作为引用地址 (HTTPS->HTTPS)，但是在降级的情况下不会发送 (HTTPS->HTTP)。
+7. strict-origin-when-cross-origin：对于同源的请求，会发送完整的 URL 作为引用地址；在同等安全级别的情况下，发送文件的源作为引用地址 (HTTPS->HTTPS)；在降级的情况下不发送此首部 (HTTPS->HTTP)。
+8. unsafe-url：无论是同源请求还是非同源请求，都发送完整的 URL（移除参数信息之后）作为引用地址。
+
+除了 HTTP 标头，还可以用一个 name 为 referrer 的 `<meta>` 元素为整个文档设置 referrer 策略。或者用 `<a>`、`<area>`、`<img>`、`<iframe>`、`<script>` 或者 `<link>` 元素上的 referrerpolicy 属性为其设置独立的请求策略。也可以在 `<a>`、`<area>` 或者 `<link>` 元素上将 rel 属性设置为 noreferrer。外部 CSS 样式表使用默认策略 (no-referrer-when-downgrade)，除非 CSS 样式表的响应消息通过 Referrer-Policy 首部覆盖该策略。对于 `<style>` 元素或 style 属性，则遵从文档的 referrer 策略。如果要为那些策略未获广泛的浏览器指定后备策略，使用逗号分隔的列表，并将希望使用的策略放在最后。
+
+**User-Agent 请求标头**（`User-Agent: <product> / <product-version> <comment>或User-Agent: Mozilla/<version> (<system-information>) <platform> (<platform-details>) <extensions>`）包含了一个特征字符串，用来让网络协议的对端来识别发起请求的用户代理软件的应用类型、操作系统、软件开发商以及版本号。
+1. Firefox 的用户代理字符串自身可以分为四部分，即Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion：Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0。
+    1. Mozilla/5.0 是一个通用标记符号，用来表示与 Mozilla 兼容，这几乎是现代浏览器的标配。
+    2. platform 用来说明浏览器所运行的原生系统平台（例如 Windows、Mac、Linux 或 Android），以及是否运行在手机上。搭载 Firefox OS 的手机仅简单地使用了 "Mobile" 这个字符串；因为 web 本身就是平台。注意 platform 可能会包含多个使用 "; " 隔开的标记符号。
+    3. rv:geckoversion 表示 Gecko 的发布版本号（例如 "17.0"）。在近期发布的版本中，geckoversion 表示的值与 firefoxversion 相同。
+    4. Gecko/geckotrail 表示该浏览器基于 Gecko 渲染引擎。在桌面浏览器中，geckotrail 是固定的字符串 "20100101" 。
+(5)Firefox/firefoxversion 表示该浏览器是 Firefox，并且提供了版本号信息（例如 "17.0"）。
+2. Chrome（或 Chromium/blink-based engines）用户代理字符串与 Firefox 的格式类似。为了兼容性，它添加了 "KHTML, like Gecko" 和 "Safari"：Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36
+3. Opera 也是一款基于 blink 引擎的浏览器，它的 UA 和 Chrome 的几乎一样，不过，它添加了一个 "OPR/<version>"：Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41。
+4. Safari的用户代理字符串：Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1。
+5. IE的用户代理字符串：Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0)。
+6. 爬虫和机器人的 UA 字符串：Googlebot/2.1 (+http://www.google.com/bot.html)。
+
+### HTTP 响应上下文相关标头（Response context）
+
+**Allow 响应标头**（`Allow: <http-methods>` 以逗号分隔的允许的HTTP 请求方法列表）用于枚举资源所支持的 HTTP 方法的集合。若服务器响应状态码 405 Method Not Allowed，则响应必须带上此首部。如果 Allow 首部字段的值为空，说明资源不接受使用任何 HTTP 方法的请求，这是可能的，比如服务器需要临时禁止对资源的任何访问。
+
+**Server 响应标头**（`Server: <product>` 处理请求的软件或者产品（或组件产品）的名称）包含了处理请求的源头服务器所用到的软件相关信息。应该避免使用过长或者过于详细的描述作为 Server 的值，因为这有可能泄露服务器的内部实现细节，有利于攻击者找到或者探测已知的安全漏洞。
+
+### HTTP Fetch元数据请求相关标头
+
+**Sec-Fetch-Site Fetch元数据请求标头**表明请求发起者的源与目标资源的源之间的关系。可能的取值有：
+1. cross-site：请求发起者和托管资源的服务器是不同的站点。
+2. same-origin：请求发起者和托管资源的服务器具有相同的源（相同的方案、主机和端口）。
+3. same-site：请求发起者和托管资源的服务器具有相同的方案、域或子域，但不一定具有相同的端口。
+4. none：该请求是用户发起的操作，与与任意上下文（站点、源，或者框架）无关。例如：在地址栏中输入 URL、打开书签或将文件拖放到浏览器窗口中。
+
+**Sec-Fetch-Mode Fetch元数据标头**表明请求的模式。可能的取值有：
+1.cors：CORS 协议请求。
+2.navigate：请求是由 HTML 文档之间的导航启动。
+3.no-cors： no-cors 请求。
+4.same-origin：请求与被请求资源的源相同.
+5.websocket：请求是为了建立 WebSocket 连接。
+
+**Sec-Fetch-User Fetch元数据标头**（Sec-Fetch-User: ?1）表明导航请求是否由用户激活触发。其值始终为 ?1。当请求是由用户激活以外的其他原因触发时，规范要求浏览器完全省略该标头。
+
+**Sec-Fetch-Dest Fetch元数据请求标头**指示请求的目标即数据的来源以及如何使用这些获取到的数据。这允许服务器根据请求是否采用了适当的使用方式来确定是否为请求提供服务。可能的取值有：
+1. audio：目标是音频数据。这可能源自 HTML `<audio>` 标签。
+2. audioworklet：目标是获取供 audio worklet 使用的数据。这可能源于对 audioWorklet.addModule()的调用。
+3. document：目标是文档（HTML 或 XML），请求是用户发起的顶级导航的结果（例如，由用户单击链接产生）。
+4. embed：目标是嵌入内容。这可能源自 HTML `<embed>` 标签。
+5. empty：目标是空字符串。这用于没有自己值的目标。例如：fetch()、navigator.sendBeacon()、EventSource、XMLHttpRequest、WebSocket 等等。
+6. font：目标是字体。这可能源自 CSS @font-face。
+7. frame：目标是 frame。这可能源自 HTML `<frame>` 标签。
+8. iframe：目标是 iframe。这可能源自 HTML `<iframe>` 标签。
+9. image：目标是图片。这可能源自 HTML `<image>`、SVG `<image>`、CSS background-image、CSS cursor、CSS list-style-image 等等。
+10. manifest：目标是 mainfest。这可能源自 HTML `<link rel=manifest>` 。
+11. object：目标是对象，这可能源自 `<object>` 标签。
+12. paintworklet：目标是 paint worklet。这可能源自对 CSS.PaintWorklet.addModule() 的调用。
+13. report：目标是报告（如一份内容安全策略报告）。
+14. script：目标是脚本。这可能源自HTML `<script>` 标签或对 WorkerGlobalScope.importScripts() 的调用。
+15. serviceworker：目标service worker。这可能源于对 navigator.serviceWorker.register() 的调用。
+16. sharedworker：目标是 shared worker。这可能源自 SharedWorker。
+17. style：目标是 style。这可能源自 HTML `<link rel=stylesheet>` 或者 CSS @import。
+18. track：目标是 HTML text track。这可能源自 HTML `<track>` 标签。
+19. video：目标是视频数据。这可能源自于 `<video>` 标签。
+20. worker：目标是 Worker。
+21. xslt：目标是 XSLT 转换。
+
+**Service-Worker-Navigation-Preload 请求标头**（`Service-Worker-Navigation-Preload: <value>`）指示该请求是 Service Worker 导航预加载期间进行的 fetch() 操作的结果。它允许服务器使用与正常 fetch() 不同的资源进行响应。通过 NavigationPreloadManager.setHeaderValue() 设置。`<value>` 是任意值，指示在响应预加载请求时应发送哪些数据，默认为 true。
+
+### HTTP WebSocket相关标头
+
+**Sec-WebSocket-Accept 响应标头**（`Sec-WebSocket-Accept: <hashed key>` 服务器获取握手请求中发送的 Sec-WebSocket-Key 值，添加 258EAFA5-E914-47DA-95CA-C5AB0DC85B11，获取新值的 SHA-1，然后进行 base64 编码）用在 websocket 开放握手中，表明服务器愿发起一个 websocket 连接。
+
+**Sec-WebSocket-Extensions请求标头**（`Sec-WebSocket-Extensions: <extensionlist>`）用于指定一个或多个请求服务器使用的协议级 WebSocket 扩展。允许在一个请求中使用多个 Sec-WebSocket-Extension 标头或在一个标头中列出多个扩展（逗号分隔）。
+
+**Sec-WebSocket-Key请求标头**（Sec-WebSocket-Key: key）向服务器提供确认客户端有权请求升级到 WebSocket 的所需信息即密钥key。当不安全（HTTP）客户端希望升级时，可以使用该标头，以提供一定程度防止滥用的保护。密钥的值是使用 WebSocket 规范中定义的算法计算的，因此不提供安全性。相反，它有助于防止非 WebSocket 客户端无意或滥用请求 WebSocket 连接。那么，从本质上讲，这个密钥是为了确认“是的，我真的是要打开一个 WebSocket 连接。”该标头由选择使用它的客户端自动添加；它不能使用 XMLHttpRequest.setRequestHeader() 方法添加。
+
+**Sec-WebSocket-Protocol标头**（Sec-WebSocket-Protocol: subprotocols）按优先顺序指定希望用的一个或者多个 WebSocket 协议。将服务器支持的第一个 WebSocket 协议，由服务器在响应中包含的 Sec-WebSocket-Protocol 标头中选择并返回它。可以在标头中多次使用它；结果与在单个标头中使用逗号分隔的子协议标识符列表相同。
+
+**Sec-WebSocket-Version通用标头**（Sec-WebSocket-Version: version或Sec-WebSocket-Version: supportedVersions ）指定客户端希望使用的 WebSocket 协议版本，以便服务器可以确认其是否支持该版本。如果服务器无法使用指定版本的 Websocket 协议进行通信，它将响应一个错误（例如 426 Upgrade Required），该错误在它的标头中包含一个 Sec-WebSocket-Version 标头，其中包含支持的逗号分隔列表的协议版本。如果服务器确实支持请求的协议版本，则响应中不包含 Sec-WebSocket-Version 标头。
+
+### HTTP 其他标头
+
+**Alt-Svc 头部**列举了当前站点备选的访问方式列表。一般用于在提供“QUIC”等新兴协议支持的同时，实现向下兼容。可能包括的指令有：
+1. clear：表示源请求该源的所有替代服务无效的特殊值。
+2. `<service-list>`：使用分号隔离的访问方式列表，格式形如`<service-name>="<host-name>:<port-number>"`。这里的`<service-name>`应是有效的 ALPN （应用层协议协商Application-Layer Protocol Negotiation）标识符。
+3. `<max-age>`：可选，当前访问方式的有效期，超过该时间后，服务端将不保证该访问方式依旧可用，客户端应当重新获取更新后的 Alt-Svc 列表。单位为秒，默认值为 24 小时（86400）。
+4. persist：可选，用于标识当前访问方式在网络环境改变时或者会话间始终保持。
+
+**Date 通用首部**（`Date: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`）包含了报文创建的日期时间。
+
+**Link 实体报头**（Link: < uri-reference >; param1=value1; param2="value2" < uri-reference >必须要用 < 和 >来关闭。以 ; 分隔的参数与 HTML 元素 `<link>` 的属性一致供了一种在 HTTP 标头中序列化一个或多个链接（以逗号分隔）的方法。它在语义上与 HTML 元素 `<link>` 相等。
+
+**Retry-After 响应首部**表示用户代理需要等待多长时间之后才能继续发送请求。主要应用场景：
+1. 当与 503 Service Unavailable 响应一起发送的时候，表示服务下线的预期时长。
+2. 当与重定向响应一起发送的时候，比如 301 Moved Permanently，表示用户代理在发送重定向请求之前需要等待的最短时间。
+可能取值有：
+1. `<http-date>`：表示在此时间之后可以重新尝试。
+2. `<delay-seconds>`：表示在重试之前需要等待的秒数。
+
+**Server-Timing 响应标头**传达在一个给定请求 - 响应周期中的一个或多个参数和描述。它用于在用户浏览器的开发工具或 PerformanceServerTiming接口中显示任何后端服务器定时参数（例如，数据库读/写、CPU 时间、文件系统访问等）。Server-Timing 头可能会暴露潜在的敏感应用程序和基础设备信息。请考虑在服务器端控制何时向谁返回哪些参数信息。
+**SourceMap 响应标头**（`SourceMap: <url>` 指向一个 source map 文件的一个相对（于请求的 URL）或者一个绝对的 URL）将生成的代码链接到一个source map，使浏览器能够重建原始的资源然后显示在调试器里。
+
+**X-DNS-Prefetch-Control 响应标头**（X-DNS-Prefetch-Control: on或X-DNS-Prefetch-Control: off）控制着浏览器的 DNS 预读取功能。DNS 预读取是一项使浏览器主动去执行域名解析的功能，其范围包括文档的所有链接，无论是图片的，CSS 的，还是 JavaScript 等其他用户能够点击的 URL。因为预读取会在后台执行，所以 DNS 很可能在链接对应的东西出现之前就已经解析完毕，这能够减少用户点击链接时的延迟。除了通过在服务器端发送 X-DNS-Prefetch-Control 报头：
+1. 可以在文档中使用 `<meta http-equiv="x-dns-prefetch-control" content="">` 标签改变content的值为on或off来改变DNS预读取设置。
+2. 可以通过使用 rel 属性值为 dns-prefetch的 `<link>` 标签来对特定域名进行预读取。协议可以省略，但主机名前必需要有双斜线。
+
+关闭预读取功能，只需要将 network.dns.disablePrefetch 选项值设置为 true。默认情况下，通过 HTTPS 加载的页面上内嵌链接的域名并不会执行预加载。在 Firefox 浏览器中，可以通过 about:config 设置 network.dns.disablePrefetchFromHTTPS 值为 false 来改变默认行为。
+
+**Upgrade通用标头**（仅限HTTP/1.1，HTTP/2明确禁止使用此机制）（Upgrade: protocol_name[/protocol_version]）可用于将已建立的客户端/服务器连接升级到不同的协议（通过相同的传输协议）。在创建初始 HTTP/1.1 会话之后，需发送另一个 HTTP 标准请求来请求升级。注意：由于Upgrade是一个逐跳标头，Connection: upgrade必须始终与Upgrade标头一起发送。协议按优先级降序排列，以逗号分隔，协议版本是可选的。客户端可以使用 Upgrade 标头来邀请服务器按优先顺序降序切换到所列协议中的一个（或多个以逗号分隔）。服务器可以出于任何原因选择忽略该请求，在这种情况下，它应该像未收到 Upgrade 标头一样进行响应（例如，使用 200 OK）。但如果服务器决定升级连接，它必须发回包含指定要切换到的协议的Upgrade标头的 101 Switching Protocols响应，然后服务器再使用新协议发送对原始请求的响应。例如，客户端可以使用它来将连接从 HTTP 1.1 升级到 HTTP 2.0，或者将 HTTP 或 HTTPS 连接升级到 WebSocket。请记住，当用 WebSocket API 以及其他大部分实现 WebSocket 的库去建立新的连接时，基本上都不用操心升级的过程，因为这些 API 已经实现发送初始 HTTP/1.1 连接和处理握手及升级过程。
+
+## HTTP cookie
+
+**HTTP Cookie**（也叫 Web Cookie 或浏览器 Cookie）是服务器发送到用户浏览器并保存在本地的一小块数据。浏览器会存储 cookie 并在下次向同一服务器再发起请求时携带并发送到服务器上。通常，它用于告知服务端两个请求是否来自同一浏览器——如保持用户的登录状态。Cookie 使基于无状态的 HTTP 协议记录稳定的状态信息成为了可能。
+
+Cookie 主要用于以下三个方面：
+1. 会话状态管理：如用户登录状态、购物车、游戏分数或其他需要记录的信息
+2. 个性化设置：如用户自定义设置、主题和其他设置
+3. 浏览器行为跟踪：如跟踪分析用户行为等。
+
+更多/更大的cookies意味着每个请求都要包含更繁重的数据传输。如果只是需要存储些 "client-only" 的数据，应该使用Web storage API（localStorage和sessionStorage）或IndexedDB。window.sessionStorage 和 window.localStorage对应于会话 cookie和永久 cookie 的持续时间，但是存储限制比 cookie 大，并且永远不会发送到服务器。可以使用 IndexedDB API 或基于它构建的库来存储更多结构化的数据。
+
+Document.cookie是用于获取或设置与当前文档相关联的 cookie的getter和setter。作为getter时，返回一个包含所有的 Cookie，且每条cookie（即，`<cookie-name>=<cookie-value>` 键值对，）以分号+空格（'; '）分隔的字符串。作为setter时，一次只能对一条cookie 字符串进行设置或更新。设置时不能包含 HttpOnly 标志。可以通过更新一个 cookie 的过期时间为 0 来删除一个 cookie。以下可选的 cookie 属性值可以跟在键值对后，用来具体化对 cookie 的设定/更新，使用分号以作分隔：
+1. `;path=<path>`：如果没有定义，默认为当前文档位置的路径。
+2. `;domain=<domain>`：如果没有定义，默认为当前文档位置的路径的域名部分。
+3. `;max-age=<max-age-in-seconds>`：过期时间。
+4. `;expires=<date-in-GMTString-format>`：如果没有定义，cookie 会在对话结束时过期。
+5. `;secure：cookie` 只通过 https 协议传输。
+6. 此外，cookie 的值字符串`<cookie-value>`可以用encodeURIComponent() 来保证它不包含任何cookie 值中禁止使用的字符：逗号、分号或空格。
+
+### HTTP Cookie 相关标头
+
+**Cookie请求标头**包含与服务器相关联的已存储 HTTP cookie（即服务器先前通过 Set-Cookie 标头发送或在 JavaScript 中使用Document.cookie设置的 cookie。语法为 `Cookie: <cookie-list>`，其中 `<cookie-list>` 是一系列的名称/值对`<cookie-name>=<cookie-value>`。名称/值对之间用分号+空格（'; '）隔开。
+
+**Set-Cookie响应标头**被用来由服务器端向用户代理发送cookie，所以用户代理可在后续的请求中将其发送回服务器。**服务器要发送多个cookie，则应该在同一响应中发送多个 Set-Cookie标头**。根据Fetch规范，Set-Cookie 是一个禁止的响应标头，对应的响应在被暴露给前端代码前，必须滤除这一响应标头，即浏览器会阻止前端JavaScript代码访问 Set-Cookie标头。语法为：`Set-Cookie: <cookie-name>=<cookie-value>; [Expires=<date>]；[Max-Age=<number>]; [Domain=<domain-value>]; [Path=<path-value>]; [Secure]; [HttpOnly]; [SameSite=<SameSite-value>]; [Partitioned]`
+1. `<cookie-name>=<cookie-value>`：有且仅一个名称/值对cookie。
+    1. `<cookie-name>` 可以是除了控制字符、空格或制表符之外的任何 US-ASCII 字符，同时不能包含以下分隔字符：( ) < > @ , ; : \ " / [ ] ? = { }。具有特殊语义的 `<cookie-name>`：以 __Secure- 或 __Host- 为前缀的 cookie（其中连接符是前缀的一部分），必须与 secure 属性一同设置，同时必须应用于使用 HTTPS 访问的页面。后者还禁止设置 domain 属性（也就不会发送给子域）且 path 属性的值必须为 /，这种 cookie 被视为“domain-locked”。带有这些前缀的 Cookie，如果不符合其限制的会被浏览器拒绝。
+    2. `<cookie-value>` 可以选择用双引号括起来，并包含任何 US-ASCII 字符，但不包括控制字符（ASCII 字符 0 到 31 和 ASCII 字符 127）、空格、双引号、逗号、分号和反斜杠。
+    3. 许多应用会对 cookie 值按照 URL 编码规则进行编码，但是按照 RFC 规范，这不是必须的。不过满足规范中对于 `<cookie-value>` 所允许使用的字符的要求是有用的。
+2. `Expires=<date>`：可选，设置cookie最长有效时间`<date>`，是客户端而不是服务器时间，形式为符合HTTP-date规范的时间戳（`<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`）。如果没有设置，则表示是会话期 cookie，即会话结束于客户端被关闭时，该会话期 cookie会被移除。然而，很多 Web 浏览器支持会话恢复功能，这个功能可以使浏览器保留所有的 tab 标签，然后在重新打开浏览器的时候将其还原。与此同时，cookie 也会恢复，就跟从来没有关闭浏览器一样。
+3. `Max-Age=<number>`：可选，在 cookie 失效之前需要经过的秒数`<number>`。秒数为 0 或 -1 将会使 cookie 直接过期。Max-Age 的优先级高于Expires。用于敏感信息（例如指示身份验证）的 Cookie 的生存期应较短。
+4. `Domain=<domain-value>`：可选，指定 cookie 可以送达的主机名`<domain-value>`。多个主机/域名的值是不被允许的，但如果指定了一个域，则其子域也会被包含。但假如没有指定，那么默认值为当前文档访问地址中的主机部分且不包含子域名。域名（.example.com）之前的点号会被忽略（example.com）。属于特定域的 cookie，假如域名`<domain-value>`不能涵盖发送该cookie服务器的域名，那么会被用户代理拒绝。
+5. `Path=<path-value>`：可选，指定一个 URL 路径 `<path-value>`，该路径必须出现在要请求的资源的路径中才可以发送 Cookie 标头。字符 / 可以解释为文件目录分隔符，此目录的下级目录也满足匹配的条件（例如，如果 path=/docs，那么/docs、/docs/、/docs/Web/ 和 /docs/Web/HTTP 都满足匹配条件。/、/docsets 或者 /fr/docs 则不满足匹配条件）。
+6. cookie 只有在请求使用 https: 协议（localhost 不受此限制）的时候才会被发送到服务器，以阻止中间人攻击。不要假设 Secure 会阻止所有的对 cookie 中敏感信息（session key、登录信息，等等）的访问。携带这一属性的 cookie 在不设置 HttpOnly 的情况下仍能从客户端的硬盘或是从 JavaScript 中访问。非安全站点（http:）已经不能在 cookie 中设置 Secure 属性了（在 Chrome 52 和 Firefox 52 中新引入的限制）。对于 Firefox，Secure 属性的 https: 限制会在域为 localhost 时被忽略（从 Firefox 75 开始）。
+7. HttpOnly：可选，用于阻止 JavaScript 通过Document.cookie 属性访问 cookie，其可用于防范跨站脚本攻击（XSS）。注意，设置了HttpOnly的cookie在使用JavaScript初始化的请求（调用 XMLHttpRequest.send() 或 fetch()）中仍然会被发送。
+8. `SameSite=<SameSite-value>`：可选，控制是否通过跨站请求发送 cookie，从而在一定程度上防止跨站请求伪造攻击（CSRF）。其中站点由可注册域（**可注册域由公共后缀列表（https://publicsuffix.org/list/public_suffix_list.dat**）中的某个条目加上它之前的域名部分组成）和URL方案（http 或 https）定义。Chrome89才开始来自同域的cookie若使用了不同的协议（http: 或 HTTPS:），将不再被视为来自同一站点。如果该 cookie 域和方案匹配当前的页面，则认为该 cookie 和该页面来自同一站点，则称为**第一方 cookie（first-party cookie）**。如果域和方案不同，则它不认为来自同一个站点，被称为**第三方 cookie（third-party cookie）**。`<SameSite-value>` 的取值有：
+    1. Strict：浏览器仅对同一站点的请求发送 cookie。如果请求来自不同的域或协议（即使是相同域），则携带有 SameSite=Strict 属性的 cookie 将不会被发送。
+    2. Lax：默认值（chrome 80+），cookie 不会在跨站点请求（例如加载img或iframe的请求）上发送，而是在用户从外部站点导航到源站点（例如，点击链接）时发送。
+    3 None：浏览器会在跨站和同站请求中均发送 cookie。携带 SameSite=None 属性的 cookie 必须同时设置 Secure 属性。
+9. Partitioned：可选，指示应使用分区存储来存储 cookie（chrome 114+）。分区cookie 必须使用Secure和设置Path=/。此外，建议在设置分区cookie时使用前缀__Host，以使它们绑定到主机名而不是可注册域。
+
+### Cookie与Session
+
+## HTTP 连接管理
+
+## HTTP 内容协商
+
+## HTTP 条件请求
+
+## HTTP范围请求
+
+## HTTP压缩
+
+## HTTP 重定向
+
+## HTTP 认证
+
+## HTTP CORS（跨源资源共享）
+
+## HTTP 权限策略
+
+## HTTP 缓存
+
+## 内容安全策略 (CSP)
