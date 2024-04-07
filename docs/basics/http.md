@@ -542,24 +542,776 @@ Document.cookie是用于获取或设置与当前文档相关联的 cookie的get
 
 ### Cookie与Session
 
+cookie和session均可用于存储用户信息。
+
+**Cookie**：保存在客户端；容易被截获篡改（**安全性缺点—可采用加密方案或带Token**）；大小一般4KB（**容量小缺点**）；同域请求一律携带cookie（**性能缺点**）；通过Expires（过期时间）或Max-Age（时间间隔（秒））设置有效期；通过 **Domain（域名）和 path（路径）**设置作用域；HttpOnly禁止JS访问（预防XSS攻击）；**SameSite 属性**限制第三方携带cookie（预防CSRF 攻击），取值Strict（完全禁止第三方）、**Lax（chrome80开始的默认值，仅get提交表单或a标签get请求允许第三方发送）**和 None。大多限制站点最多保存 20 个cookie。
+
+![](../public/basics/http/100.png)
+
+<!-- ![](../public/basics/http/101.png) -->
+服务端可以设置 Cookie 的所有选项：Expires、Domain、Path、Secure、HttpOnly，一个 Set-Cookie 字段只能设置一个 Cookie, 当需要设置多个 Cookie 时，需要添加同样多的 Set-Cookie 字段。
+
+客户端可以设置 Cookie 的选项：Expires、Domain、Path、Secure(有条件：只有在 HTTP 协议的网页中，客户端设置 Secure 类型的 Cookie 才能成功)，但无法设置 HttpOnly 选项。
+
+**Session**：保存在服务器，敏感的信息用session存储更安全，session可以存放在文件/数据库/内存中，但是会增加服务器的压力。
+
 ## HTTP 连接管理
+
+打开和维护连接很大程度上影响性能。HTTP/1.x连接管理模型包括**短连接（short-lived connections）**，**持久连接（Persistent Connection，又称为长连接）**和 **HTTP流水线（HTTP pipelining）**。 HTTP/2 新增了其他连接管理模型。HTTP 的连接管理适用于两个连续节点之间的连接，它是逐跳的，而不是端到端的，即客户端与其第一个代理之间的连接使用的模型可能不同于代理与目标服务器（或任何中间代理）之间的模型，而定义连接模型所涉及的 HTTP 标头（如 Connection 和 Keep-Alive）是逐跳标头，其值可由中间节点更改。
+
+![](../public/basics/http/102.png)
+
+HTTP 主要依赖于 TCP 来提供从客户端到服务器端之间的连接。
+
+HTTP 最早期的模型和 HTTP/1.0 的默认模型是**短连接（short-lived connections）**：**每发起一个请求时都会创建一个新的连接，并在收到应答时立即关闭**。HTTP/1.1 中，只有当 Connection标头被设置为 close 时才用该模型。**短连接的两个大的问题是创建新连接本身耗费时间和TCP 连接的性能只有在该连接被使用一段时间后即成为热连接才能得到改善。**
+
+HTTP/1.1的默认模型是**持久连接（Persistent Connection）**：会保持一段时间，重复用于发送一系列请求，连接在空闲一段时间后会被关闭，节省了新建 TCP 连接握手的时间，还可以利用 TCP 热链接的性能增强能力（服务器可以使用 Keep-Alive 标头来指定一个空闲连接最小保持时间）。HTTP/1.0中只有当Connection 标头显式设置成 close 以外的值才用该模型（通常会设置为 retry-after）， HTTP/1.1 即使默认持久连接，为避免可能回退到HTTP/1.0，建议也显式设置。**持久连接的缺点**是空闲状态会消耗服务器资源，而且在重负载时有可能遭受 DoS 攻击。
+
+HTTP/1.1的**持久连接（Persistent Connection）**在默认情况下请求是按顺序发出的，即下一个请求只有在当前请求收到响应过后才会被发出。而**HTTP流水线**：在同一条持久连接上发出连续的请求，而不用等待应答返回。理论上，如果将两个 HTTP 请求打包到同一个 TCP 消息中，性能也会得到提高，管 HTTP 请求大小的需求持续增长，但典型的 MSS（最大分段大小，Maximum Segment Size，是除去TCP 或 IP 协议头后，以字节数定义一个计算机或通信设备所能接受的分段的最大数据量）足以包含多个简单请求。所有遵循 HTTP/1.1 标准的代理和服务器都应该支持流水线，但HTTP 流水线在现代浏览器中并不是默认被启用的，因为：
+1. 服务器或代理程序可能不支持HTTP/1.1
+2. 正确的实现流水线是复杂的：传输资源的大小、将使用的有效 RTT 以及有效带宽，都会直接影响流水线的改进效果。不知道这些的话，重要的消息可能被延迟到不重要的消息后面。这个重要性的概念甚至会演变为影响到页面布局！因此 HTTP 流水线在大多数情况下带来的改善并不明显。
+3. 流水线受制于队头阻塞（Head-of-line blocking，HOL blocking）问题。
+4. 如果有故障发生时，流水线的内容要能被安全的重试。因此只有幂等方法（GET， HEAD、PUT、DELETE、OPTIONS和TRACE）能使用。
+
+因此，HTTP流水线已被 HTTP/2的多路复用（multiplexing）所取代。
+
+由于浏览器限制每个域的活动连接数（6，大于该数字就有触发服务器 DoS 保护的风险），**域名分片（domain sharding）**会将内容拆分到多个子域中。浏览器能够同时下载更多资源，从而缩短了页面加载时间并改善了用户体验。但域名分片的问题在于每个域都需要额外的 DNS 查找成本以及建立每个 TCP 连接的开销。HTTP/2 不限制并发请求，因此 HTTP/2 中不必使用域名分片。
+
+### HTTP连接管理相关标头（Connection）
+
+**Connection 通用标头（Connection: keep-alive或Connection: close）**控制网络连接在当前会话完成后是否仍然保持打开状态。如果发送的值是 keep-alive，则连接是持久的，不会关闭，允许对同一服务器进行后续请求。在 HTTP/2 和 HTTP/3 中，禁止使用特定于连接的标头字段，如 Connection 和 Keep-Alive。Chrome 和 Firefox 会在 HTTP/2 响应中忽略它们，但 Safari 遵循 HTTP/2 规范要求，不会加载包含这些字段的任何响应。除去标准的逐段传输（hop-by-hop）头，任何逐段传输头都需要在 Connection 头中列出，这样才能让第一个代理知道必须处理它们且不转发这些头。标准的逐段传输头也可以列出。可能取值：
+1. close表明客户端或服务器想要关闭该网络连接，这是 HTTP/1.0 请求的默认值。
+2. 以逗号分隔的 HTTP 标头列表。通常仅有keep-alive，表明客户端想要保持该网络连接打开。HTTP/1.1 的请求默认使用持久连接。
+
+**Keep-Alive 通用标头（Keep-Alive: parameters）**允许消息发送者暗示连接的状态，还可以用来设置超时时长和最大请求数。前提是将Connection 首部的值设置为 "keep-alive"，同时在 HTTP/2 协议中， Connection 和 Keep-Alive 是被忽略的。parameters是一系列用逗号隔开的参数，每一个参数由一个标识符和一个值构成，并使用等号 ('=') 隔开。可用的标识符有：
+1. timeout：指定了一个空闲连接需要保持打开状态的最小时长（以秒为单位），如果没有在传输层设置 keep-alive TCP message 的话，大于 TCP 层面的超时设置会被忽略。
+2. max：表示关闭连接之前可以在此连接上发送的最大请求数。除非为 0，否则非管道连接将忽略此值，因为下一个响应将发送另一个请求。HTTP 管道可以用它来限制管道化。
 
 ## HTTP 内容协商
 
+在 HTTP 协议中，内容协商指通过为同一 URI 指向的资源提供不同的表示形式，可以使用户代理选择与用户需求相适应的最佳匹配（例如：文档使用的自然语言、图片的格式或者内容编码形式）。
+
+![](../public/basics/http/103.png)
+
+内容协商的最佳表示形式的选取可以通过两种机制实现：
+1. 服务端驱动型内容协商或者主动内容协商：服务器以浏览器（或者其他任何类型的用户代理）随同 URL 发送的一系列描述了用户选择倾向的 HTTP 标头（比如Accept、Accept-Encoding、Accept-Language）为线索，通过内部算法来选择最佳方案提供给客户端。如果不能提供合适的资源，它可能使用 406 Not Acceptable、415 Unsupported Media Type进行响应并为其支持的媒体类型设置标头（比如，分别对 POST 和 PATCH 请求使用 Accept-Post 或 Accept-Patch 标头）。
+    1. 每一个特性需要对应一个标头随请求发送，客户端提供的标头信息相当冗长（HTTP/2 协议的标头压缩机制可以缓解），并且存在被HTTP 指纹识别的隐私风险。
+    2. 即使借助客户端提示扩展，服务器也无法获取关于浏览器能力的全部信息。
+    3. 因为给定的资源需要返回不同的表示形式，共享缓存的效率会降低，而服务器端的实现会越来越复杂。 
+
+![](../public/basics/http/104.png)
+
+2. 代理驱动型协商或者响应式协商：服务器返回 300 Multiple Choices或者 406 Not Acceptable、415Unsupported Media Type（备选方案）。当面临不明确的请求时，服务器会返回一个页面，其中包含了可供选择的资源的链接呈现给用户，由用户做出选择。
+    1. HTTP 标准没有明确指定提供可选资源链接的页面的格式，因此自动化大都是在检测了协商的条件之后，由JavaScript脚本会触发重定向。
+    2. 需要额外发送一次请求来获取实际资源，减慢了将资源呈现给用户的速度。
+
+![](../public/basics/http/105.png)
+
+### HTTP内容协商相关标头（Content negotiation）
+
+**Accept 请求标头**表示客户端可以处理的内容类型（用MIME 类型来表示）。借助内容协商机制，服务器可以从诸多备选项中选择一项进行应用，并使用 Content-Type 响应标头通知客户端它的选择。浏览器会基于请求的上下文来为Accept 请求标头设置合适的值。可能取值为：
+1. `<MIME_type>/<MIME_subtype>`：单一精确的 MIME 类型。
+2. `<MIME_type>/*`：一类 MIME 类型，但是没有指明子类。
+3. `*/*`：任意类型的 MIME 类型。
+4. 可以设置以上的多种类型。
+5. 不同的 MIME 类型之间用逗号分隔，
+6. 每个类型后可接质量价值（Quality values）`;q=<q>`作权重。
+
+**Accept-Language 请求标头**允许客户端声明它可以理解的自然语言，以及优先选择的区域方言。借助内容协商机制，服务器可以从诸多备选项中选择一项进行应用，并使用 Content-Language 应答头通知客户端它的选择。可能的取值有：
+1. `Accept-Language: <language>`，用含有两到三个字符的字符串表示的语言码或完整的语言标签。
+2. `Accept-Language: *，任意语言；"*"` 表示通配符（wildcard）。
+3. `Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5`，每个语言后可接质量价值（Quality values）`;q=<q>`作权重。
+
+**Accept-Encoding 请求标头**会将客户端能够理解的内容编码方式列表通常是某种压缩算法通知给服务端。通过内容协商的方式，服务端会从中选择使用并在响应头 Content-Encoding 中通知客户端该选择。即使客户端和服务器都支持相同的压缩算法，在指令可以被接受的情况下，服务器也可以选择对响应body不进行压缩，导致这种情况出现的两种常见的情形是：
+1. 要发送的数据已经经过压缩，再次进行压缩不会导致被传输的数据量更小。比如一些图像格式的文件；
+2. 服务器超载，无法承受压缩需求导致的计算开销。通常，如果服务器使用超过 80% 的计算能力，微软建议不要压缩。
+
+可能的标记取值（每个标记后可接质量价值（Quality values）`;q=<q>`作权重）：
+1. gzip：表示采用 Lempel-Ziv coding (LZ77) 压缩算法，以及 32 位 CRC 校验的编码方式。
+2. compress：采用 Lempel-Ziv-Welch (LZW) 压缩算法。
+3. deflate：采用 zlib 结构和 deflate 压缩算法。
+4. br：表示采用 Brotli 算法的编码方式。
+5. identity：用于指代自身（例如：未经过压缩和修改）。除非特别指明，这个标记始终可以被接受，即服务器禁止返回表示客户端错误的 406 Not Acceptable 响应。
+6. `*`：匹配其他任意未在该请求头字段中列出的编码方式。假如该请求头字段不存在的话，这个值是默认值。它并不代表任意算法都支持，而仅仅表示算法之间无优先次序。
+
+**Accept-Patch 响应标头**指示服务器接受 PATCH请求的媒体类型。
+
+**Accept-Post 响应标头**指示服务器接受 POST 请求的媒体类型。
+
+**Accept-CH 响应标头**指定在后续请求中应包含哪些客户端提示标头。
+
+### HTTP 消息主体信息相关标头（Message body information）
+
+**Content-Length 实体标头/表示标头（`Content-Length: <length>`）**，用来指明发送给接收方的消息主体的大小，即用十进制数字表示的八位元组的数目。
+
+**Content-Type 实体标头/表示标头**用于指示资源的 MIME 类型（`Content-Type: <media-type>;[charset=<charset>];[boundary=<boundary>]`）。在响应中，Content-Type 标头告诉客户端返回内容的内容类型。浏览器会在某些情况下进行 MIME 查找，并不一定遵循此标头的值，为了防止这种行为，可以将标题 X-Content-Type-Options 设置为 nosniff。在请求中 (如POST 或 PUT)，客户端告诉服务器实际发送的数据类型。参与的指令包括：
+1. `<media-type>`：资源或数据的 MIME type 。
+2. `[charset=<charset>]`：可选，字符编码标准。
+3. `[boundary=<boundary>]`：可选，但对于多部分实体是必需的，其包括来自一组字符的 1 到 70 个字符。它用于封装消息的多个部分的边界。
+
+**Content-Encoding实体标头/表示标头**列出了对当前实体消息（消息荷载）应用的任何编码类型，以及编码的顺序。它让接收者知道需要以何种顺序解码该实体消息才能获得原始荷载格式。Content-Encoding 主要用于在不丢失原媒体类型内容的情况下压缩消息数据。请注意原始媒体/内容的类型通过 Content-Type 首部给出，而 Content-Encoding 应用于数据的表示，或“编码形式”。如果原始媒体以某种方式编码（例如 zip 文件），则该信息不应该被包含在 Content-Encoding 首部内。一般建议服务器应对数据尽可能地进行压缩，并在适当情况下对内容进行编码。对一种压缩过的媒体类型如 zip 或 jpeg 进行额外的压缩并不合适，因为这反而有可能会使荷载增大。可能取值：
+1. gzip：表示采用 Lempel-Ziv coding (LZ77) 压缩算法，以及 32 位 CRC 校验的编码方式。
+2. compress：采用 Lempel-Ziv-Welch (LZW) 压缩算法。此内容编码方式已经被大部分浏览器弃用，部分因为专利问题（这项专利在 2003 年到期）。
+3. deflate：采用 zlib 结构和 deflate 压缩算法。
+4. br：表示采用 Brotli 算法的编码方式。
+
+**Content-Language 实体标头/表示标头**用来描述目标访问者希望采用的语言或语言组合。如果没有指明 Content-Language，那么默认地，文件内容是提供给所有语言的访问者使用的。多个语言标签也是合法的，同样的，这个首部还可以用来描述不同媒体类型的文件，而不单单局限于文本型文档。多个语言标签需要用逗号隔开。每一个语言标签都是由一个或多个不区分大小写的子标签构成的，子标签之间用连字号 ("-") 隔开。
+
+**Content-Location 实体标头/表示标头**（`Content-Location: <url>` 其中`<url>`是相对（相对于请求 URL）或绝对 URL）表示返回数据的备用位置。最主要的用途是用来指定要访问的资源经过内容协商后的结果的 URL。Location 指定的是一个重定向请求的目的地址（或者新创建的文件的 URL），而 Content-Location指向的是可供访问的资源的直接地址，不需要进行进一步的内容协商。Location 对应的是响应，而 Content-Location 对应的是要返回的实体。
+
 ## HTTP 条件请求
 
+**HTTP 条件请求**通过将受影响的资源与验证器的值进行比较，可以改变请求的结果甚至成功与否。
+
+在 HTTP 协议中，**条件请求**指的是请求的执行结果会因特定首部的值不同而不同。这些首部规定了请求的前置条件，请求结果则视条件匹配与否。请求引发的不同的反应取决于请求所使用的方法，以及组成前置条件首部集合（If-Match、If-None-Match、If-Modified-Since、If-Unmodified-Since、If-Range）：
+1. 对于安全方法来说，例如GET，条件请求可以被用来限定仅在满足条件的情况下返回资源，这样可以节省带宽。
+2. 对于非安全方法来说，例如PUT，条件请求可以被用来限定仅在满足文件的初始版本与服务器上的初始版本相同的条件下才会将其上传。
+
+这种请求可以用来验证缓存的内容，避免无用的控制，验证文档的完整性，比如在断点续传时，或者在上传或修改文档时防止丢失更新。
+
+**验证器是描述资源版本的条件请求首部值**，分为两大类：
+1. 文件的最后修改时间。
+2. 指代版本的一个独一无二的不透明的字符串，称为entity tag或etag。
+
+对于比较同一份资源的不同版本，取决于上下文环境的不同，有两种不同的等值检查（equality checks）类型：
+1. **强验证类型（Strong validation）**：需要每一个字节都相同，由 ETag 首部来完成的。比如断点续传。
+2. **弱验证类型（Weak validation）**：只需要确认资源内容相同。即便是有细微差别也可以接受，比如展示的广告不同或者页脚显示的时间不同。
+
+验证类型与验证器的类型是相互独立的，Last-Modified标头和 ETag 标头均可应用于两种验证类型，尽管在服务器端实现的复杂程度可能会有所不同。HTTP 协议默认使用强验证类型，可以指定何时使用弱验证类型。构建应用于弱验证类型的标签（etag）体系可能会比较复杂，因为这会涉及到对页面上不同的元素的重要性进行排序，但是会对缓存性能优化相当有帮助。
+
+**应用场景**：
+
+1. **更新缓存**。
+    1. 假如缓存为空，或者是没有缓存的话，被请求资源会以状态码 200 OK 返回。验证器（Last-Modified 或 ETag标头值）会同资源一起返回和缓存起来。
+
+    ![](../public/basics/http/106.png)
+
+    2. 只要缓存未失效，就不会发起任何请求。但是一旦失效——主要是由 Cache-Control 首部控制——客户端就不会采用缓存而是以验证器（Last-Modified 或 ETag标头值）的值用作 If-Modified-Since 或 If-Match 标头的值发起条件式请求。
+    3. 假如资源未发生变化，服务器响应 304 Not Modified。客户端则仍采用被缓存的资源。
+
+    ![](../public/basics/http/107.png)
+
+    4. 假如资源发生了变化，服务器响应200 OK 返回新版本的资源；客户端则采用新版本资源并将其缓存起来。
+
+    ![](../public/basics/http/108.png)
+
+2. 断点续传。
+    1. 支持增量下载的服务器会通过 Accept-Ranges 标头告知客户端。
+
+    ![](../public/basics/http/109.png)
+
+    2. 户端就可以通过发送 Ranges标头以及缺失的范围值来进行断点续传。
+    3. 如果要下载的资源在两次下载之间进行了修改，得到的数据范围就会对应该资源的两个不同的版本，那么最终获得的文件是损坏的。因此，需要以验证器（Last-Modified 或 ETag标头值）的值作为If-Range的值发起条件式请求。
+    4. 如果条件得到满足时，服务器回复 206 Partial Content，以及Range 首部请求的相应部分。
+    5. 如果条件没有得到满足，服务器将会返回 200 OK，并返回完整的请求资源。而客户端就可以从头开始重新下载资源。
+
+    ![](../public/basics/http/110.png)
+
+3. 远程更新文件。
+    1. 客户端首先读取原始文件，然后进行修改，最后将它们推送到服务器上（使用PUT方法）。当一个客户端在本地修改它新获得的资源副本的时候，另外一个客户端同样可以获取一份资源副本并进行同样的操作，即出现竞态条件，可能导致更新丢失。
+
+    ![](../public/basics/http/111.png)
+
+    2. 条件式请求的思路是，允许所有的客户端获得资源的副本，然后在本地进行编辑，通过只允许第一个客户端成功提交的方式来控制并发操作。具体是使用If-Match 或 If-Unmodified-Since 首部，假如实体标签与源头文件的实体标签不一致，或者源头文件在被获取副本之后经过了修改，那么此次变更请求就会被拒绝，收到 412 Precondition Failed 的错误提示。之后就需要依靠客户端来处理该错误了：或者通知用户重新开始（基于最新的版本），或者是给用户展示两个版本之间的差异，辅助他们决定要保留哪些变更。
+
+    ![](../public/basics/http/112.png)
+
+    3. 资源的首次上传时（使用PUT方法），当两个客户端在大致相同的时间进行上传操作的时候，也可能会遇到竞态条件。使用值设置为'*'（表示任意实体标签）的 If-None-Match标头发起条件请求。当且仅当资源先前并不存在的情况下请求的操作才会成功执行。If-None-Match 首部只可应用于兼容 HTTP/1.1（及后续版本）的服务器。
+
+    ![](../public/basics/http/113.png)
+
+
+### HTTP 条件相关标头（Conditional）
+
+**Last-Modified 响应标头**（Last-Modified: `<day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`）表示源头服务器认定的资源做出修改的日期及时间，通常用于判断接收到的或者存储的资源是否一致。精确度比 ETag 低，因此是备用机制。包含有 If-Modified-Since 或 If-Unmodified-Since 标头的条件请求会使用该标头。其中：
+1. `<day-name>`：Mon, Tue, Wed, Thu, Fri, Sat, 或 Sun 之一（区分大小写）。
+2. `<day>`：两位数字表示的天数，例如 04 or 23。
+3. `<month>`：Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec 之一（区分大小写）。
+4. `<year>`：4 位数字表示的年份，例如 1990 或者2016。
+5. `<hour>`：两位数字表示的小时数，例如 09或者 23。
+6. `<minute>`：两位数字表示的分钟数，例如04 或者 59。
+7. `<second>`：两位数字表示的秒数，例如 04 或者 59。
+8. GMT：国际标准时间。HTTP 中的时间均用国际标准时间表示，从来不使用当地时间。
+
+**ETag 响应标头**（`ETag: W/"<etag_value>"`或`ETag: "<etag_value>"`）是资源的特定版本的标识符。'W/'(大小写敏感) 表示使用弱验证器。`"<etag_value>"` 是唯一地表示所请求的资源的实体标签，是位于双引号之间的 ASCII 字符串。ETag常见的应用场景：
+1. 缓存未更改的资源：如果用户再次访问给定的 URL（设有ETag字段），如果资源过期了且不可用，客户端就发送包含值为ETag的If-None-Match 标头的请求。服务器将客户端的 ETag（即If-None-Match的值）与其当前版本的资源的 ETag 进行比较，如果两个值匹配（即资源未更改），服务器将返回不带任何内容的 304 Not Modified 状态，告诉客户端缓存版本可用（fresh）。
+2. 避免“空中碰撞”：利用在ETag和 If-Match 标头，可以检测到"空中碰撞"的编辑冲突。编辑后内容被散列，并在响应中放入Etag标头，对更改保存即发布数据时，POST请求将包含有 ETag 值的If-Match标头来检查是否为最新版本。如果哈希值不匹配，则意味着文档已经被其他人编辑，抛出412错误。
+
+**If-Match 条件请求标头**（`If-Match: <etag_value>` 或 `If-Match: <etag_value>, <etag_value>, … `或 `If-Match:*`），在请求方法为 GET 和 HEAD 的情况下，服务器仅在请求的资源满足此首部列出的 ETag值时才会返回资源，而对于 PUT 或其他非安全方法来说，只有在满足条件的情况下才可以将资源上传。*星号是一个指代任意资源的特殊值，它只用在进行资源上传时，通常是采用 PUT 方法，来检测拥有相同识别 ID 的资源是否已经上传过了。ETag 值之间的比较使用的是强比较算法，即只有在每一个字节都相同的情况下，才可以认为两个文件是相同的，在 ETag 值前面添加 W/ 前缀才表示采用弱验证。If-Match常见的应用场景：
+1. 对于 GET 和 HEAD 方法，搭配 Range首部使用，可以用来保证新请求的范围与之前请求的范围是对同一份资源的请求。如果 ETag值 无法匹配，那么需要返回 416 (Range Not Satisfiable，范围请求无法满足) 响应。
+2. 对于其他方法来说，尤其是 PUT, If-Match 首部可以用来避免更新丢失问题（即“空中碰撞”问题）。它可以用来检测用户想要上传的不会覆盖获取原始资源之后做出的更新。如果请求的条件不满足，那么需要返回 412 (Precondition Failed，先决条件失败) 响应。
+
+If-None-Match条件请求标头（`If-None-Match: <etag_value>` 或 `If-None-Match: <etag_value>`, `<etag_value>, …` 或 `If-None-Match:*`），对于 GET 和 HEAD 请求方法来说，当且仅当服务器上没有任何资源的 ETag 值与该首部中列出的相匹配的时候，服务器端才会返回所请求的资源，响应码为 200，否则返回 304且同时生成会存在于 200 响应中的Cache-Control、Content-Location、Date、ETag、Expires 和 Vary首部。对于其他方法来说，当且仅当最终确认没有已存在的资源的 ETag 值与该首部中所列出的相匹配的时候，才会对请求进行相应的处理，否则返回412 Precondition Failed。ETag 值之间的比较默认就是采用的是弱比较算法，即内容一致就可以认为是相同的。ETag 值前有可能包含一个 W/ 前缀，来提示应该采用弱比较算法（画蛇添足，因为 If-None-Match 用且仅用弱比较算法）。If-None-Match比If-Modified-Since优先级更高。If-None-Match常见的应用场景：
+1. 采用 GET 或 HEAD 方法，来更新拥有特定的ETag 值的缓存。
+2. 采用其他方法，尤其是 PUT，将 If-None-Match 的值设置为 * ，用来生成事先并不知道是否存在的文件，可以确保先前并没有进行过类似的上传操作，防止之前操作数据的丢失。
+
+**If-Modified-Since 条件请求标头**（`If-Modified-Since: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`），表示资源最后修改的日期时间。服务器只在所请求的资源在给定的日期时间之后对内容进行过修改的情况下才会将资源返回，状态码为 200。如果请求的资源从那时起未经修改，那么返回 304 响应，而在 Last-Modified 首部中会带有上次修改时间。不同于 If-Unmodified-Since, If-Modified-Since 只可以用在 GET 或 HEAD 请求中。当与 If-None-Match 一同出现时，它（If-Modified-Since）会被忽略掉，除非服务器不支持 If-None-Match。最常见的应用场景是来更新没有特定 ETag 标签的缓存实体。
+
+**If-Unmodified-Since 条件请求标头**（`If-Unmodified-Since: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`）：只有当资源在指定的时间之后没有进行过修改的情况下，服务器才会返回请求的资源，或是接受 POST 或其他不安全方法的请求。如果所请求的资源在指定的时间之后发生了修改，那么会返回 412 (Precondition Failed) 错误。常见的应用场景：
+1. 与不安全方法如 POST 搭配使用，可以用来优化并发控制。假如在原始副本获取之后，服务器上所存储的文档已经被修改，那么对其作出的编辑会被拒绝提交。
+2. 与含有 If-Range 请求标头的范围请求搭配使用，用来确保新的请求片段来自于未经修改的文档。
+
+**Vary 响应标头**（`Vary: *` 或 `Vary: <header-name>, <header-name>, ...`）描述了请求信息中除方法和 URL 之外影响响应内容的其他部分。这通常用于在使用内容协商时创建缓存密钥。在响应状态码为 304 Not Modified 中，也要设置 Vary 首部，而且要与相应的 200 OK 响应设置得相同。*表示该响应的生成受请求标头以外因素的影响，表示该响应不可缓存。`<header-name>` 表示可能影响此响应生成的请求标头名称。
+
+### HTTP 范围请求相关标头（Range requests）
+
+**Accept-Ranges 响应标头**（Accept-Ranges: bytes或Accept-Ranges: none）是服务器用来表示其支持客户端部分文件下载请求的标记。该字段的值表示可用于定义范围的单位。如果出现 Accept-Ranges 标头，浏览器可能会尝试恢复中断的下载，而不是重新开始下载。none表示不支持任何范围请求单位，由于其等同于没有返回此头部，因此很少使用，不过一些浏览器，比如 IE9，会依此去禁用或者移除下载管理器的暂停按钮。bytes表示范围请求的单位是字节。
+
+**Range 请求标头**（`Range: <unit>=<range-start>-<range-end>`）告知服务器返回文件的哪一部分。在一个 Range 首部中，可以一次性请求多个部分，服务器会以 multipart 文件的形式将其返回。如果服务器返回的是范围响应，需要使用 206 Partial Content。假如所请求的范围不合法，那么服务器会返回 416 Range Not Satisfiable，表示客户端错误。服务器允许忽略 Range 首部，从而返回整个文件，状态码用 200 。`<unit>`范围所采用的单位，通常是bytes（字节）。`<range-start>` 表示在特定单位下，范围的起始整数值。`<range-end>` 表示在特定单位下，范围的结束整数值，这个值是可选的，如果不存在，表示此范围一直延伸到文档结束。多个 `<range-start>-<range-end>` 之间用逗号分隔。
+
+**If-Range 请求标头**（`If-Range: <http-date>` 或 `If-Range: <etag>`，其中 `<etag>` 当应用弱匹配算法时会有 W/ 前缀）用来当字段值中的条件得到满足时，Range首部才生效且服务器回复 206 Partial Content，以及Range 首部请求的相应部分；如果字段值中的条件没有得到满足，服务器将会返回 200 OK，并返回完整的请求资源。字段值中既可以用 Last-Modified 时间值用作验证，也可以用ETag标记作为验证，但不能将两者同时使用。If-Range 首部通常用于断点续传的下载过程中，确保自上次中断后下载的资源没有发生改变。
+
+**Content-Range 响应标头**（`Content-Range: <unit> <range-start>-<range-end>/<size>`）显示的是一个数据片段在整个文件中的位置。`<size>` 表示整个文件的大小（如果大小未知则用"*"表示）。
+
 ## HTTP范围请求
+  
+HTTP 协议范围请求允许服务器只发送 HTTP 消息的一部分到客户端。范围请求在传送大的媒体文件，或者文件下载的断点续传时很有用。
+
+假如在响应中存在 Accept-Ranges 首部并且它的值不为“none”，那么表示该服务器支持范围请求，否则表示不支持，而在这种情况下，某些应用的下载管理器会将暂停按钮禁用。
+
+在请求的范围越界的情况下即范围值超过了资源的大小，服务器会响应 416 Requested Range Not Satisfiable。
+
+如果数据量很大，并且在请求未能完全处理完成之前无法知晓响应的体积大小。
+
+范围请求分为三类：
+1. **单一范围请求**：使用Range标头，可以请求资源的某一部分。而服务器端会带Content-Length 标头（表示先前请求范围的大小）和Content-Range 标头（表示这部分内容在整个资源中所处的位置）响应206 Partial Content。
+2. **多重范围请求**：使用Range标头，也可以请求资源的多个部分（用逗号分隔开）。而服务器返回 206 Partial Content和 `Content-Type：multipart/byteranges; boundary=<boundary>` 标头（表示响应有多个byterange），而且每一部分 byterange 都有自己的 Content-type 标头和 Content-Range标头，并且使用 `<boundary>` 对 body 进行划分。
+3. **条件式范围请求**：使用If-Range 请求标头生成，当中断之后重新开始请求更多资源片段的时候，确保自从上一个片段被接收之后该资源没有进行过修改：假如条件满足的话，条件请求就会生效，服务器会响应 206 Partial，以及相应的消息主体。假如条件未能得到满足，那么就会响应 200 OK，以及整个资源。
+
+### HTTP 传输编码相关标头（Transfer coding）
+
+**Transfer-Encoding 响应标头**指示将有效载荷安全传递给用户所采用的编码形式。Transfer-Encoding 是逐跳标头，即仅应用于两个节点之间的消息传递，而不是所请求的资源本身。一个多节点连接中的每一段都可以应用不同的Transfer-Encoding 值。如果想要将压缩后的数据应用于整个连接，那么请使用端到端传输消息首部 Content-Encoding 。当这个消息首部出现在 HEAD 请求的响应中，而这样的响应没有消息体，那么它其实指的是应用在相应的 GET 请求的应答的值。可能的取值有，且允许以逗号分隔的多值：
+1. chunked：数据以一系列分块的形式进行发送。 Content-Length 首部在这种情况下不被发送。在每一个分块的开头需要添加当前分块的长度，以十六进制的形式表示，后面紧跟着 '\r\n' ，之后是分块本身，后面也是'\r\n' 。终止块是一个常规的分块，不同之处在于其长度为 0。终止块后面是一个挂载（trailer），由一系列（或者为空）的实体消息首部构成。这在将大量数据发送到客户端并且在请求完全处理之前未知响应的总大小时非常有用。服务器会直接向客户端发送数据，而无需缓冲响应或确定确切长度，从而改善了延迟。分块传输与范围请求是兼容的，可以单独或搭配使用。
+2. compress：采用 Lempel-Ziv-Welch (LZW) 压缩算法。这种内容编码方式已经被大部分浏览器弃用，部分因为专利问题（这项专利在 2003 年到期）。
+3. deflate：采用 zlib 结构和 deflate 压缩算法。
+4. gzip：表示采用 Lempel-Ziv coding (LZ77) 压缩算法，以及 32 位 CRC 校验的编码方式。处于兼容性的考虑，HTTP/1.1 标准提议支持这种编码方式的服务器应该识别作为别名的 x-gzip 指令。
+5. identity：用于指代自身（例如：未经过压缩和修改）。除非特别指明，这个标记始终可以被接受。
+
+**TE 请求标头**用来指定用户代理希望使用的传输编码类型。(可以将其非正式称为 Accept-Transfer-Encoding)。可能的标记取值（每个标记后可接质量价值（Quality values）`;q=<q>` 作权重）：
+1. gzip：表示采用 Lempel-Ziv coding (LZ77) 压缩算法，以及 32 位 CRC 校验的编码方式。
+2. compress：采用 Lempel-Ziv-Welch (LZW) 压缩算法。
+3. deflate：采用 zlib 结构和 deflate 压缩算法。
+4. trailers：表示客户端期望在采用分块传输编码的响应中接收挂载(trailer )首部。
+
+**Trailer 响应首部**（Trailer: header-names）允许发送方在分块发送的消息后面添加额外的元信息，这些元信息可能是随着消息主体的发送动态生成的，比如消息的完整性校验，消息的数字签名，或者消息经过处理之后的最终状态等。header-names是出现在分块信息挂载部分的消息首部。以下首部字段不允许出现：
+1. 用于信息分帧的首部 (例如Transfer-Encoding 和 Content-Length),
+2. 用于路由用途的首部 (例如 Host)，
+3. 请求修饰首部 (例如控制类和条件类的，如Cache-Control，Max-Forwards，或者 TE)，
+4. 身份验证首部 (例如 Authorization 或者 Set-Cookie)，
+5. Content-Encoding, Content-Type, Content-Range，以及 Trailer 自身。
 
 ## HTTP压缩
 
+数据压缩是提高 Web 站点性能的一种重要手段。数据压缩会在三个不同的层面发挥作用：
+1. **文件格式压缩**：某些格式的文件会采用特定的优化算法进行压缩。每一种文件类型都会存有冗余（即浪费的空间）。文件的压缩算法大致分为两类：
+    1. 无损压缩。在压缩与解压缩的循环期间，不会对要恢复的数据进行修改。复原后的数据与原始数据是一致的（比特与比特之间一一对应）。对于图片文件来说，gif 或者 png 格式的文件就是采用了无损压缩算法。
+    2. 有损压缩。在压缩与解压缩的循环期间，会对原始数据进行修改，但是会（希望）以用户无法觉察的方式进行。网络上的视频文件通常采用有损压缩算法，jpeg 格式的图片也是有损压缩。
+    3. 特定的文件格式既可以采用无损压缩算法，又可以采用有损压缩算法，例如 webp，并且有损压缩算法可以对压缩比率进行配置，当然这会导致压缩品质的不同。为使站点获得更好的性能，理想情况是在保持可以接受的品质水准的前提下，压缩比率尽可能得高。对于图片来说，通过压缩工具生成的图片对于 Web 应用来说，优化程度可能依然不够高。一般建议选用在保持所要求的品质的前提下压缩比率尽可能高的工具。
+2. **端到端压缩**：在HTTP 协议层面会进行通用数据加密，即数据资源会以压缩的形式进行端到端传输。端到端压缩技术指的是消息主体的压缩是在服务器端完成的，并且在传输过程中保持不变，无论中间节点如何，直到抵达客户端。建议对除了已经经过压缩的文件如图片、音频和视频文件之外的其他类型的文件均进行端到端压缩。
+
+    ![](../public/basics/http/114.png)
+
+    1. 浏览器和服务器通过主动协商机制：浏览器发送 Accept-Encoding 标头（包含有它所支持的压缩算法，以及各自的优先级），服务器从中选择一种对响应的消息主体进行压缩，并且发送 Content-Encoding 标头来告知所选择的算法。由于该内容协商过程是基于编码类型来选择资源的展现形式的，在响应时，服务器至少发送一个包含 Accept-Encoding 的 Vary 标头，这样，缓存才能够缓存资源的不同表示形式。
+
+    ![](../public/basics/http/115.png)
+
+    2. Apache 服务器支持数据压缩，有 mod_deflate可使用；nginx 中有ngx_http_gzip_module 模块；在 IIS 中则可以使用 `<httpCompression>` 元素。
+3. **逐跳压缩**：在网络连接层面，数据压缩发生在 HTTP 连接的两个节点之间。这里的压缩指的不是对源头服务器上的资源的压缩，以此来创建一份特定的展现形式然后进行传输，而是对客户端与服务器端之间的任意两个节点（在单次转发层面使用传输编码和压缩非常罕见，以至于大多数服务器，例如 Apache、Nginx 或 IIS，没有简单的方法来配置它。此类配置通常发生在代理服务器层面）之间传递的消息的主体的压缩。在两个相邻的中间节点之间的连接上，可能会应用不同的压缩方式。
+
+    ![](../public/basics/http/116.png)
+
+    1. 节点使用 TE 标头（包含有它所支持的压缩算法，以及各自的优先级）发送请求，另外一个节点则从中选择合适的算法进行应用，然后在 Transfer-Encoding 标头中指出它所选择的方法。在实际应用中，逐跳压缩对于服务器和客户端来说是不可见的，并且很少使用。TE 标头和 Transfer-Encoding 标头最常用来发送分块响应，允许在获得资源的确切长度之前就可以开始传输。
+
+    ![](../public/basics/http/117.png)
+
 ## HTTP 重定向
+
+URL 重定向（也称为 URL 转发）是一种为页面、表单或者整个 Web 站点/应用提供多个 URL 地址的技术。
+
+定义URL重定向的方法有：
+1. HTTP 重定向（HTTP redirect）：是HTTP对URL 重定向操作的一种特殊类型的响应。在 HTTP 协议中，重定向操作由服务器向请求发送特殊的重定向响应而触发，除额外的往返操作存在性能损失外，该操作对于用户来说是透明的。重定向响应包含以 3 开头的状态码，以及 Location 标头（保存着重定向的 URL）。浏览器在接收到重定向时会立刻加载 Location 标头中提供的新 URL。HTTP 协议的重定向机制永远最先触发。HTTP重定向分为三个类型：
+
+    ![](../public/basics/http/118.png)
+
+    1. **临时重定向**：请求的资源无法从其标准地址访问，但是却可以从另外的地方访问时使用。搜索引擎和其他爬虫不会记录新的、临时的 URL。在创建、更新或者删除资源的时候，临时重定向也可以用于显示临时性的进度页面。
+        1. 响应302	Found。GET 方法不会发生变更。其他方法有可能会变更为 GET 方法（（规范并不打算允许方法更改，但现有的用户代理确实会更改其方法）。典型的应用场景是由于不可预见的原因该页面暂不可用。 
+        2. 响应303	See Other。GET 方法不会发生变更，其他方法会变更为 GET 方法（消息主体丢失）。典型应用场景是用于 PUT 或 POST 请求完成之后重定向，防止由于页面刷新导致的操作的重复触发。 
+        3. 响应307	Temporary Redirect	。方法和消息主体都不发生变化。创建 307 是为了消除使用非 GET 方法时行为的歧义。典型的应用场景是由于不可预见的原因该页面暂不可用，当站点支持非 GET 方法的链接或操作时，该状态码优于 302。
+    2. **永久重定向**：表示原 URL 不应再被使用，而选用新的 URL 替换它。搜索引擎机器人、RSS 阅读器以及其他爬虫将更新资源原始的 URL。
+        1. 响应301 Moved Permanently。GET 方法不会发生变更，其他方法有可能会变更为 GET 方法（规范并不打算允许方法更改，但现有的用户代理确实会更改其方法）。典型应用场景是网站重构。
+        2. 响应308 Permanent Redirect。方法和消息主体都不发生变化。创建 308 是为了消除使用非 GET 方法时行为的歧义。典型应用场景是使用非 GET 链接/操作重构网站。
+    3. 特殊重定向：
+        1. 响应300 Multiple Choice。这是手动重定向，即将消息主体以 Web 页面形式呈现在浏览器中，列出了可能的重定向链接，用户可以从中进行选择。相比把所有的选择在消息主体的 HTML 页面中列出，更鼓励将机器可读的选择作为带有 rel=alternate 的Link标头发送。
+        2. 响应304 Not Modified。缓存失效但资源未发生变更时，会使页面跳转到本地的缓存副本中。典型应用场景是更新缓存的条件请求，表示本地缓存可继续使用。
+2. 借助 HTML 的 `<meta>` 元素的 HTML 重定向机制：在页面的 `<head>` 中添加 http-equiv="Refresh" content="0; URL=http://example.com/" /> 元素，当显示页面的时浏览器会检测该元素，然后跳转到指定的http://example.com/ 页面，其中content 属性的值开头是的数字指示浏览器延迟跳转的秒数（建议始终将其设置为 0 来获取更好的无障碍体验）。应用场景是自己不能控制服务器，且仅适用于 HTML 页面（或类似的页面），然而并不能应用于图片或者其他类型的内容。HTML 的重定向机制 (`<meta>`) 会在没有任何 HTTP 协议重定向的情况下触发。如果可能，请采用 HTTP 协议的重定向机制，而不要使用 `<meta>` 元素重定向。
+3. 借助 DOM 的 JavaScript 重定向机制：设置 window.location 的属性值，然后加载新的页面。与 HTML 重定向机制类似，它并不适用于所有类型的资源，并且显然只有在执行 JavaScript 的客户端上才能使用。
+
+注意应该尽可能地限制其使用数量，因为每一次重定向都会带来性能上的开销。**重定向应用场景**：
+1. **域名别称**：理想情况下，一项资源只有一个访问位置，也就是只有一个 URL。但是由于种种原因，需要为资源设定不同的名称
+    1. 扩大站点的用户覆盖面：假如站点位于 www.example.com 域名下，那么通过 example.com 也应该可以访问到。这种情况下，可以建立从 example.com 的页面到 www.example.com 的重定向。此外还可以提供域名常见的同义词，或者该域名容易导致的拼写错误的别称来重定向到网站。
+    2. 迁移到新的域名：公司改名后，你希望用户在搜索旧名称的时候，依然可以访问到应用了新名称的站点
+    3. 强制使用 HTTPS：对网站的 http:// 版本的请求将重定向到网站的 https:// 版本。
+2. **保持链接有效**：当重构 Web 站点的时候，资源的 URL 会发生改变。即便是更新站点内部的链接来匹配新的 URL，也无法控制被外部资源使用的 URL。此时并不想因此而使旧链接失效，因为它们会为你带来宝贵的用户并且帮助优化 SEO，所以需要建立从旧链接到新链接的重定向映射。
+3. **对于不安全请求的临时响应**：不安全的请求会修改服务器端的状态，应该避免用户无意的重复发送它们，如果将响应作为此请求的结果，只需按一下重新加载按钮即可重新发送请求（可能在确认消息之后）。在这种情况下，服务器可以发回包含正确信息的 URL 的 303 See Other响应。如果按下重新加载按钮，则仅重新显示该页面，而不会重复提交不安全的请求。
+4. **对于耗时请求的临时响应**：一些请求的处理会需要比较长的时间，比如有时候 DELETE 请求会被安排为稍后处理。在这种情况下，会返回一个 303 See Other重定向响应，该响应链接到一个页面，表示请求的操作已经被列入计划，并且最终会通知用户操作的进展情况，或者允许用户将其取消。
+
+通用服务器中配置重定向：
+1. Apache：重定向可以在服务器的配置文件中设置，也可以在每一个文件目录的 .htaccess 文件中设置。mod_alias 模块提供了 Redirect 和 Redirect_Match 两种指令来设置，其中Redirect_Match 指令可以通过正则表达式来指定一批受影响的 URL，默认设置的是302响应，可以使用额外参数（要么使用的 HTTP 状态码，比如301，要么设置关键字，比如 permanent ）来设置不同的重定向。mod_rewrite 模块也可以用来设置重定向。
+2. Nginx：可以创建一个server模块进行重定向设置，如果要将重定向应用于目录或者仅是部分页面，则使用 rewrite 指令。
+3. IIS：可以使用 `<httpRedirect>` 元素来配置重定向。
+
+### HTTP 重定向相关标头（Redirects）
+
+**Location 响应标头**（`Location: <url>` 其中 `<url>` 是相对（相对于请求 URL）或绝对 URL）指定的是需要将页面重新定向至的地址。一般在响应码为 3xx 的响应中才会有意义。发送新请求获取 Location 指向的新页面所采用的方法与初始请求使用的方法以及重定向的类型相关：
+1. 303 See Also始终导致请求使用 GET 方法，而 307 Temporary Redirect和 308 Permanent Redirect则不转变初始请求中的所使用的方法；
+2. 301 Permanent Redirect和 302 Found在大多数情况下不会转变初始请求中的方法，不过一些比较早的用户代理可能会引发方法的变更。
+
+以上响应都会带Location 首部。此外，状态码为 201 Created的消息也会带有 Location 首部。Location 指定的是一个重定向请求的目的地址（或者新创建的文件的 URL），而Content-Location指向的是经过内容协商后的资源的直接地址，不需要进行进一步的内容协商。Location 对应的是响应，而 Content-Location 对应的是要返回的实体。
 
 ## HTTP 认证
 
+在安全协议中，质询（challenge）是服务器将某些数据发送到客户端，以便每次生成不同的响应。**质询—响应认证协议**是防御**重放攻击**的一种方法。在重放攻击中，攻击者侦听先前的消息，并在以后的时间重新发送它们，以获取与原始消息相同的凭据。
+
+HTTP 认证协议即通用的 HTTP 认证框架是基于质询—响应认证协议的，尽管“Basic”协议未使用实际的质询（realm 始终相同）。服务器可以使用它来质询客户端请求，客户端可以使用它来提供身份验证凭据。质询与响应的工作流程如下：
+1. 服务器端向客户端返回 401（Unauthorized，未被授权的）响应状态码，并在 WWW-Authenticate 响应标头提供如何进行验证的信息，其中至少包含有一种质询方式。
+2. 想要使用服务器对自己身份进行验证的客户端，可以通过包含凭据的 Authorization 请求标头进行验证：通常，客户端会向用户显示密码提示，然后发送包含正确的 Authorization 标头的请求。
+
+![](../public/basics/http/119.png)
+
+以上质询和响应机制可用于代理身份验证，但由于资源身份验证和代理身份验证可以共存，因此需要一组不同的标头和状态码。对于代理，质询状态码为 407 Proxy Authentication Required，其中Proxy-Authenticate 响应标头包含至少一个适用于代理的质询，Proxy-Authorization 请求标头用于向代理提供凭据服务器：
+1. 如果代理服务器收到无效的凭据，它应该响应 401 Unauthorized 或 407 Proxy Authentication Required，用户可以发送新的请求或替换 Authorization 标头字段。
+2. 如果代理服务器接受的有效凭据不足以访问给定的资源，服务器将响应 403 Forbidden 状态码，与 401 Unauthorized 或 407 Proxy Authentication Required 不同的是，该用户无法进行身份验证并且浏览器不会提出新的的尝试。
+3. 在所有情况下，服务器更可能返回 404 Not Found 状态码，以向没有足够权限或者未正确身份验证的用户隐藏页面的存在。
+
+HTTP 认证采用的字符编码：浏览器使用 utf-8 编码用户名和密码。
+
+一个潜在的安全漏洞（现已在浏览器中修复）是跨站点图像的身份验证。从 Firefox 59 开始，从不同来源加载到当前文档的图像资源不再能够触发 HTTP 身份验证对话框，从而防止攻击者能够将任意图像嵌入第三方页面时窃取用户凭据。
+
+通用 HTTP 身份验证框架可以被多个验证方案使用。不同的验证方案会在安全强度以及在客户端或服务器端软件中可获得的难易程度上有所不同。常见的验证方案包括：
+1. Basic：使用用户的 ID/密码作为凭据信息，并且使用 base64 算法进行编码。由于用户 ID 与密码是是以明文的形式在网络中进行传输的（尽管采用了 base64 编码，但是 base64 算法是可逆的），所以Basic验证方案并不安全。basic 验证方案应与 HTTPS/TLS 协议搭配使用。假如没有这些安全方面的增强，那么 basic 验证方案不应该被来用保护敏感或者极具价值的信息。
+    1. 使用 Apache 限制访问和 basic 身份验证：需要 .htaccess 和 .htpasswd 文件。该 .htaccess 文件引用一个 .htpasswd 文件（每行用冒号（:）分隔的用户名和密码）。可以命名 .htpasswd 文件为其他名字，但是应该保证这个文件不被其他人访问(Apache 通常配置阻止访问 .ht* 类的文件)。
+    2. nginx 访问限制和 basic 认证：指定一个要保护的 location 并且 auth_basic 指令提供密码保护区域的名称。而auth_basic_user_file 指令指定包含加密的用户凭据 .htpasswd 文件
+2. Bearer：bearer 令牌通过 OAuth 2.0 保护资源。
+3. Digest：Firefox 93 及更高版本支持 SHA-256 算法。以前的版本仅支持 MD5 散列（不建议）。
+4. HOBA：HTTP Origin-Bound 认证，基于数字签名。
+5. Mutual
+6. Negotiate / NTLM
+7. VAPID
+8. SCRAM
+9. AWS4-HMAC-SHA256：用于 AWS3 服务器验证。
+
+### HTTP认证相关标头（Authentication）
+
+**WWW-Authenticate 响应标头**定义了 HTTP 身份验证的方法（“质询”），它用于获取特定资源的访问权限。该标头是通用的 HTTP 认证框架的一部分，可用于多种身份验证方案。每个“质询”都列出了服务器支持的方案以及为该方案类型添加的额外参数。使用 HTTP 身份验证的服务器将以 401 Unauthorized 响应去响应受保护资源的请求。该响应必须包含至少一个 WWW-Authenticate 标头和至少一个质询，以指示使用哪些身份验证方案访问资源（以及每个特定方案的任意额外的数据）。一个 WWW-Authenticate 标头中允许以逗号分隔的多个质询，一个响应也允许多个 WWW-Authenticate 标头，单个质询的格式为 `WWW-Authenticate: <auth-scheme> realm=<realm> token68 auth-param1=auth-param1-token , ..., auth-paramN=auth-paramN-token。这些方案的 token（<auth-scheme>`）是强制性的，而realm、token68 以及其他参数的存在依赖于所选方案的定义。服务器也可以在其他的响应消息中包含 WWW-Authenticate 标头，以指示提供的凭据可能会影响响应。客户端在接收 WWW-Authenticate 标头之后，通常会提示用户接收凭据，然后重新请求资源。这个新的请求会使用Authorization标头向服务器提供凭据，并针对所选择的“质询”身份验证方法进行合适的编码。客户端应该选择它理解的最安全的质询。
+
+**Authorization 请求标头**（`Authorization: <type> <credentials>`）用于提供服务器验证用户代理身份的凭据，允许访问受保护的资源。Authorization 标头通常在用户代理首次尝试请求受保护的资源（没有携带凭据）之后发送的，但并不总是发送。服务器响应一条 401 Unauthorized 信息，其中包含至少一个 WWW-Authenticate 标头。该标头表示哪些身份验证的方案可用于访问资源（以及客户端使用它们时需要的额外的信息）。用户代理应该从这些提供的身份验证方案中选择它支持的最安全的身份验证方案，并提示用户提供凭据，然后重新获取资源（包含 Authorization 标头中编码的凭据）。
+
+**Proxy-Authenticate 响应标头**（`Proxy-Authenticate: <type> realm=<realm>`，其中 `<type>` 是身份验证方案，`realm=<realm>` 中的 `<realm>` 是对于被保护区域（即安全域）的描述。如果没有指定安全域，客户端通常用一个格式化的主机名来代替）指定了获取**代理服务器**上的资源访问权限而采用的身份验证方式。代理服务器对请求进行验证，以便它进一步传递请求。它需要与 407 Proxy Authentication Required 响应一起发送。
+
+**Proxy-Authorization 请求标头**（`Proxy-Authorization: <type> <credentials>` 其中 `<type>` 是身份验证方案，`<credentials>` 是身份验证的值）包含了用户代理提供给**代理服务器**的用于身份验证的凭证。它通常是在服务器返回407 Proxy Authentication Required 响应状态码及 Proxy-Authenticate 首部后发送的。在使用basic身份验证方案的时候推荐与 HTTPS 搭配使用，因为其中Base64 编码的安全性相当于将凭证使用明文发送。
+
 ## HTTP CORS（跨源资源共享）
+
+出于安全性，浏览器限制脚本内发起的跨源 HTTP 请求。例如，XMLHttpRequest 和 Fetch API 遵循同源策略。这意味着除非响应报文包含了正确 CORS 响应头，使用这些 API 的 Web 应用程序只能从加载应用程序的同一个源请求 HTTP 资源。
+
+跨源资源共享（CORS，Cross-Origin Resource Sharing，或通俗地译为跨域资源共享）是一种基于 HTTP 标头的机制，允许服务器指示除其自身之外的任何源（域、方案或端口），浏览器应允许从中加载资源。比如运行在 https://domain-a.com 的 JavaScript 代码使用 XMLHttpRequest 或Fetch API来发起一个到 https://domain-b.com/data.json 的请求。
+
+![](../public/basics/http/120.png)
+
+默认情况下，XMLHttpRequest 或 Fetch具有跨域安全策略限制即只能访问同源资源（协议-域名-端口相同）（可能是浏览器直接限制发起请求，也可能是请求响应被浏览器拦截），跨源会抛出 DOMException “INVALID_ACCESS_ERR” 异常。
+
+浏览器将CORS请求分为两种：简单请求和**非简单请求（即 CORS 预检请求）**。
+
+**满足以下全部条件的请求即简单请求**（在废弃的 CORS 规范中，目前的 Fetch 规范（CORS 的现行定义规范）中不再使用这个词语）：
+1. http方法是get、post、head之一；
+2. 使用CORS规定的安全首部集合中的字段：Accept、Accept-Language、Content-Language、Content-Type （只能是text/plain、multipart/form-data、application/x-www-form-urlencoded之一）、DPR、Downlink、Save-Data、Viewport-Width、Width；
+3. Content-Type 标头所指定的媒体类型的值仅限于下列三者之一： text/plain、multipart/form-data、application/x-www-form-urlencoded。
+4. 请求中的任意XMLHttpRequestUpload 对象均没有注册任何事件监听器；XMLHttpRequestUpload 对象使用 XMLHttpRequest.upload 属性访问；
+5. 请求中没有使用 ReadableStream 对象。
+
+![](../public/basics/http/121.png)
+
+简单请求使用 Origin 和 Access-Control-Allow-Origin 就能完成最简单的访问控制。
+
+CORS 预检请求是用于检查服务器是否支持 CORS 即跨域资源共享。“需预检的请求”要求必须首先使用 OPTIONS 方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。"预检请求“的使用，可以避免跨域请求对服务器的用户数据产生未预期的影响。**真正的POST 请求不会携带 Access-Control-Request-* 标头，它们仅用于 OPTIONS 请求。如果浏览器发现服务端并不支持该请求，则会在控制台抛出错误**。
+
+![](../public/basics/http/122.png)
+
+**并不是所有浏览器都支持预检请求的重定向**。如果一个预检请求发生了重定向，一部分浏览器将报告错误。CORS 最初要求浏览器具有该行为，不过在后续的修订中废弃了这一要求。但并非所有浏览器都实现了这一变更，而仍然表现出最初要求的行为。在浏览器的实现跟上规范之前，有两种方式规避上述报错行为：
+1. 更改服务器端行为以避免预检和避免重定向。
+2. 更改请求使其成为不会导致预检的简单请求。
+
+如果难以做到，另一个方法是：发出一个简单的请求，使用 XMLHttpRequest.responseURL或 Fetch API 的 Response.url来确定实际预检请求最终到达的UR，然后使用该 URL 发出实际的请求。但如果请求是由于存在 Authorization 字段而引发了预检请求，则只能由服务端进行更改。
+
+默认情况下，跨源 XMLHttpRequest 或 Fetch 请求，浏览器不会发送身份凭证信息（cookie、HTTP认证及客户端SSL证明等），而且不能使用 setRequestHeader() 设置自定义头部以及调用 getAllResponseHeaders() 方法总会返回空字符串。如果要发送凭证信息，需要设置 XMLHttpRequest 对象的withCredentials标志，或在构造 Request 对象时设置。
+
+对于携带凭据的简单请求，如果服务器端的响应中未携带 Access-Control-Allow-Credentials: true，浏览器将不会把响应内容返回给请求的发送者。
+
+CORS 预检请求不能包含凭据。预检请求的响应必须指定 Access-Control-Allow-Credentials: true 来表明可以携带凭据进行实际的请求。某些企业身份验证服务要求在预检请求中发送 TLS 客户端证书，这违反了 Fetch 规范。Firefox 87 允许通过将首选项network.cors_preflight.allow_client_cert设置为true启用此不合规行为。基于 Chromium 的浏览器目前始终在 CORS 预检请求中发送 TLS 客户端证书。在响应附带身份凭证的请求时，服务器不能将 Access-Control-Allow-Origin 的值设为通配符 `“*”`，而应将其设置为特定的域；服务器不能将 Access-Control-Allow-Headers 的值设为通配符 `“*”`，而应将其设置为标头名称的列表；服务器不能将 Access-Control-Allow-Methods 的值设为通配符 `“*”`，而应将其设置为特定请求方法名称的列表。
+
+当发出跨源请求时，第三方 cookie 策略（受 SameSite 属性控制）仍将适用。无论如何改变CORS相关的服务器和客户端的设置，该策略都会强制执行，即强制执行的 cookie 策略可能会阻止发出任何携带凭据的请求。
+
+**浏览器CORS允许的应用场景**：
+1. 由 XMLHttpRequest 或 Fetch 发起的跨源 HTTP 请求
+2. Web 字体（CSS 中通过 @font-face 使用跨源字体资源），因此，网站就可以发布 TrueType 字体资源，并只允许已授权网站进行跨站调用。
+3. WebGL 贴图。
+4. 使用 drawImage 将 Images/viedo 画面绘制到 Canvas。
+5. 来自图像的 CSS 图形。
+
+检测XMLHttpRequest是否支持CORS的最简单方式：检查是否存在 withCredentials属性。再结合检测 XDomainRequest 对象是否存在。
+
+### HTTP CORS相关标头
+
+**Access-Control-Allow-Origin 响应标头**指定了该响应的资源是否被允许与给定源共享。可能的取值有：
+1. `*`：对于不包含凭据的请求，服务器会以 `“*”` 作为通配符，从而允许任意来源的请求都具有访问资源的权限。尝试使用通配符来响应包含凭据的请求会导致错误（Reason: Credential is not supported if the CORS header 'Access-Control-Allow-Origin' is '*'）。
+2. `<origin>`：指定且只能指定一个来源。因此，如果需要将可能的 Access-Control-Allow-Origin 值限制在一组允许的源，则需要服务器端的代码检查 Origin 请求标头的值，将其与允许的来源列表进行比较，如果Origin值在列表中，才将 Access-Control-Allow-Origin 设置为与 Origin 标头相同的值。如果服务器未使用通配符“*”，而是指定了明确的来源，那么为了向客户端表明服务器的返回会根据 Origin 请求标头而有所不同，必须在 Vary 响应标头中包含 Origin。
+3. null：null 不应该被使用，返回 Access-Control-Allow-Origin: null 似乎是安全的，但任何使用非分级协议（如 data: 或 file:）的资源和沙盒文件的源的序列化都被定义为‘null’。许多用户代理将授予这类文件对带有 Access-Control-Allow-Origin: null 标头的响应的访问权，而且任何源都可以用 null 源创建一个恶意文件。因此，应该避免将 ACAO 标头设置为‘null’值。
+
+**Access-Control-Allow-Credentials 响应标头**（唯一有效值true，且区分大小写，如果不需要 credentials，请完全省略此标头，而不是将其值设置为 false）用于在请求要求包含 credentials（Request.credentials 的值为 include）时，告知浏览器是否可以将对请求的响应暴露给前端 JavaScript 代码。Access-Control-Allow-Credentials 标头需要与 XMLHttpRequest.withCredentials 或 Fetch API 的 Request() 构造函数中的 credentials 选项结合使用。Credentials 必须在前后端都被配置（即 Access-Control-Allow-Credentials header 和 XHR 或 Fetch request 中都要配置）才能使带 credentials 的 CORS 请求成功。因此，若请求带了 credentials，如果Access-Control-Allow-Credentials响应头没有随资源返回，响应就会被浏览器忽视，不会返回到 web 内容。
+
+**Access-Control-Allow-Headers 响应标头**（`Access-Control-Allow-Headers: [<header-name>[, <header-name>]*]`）用于预检请求中，它列出了将会在正式请求的 Access-Control-Request-Headers 请求标头中出现的首部列表，用逗号分隔。简单请求标头始终是被支持的，不需要在Access-Control-Allow-Headers中特意列出。对于没有凭据的请求（没有 HTTP cookie 或 HTTP 认证信息的请求），值“ *”仅作为特殊的通配符值。在具有凭据的请求中，它被视为没有特殊语义的文字标头名称“ *”。请注意，Authorization标头不能使用通配符，并且始终需要显式列出。
+
+**Access-Control-Allow-Methods 响应标头**（`Access-Control-Allow-Methods: <method>, <method>, ...`）在对预检请求的响应中列出了客户端所要访问的资源允许使用的方法或方法列表。对于没有凭据的请求（没有 HTTP cookie 或 HTTP 认证信息的请求），值“ *”仅作为特殊的通配符值。在具有凭据的请求中，它被视为没有特殊语义的文字标头名称“ *”。
+
+**Access-Control-Expose-Headers 响应标头**（`Access-Control-Expose-Headers: [<header-name>[, <header-name>]*]`）允许服务器指示那些响应标头可以暴露给前端 JavaScript 代码，以响应跨源请求，用逗号分隔。默认情况下，仅暴露 CORS 安全列表的响应标头。如果想要让客户端可以访问到其他的标头，服务器必须将它们在 Access-Control-Expose-Headers 里面列出来。对于没有凭据的请求（没有 HTTP cookie 或 HTTP 认证信息的请求），值“ *”仅作为特殊的通配符值。在具有凭据的请求中，它被视为没有特殊语义的文字标头名称“ *”。请注意，Authorization标头不能使用通配符，并且始终需要显式列出。
+
+**Access-Control-Max-Age 响应标头**（`Access-Control-Max-Age: <delta-seconds>`）表示预检请求的返回结果，即 Access-Control-Allow-Methods 和Access-Control-Allow-Headers 提供的信息可以被缓存多久（秒）。在有效时间内，浏览器无须为同一请求再次发起预检请求。在 Firefox 中，上限是 24 小时 （即 86400 秒）。 在 Chromium v76 之前， 上限是 10 分钟（即 600 秒）。 从 Chromium v76 开始，上限是 2 小时（即 7200 秒）。 Chromium 同时规定了一个默认值 5 秒。如果值为 -1，表示禁用缓存，则每次请求前都需要使用 OPTIONS 预检请求。
+
+**Access-Control-Request-Headers 请求标头**（`Access-Control-Request-Headers: <header-name>, <header-name>, ...`）出现于预检请求中，用于通知服务器在真正的请求中会采用哪些请求头。Access-Control-Allow-Headers 将响应该标头。
+
+**Access-Control-Request-Method 请求标头**（`Access-Control-Request-Method: <method>`）出现于预检请求中，用于通知服务器在真正的请求中会采用哪种 HTTP 方法。因为预检请求所使用的方法总是 OPTIONS ，与实际请求所使用的方法不一样，所以这个请求头是必要的。
+
+**Origin 请求标头**（`Origin: null或Origin: <scheme>://<hostname>或Origin: <scheme>://<hostname>:<port>`）表示了请求的来源（协议、主机、端口）。例如，如果一个用户代理需要请求一个页面中包含的资源，或者执行脚本中的 HTTP 请求（fetch），那么该页面的来源（origin）就可能被包含在这次请求中。null表示请求的来源是“隐私敏感”的，或者是 HTML 规范定义的不透明来源。`<scheme>` 是请求所使用的协议，通常是 HTTP 协议或者它的安全版本（HTTPS 协议）。`<hostname>` 是来源的域名或 IP 地址。`<port>` 是可选的，表示服务器正在监听的端口号，缺省为服务的默认端口（对于 HTTP 而言，默认端口为 80）。Origin 标头与 Referer 标头类似，但前者不会暴露 URL 的 path 部分，而且其可以为 null 值。其用于为源站的请求提供“安全上下文”，除非源站的信息敏感或不必要的。从广义上讲，用户代理会在除no-cors 模式下的跨源请求和除GET、HEAD以外的同源请求中添加 Origin 请求标头。Origin 标头在以下情况中（不完整）会被设置为 null：
+1. 请求来源的协议不是 http、https、ftp、ws、wss 或 gopher 中的任意一个（如：blob、file 和 data）。
+2. 跨源的图像或媒体，包括：`<img>`、`<video>` 和 `<audio>` 元素。
+3. 属于以下几种文档类型的：使用 createDocument() 创建的、通过 data: URL 生成的或没有创建者的浏览上下文的。
+4. 跨源重定向。
+5. 没有为 sandbox 属性设置 allow-same-origin 值的 iframe。
+6. 响应（response）是网络错误。
+
+**Timing-Allow-Origin 响应标头**（`Timing-Allow-Origin:[<origin>[, <origin>]*]`）用于指定以允许访问Resource Timing API提供的相关信息的特定站点，否则这些信息会由于跨源限制将被报告为零。*表示允许所有域都具有访问定时信息的权限。
+
+### 常见CORS错误及解决方案
+
+当请求因 CORS 失败时，浏览器会在其控制台中显示消息。常见的 CORS 错误消息：
+1. **Reason: CORS disabled**。发送了一个需要使用 CORS 的请求，但在用户的浏览器中禁用了 CORS。发生这种情况时，用户需要在浏览器的首选项中重新打开 CORS，比如Firefox的禁用 CORS 的首选项是 content.cors.disable。
+2. **Reason: CORS header 'Access-Control-Allow-Origin' does not match 'xyz'**。发出请求的源不能与 Access-Control-Allow-Origin 标头允许的源相匹配。如果响应包含多个 Access-Control-Allow-Origin 标头，也会发生此错误。如果代码使用 CORS 请求访问的服务在自己的控制之下，请确保在它的 Access-Control-Allow-Origin 标头中包含了当前源。此外，确定响应中只有一个Access-Control-Allow-Origin，并且它只能包含一个单独的源。在 Apache 中，将Header set Access-Control-Allow-Origin 'origin' 行添加到服务器的配置中（在相应的 `<Directory>`、`<Location>`、`<Files>` 或 `<VirtualHost>` 部分中）。配置通常位于 .conf 文件中（httpd.conf 和 apache.conf 是这些文件的通用名称）或者位于 .htaccess 文件中。而在 Nginx 中，对应的配置为add_header 'Access-Control-Allow-Origin' 'origin'。
+3. **Reason: CORS header 'Access-Control-Allow-Origin' missing**：对 CORS 请求的响应缺少必需的 Access-Control-Allow-Origin 标头，该标头用于确定在当前源中的操作是否可以访问资源。如果服务器在自己的控制之下，请将请求站点的源添加到允许访问的域集，方法是将其添加到 Access-Control-Allow-Origin 标头的值。如果要在不使用 * 通配符的情况下让任意站点发出 CORS 请求，服务器必须读取请求的 Origin 标头，将那个值设置为 Access-Control-Allow-Origin 的值，且必须一并设置 Vary: Origin 标头，表明一部分标头由源动态决定。
+4. **Reason: CORS header 'Origin' cannot be added**：用户代理不能把所需的 Origin 标头添加到 HTTP 请求中。所有的 CORS 请求必须有 Origin 标头。例如，如果 JavaScript 代码以增强的权限运行，允许它访问多个域名的内容，则会发生这种情况。
+5. **Reason: CORS preflight channel did not succeed：CORS 请求需要预校验，但是不能执行预校验。原因可能是：a. 一个跨站请求在先前已经进行过预校验，进行重复的校验是不被允许的。请确保代码每次连接只进行一次预校验。b. 预校验请求碰到了通常情况下不应该发生的网络问题。
+6. **Reason: CORS request did not succeed**：使用 CORS 的 HTTP 请求失败，因为 HTTP 连接在网络或协议级别失败。该错误与 CORS 没有直接关系，而是某种基本的网络错误。很多情况下，它是某个浏览器插件（比如广告拦截或隐私保护插件）阻止了请求而引起的。其他可能的原因：a. 尝试访问拥有无效凭证的 https 资源将导致此错误。b. 尝试从 https 源页面访问 http 资源将也会导致此错误。c. 从 Firefox 68 开始，https 页面不允许去访问 http://localhost。d. 服务器不能响应真实的请求（即使它响应了预检请求）。一种情况是正在开发的 HTTP 服务器发生异常停止，而且没有返回任何数据。
+7. **Reason: CORS request external redirect not allowed**：服务器响应了 CORS 请求，并将 HTTP 重定向到与原始请求不同源的 URL 上，这在 CORS 请求期间是不允许的。
+8. **Reason: CORS request not HTTP**：CORS 请求只能用于 HTTP 或 HTTPS URL 方案，但请求指定的 URL 可能是不同类型。这种情况经常发生在 URL 指定本地文件，例如使用了 file:/// 的 URL。来自相同的目录或者子目录的本地文件在历史上被视为同源的。这意味着在测试期间可以从本地目录或子目录加载文件以及它的所有子资源，而不会触发 CORS 错误。但是现在很多浏览器，包括 Firefox 和 Chrome，现在将所有本地文件视为不透明来源（默认）。因此，加载包含本地资源的本地文件现在会导致 CORS 错误。开发者如果想要在本地进行测试，现在要设置一个本地服务器。由于所有的文件都来自同种方案和域（localhost），它们都有相同的源，并不会触发跨源错误。
+9. **`Reason: Credential is not supported if the CORS header 'Access-Control-Allow-Origin' is '*'`**：CORS 请求是在设置了凭证标志的情况下尝试的，但服务端使用通配符（"*"）配置 Access-Control-Allow-Origin 的值，这样是不允许使用凭证的。要在客户端改正这个问题，只需要确保发出 CORS 请求时将凭证标志设置为 false：a. 如果使用 XMLHttpRequest 发出请求，确保未将 withCredentials 设置为 true；b. 如果使用服务器发送事件，确保 EventSource.withCredentials的值为 false（false 为默认值）；c. 如果使用 Fetch API，确保 Request.credentials 的值为 "omit"。如果还不成功，则需要修改服务端的行为，可能需要修改 Access-Control-Allow-Origin 的值，来为客户端所能够加载资源的源予以授权。
+10. **Reason: Did not find method in CORS header 'Access-Control-Allow-Methods'**：CORS 请求使用的 HTTP 方法不包含在响应的 Access-Control-Allow-Methods 标头指定的方法列表中。此标头指定了一个使用逗号分隔的 HTTP 方法列表，当使用 CORS 访问请求中指定的 URL 时，可以使用这些方法；如果请求使用任何其他方法，则会发生此错误。
+11. **Reason: expected 'true' in CORS header 'Access-Control-Allow-Credentials'**：CORS 请求要求服务器允许使用凭据，但是服务器的 Access-Control-Allow-Credentials 标头的值并没有设置为 true。要在客户端改正这个问题，只需要确保发出 CORS 请求时将凭证标志设置为 false：a. 如果使用 XMLHttpRequest 发出请求，确保未将 withCredentials 设置为 true；b. 如果使用服务器发送事件，确保 EventSource.withCredentials的值为 false（false 为默认值）；c. 如果使用 Fetch API，确保 Request.credentials 的值为 "omit"。想要通过更改服务器的配置来消除此错误，请调整服务器的配置以将 Access-Control-Allow-Credentials 标头的值设置为 true。
+12. **Reason: invalid token 'xyz' in CORS header 'Access-Control-Allow-Headers'**：服务器发送的对 CORS 请求的响应包含 Access-Control-Allow-Headers 标头，并且至少含有一个无效的标头名称。这很有可能只能在服务端解决，方法是修改服务器的配置以不再发送带有 Access-Control-Allow-Headers 标头的无效或未知标头名称。
+13. **Reason: invalid token 'xyz' in CORS header 'Access-Control-Allow-Methods'**：服务器发送的对 CORS 请求的响应包含 Access-Control-Allow-Methods 标头信息，并且含有至少一个无效的方法名称。这很有可能只能在服务端解决，方法是修改服务器的配置以不再发送带有 Access-Control-Allow-Methods 标头的无效或未知方法名称。
+14. **Reason: missing token 'xyz' in CORS header 'Access-Control-Allow-Headers' from CORS preflight channel**：尝试预检未明确允许的标头时会发生此错误（即，它不包含在服务器发送的 Access-Control-Allow-Headers 标头指定的列表中）。要解决此问题，需要更新服务器以允许指定的标头，或者需要避免使用该标头。
+15. **Reason: Multiple CORS header 'Access-Control-Allow-Origin' not allowed**：服务器返回了多个 Access-Control-Allow-Origin 标头。这是不允许的。如果有权访问该该服务器，请更改实现以在 Access-Control-Allow-Origin 标头返回该源。且不能发回源列表，因为浏览器仅接受单一的源或者空值。
 
 ## HTTP 权限策略
 
-## HTTP 缓存
+**权限策略**为网站开发人员提供了**明确声明哪些特性可以或不可以在网站上使用的机制**，即定义一组“策略”，限制网站代码可以访问哪些 API，或者修改浏览器对某些特性的默认行为，比如：
+1. 改变手机和第三方视频自动播放的默认行为。
+2. 限制网站使用相机、麦克风、扬声器等敏感设备。
+3. 允许 iframe 使用全屏 API。
+4. 如果项目在视口中不可见则停止对其进行脚本处理以提高性能。
+
+权限策略曾经被称为特性策略（Feature Policy，对应于过去的HTTP标头是Feature-Policy）。
+
+权限策略允许控制哪些源可以使用哪些特性，无论是在顶层页面还是在嵌入的 `<iframe>` 中。脚本会继承其浏览上下文的策略，而不管其源如何。这意味着顶层的脚本会继承主文件的策略。权限策略提供两种指定策略的方法：
+1. Permissions-Policy HTTP 标头，控制收到的响应和页面内任何嵌入的内容（包括 `<iframe>`）。
+2. `<iframe>` 的 allow 属性，控制在特定 `<iframe>` 中使用的特性。allow属性中特性的默认行为总是 src。通过在 allow 属性中包含一个分号分隔的策略指令列表，可以同时控制多个特性。默认情况下，如果一个 `<iframe>` 导航到另一个源，策略就不会应用到 `<iframe>` 导航到的源。通过在 allow 属性中列出 `<iframe>` 导航到的源，应用于原始 `<iframe>` 的许可策略将被应用于 `<iframe>` 导航到的源。
+
+所有 `<iframe>` 都继承其父页的策略。如果 `<iframe>` 有一个 allow 属性，并且父页面有一个 Permissions-Policy 标头，父页面和 allow 属性的策略将被合并，使用最严格的子集。对于一个 `<iframe>` 来说，要启用一种特性，其源必须是在父页和 allow 属性的允许列表中。
+
+### HTTP 权限策略相关标头
+
+**Permissions-Policy 响应标头**（`Permissions-Policy: <directive>=<allowlist>`）提供了一种可以在本页面或包含的 iframe 上启用或禁止浏览器特性的机制。`<directive>` 是应用到allowlist的权限策略指令，指令确定了要控制的特性名称。可能的指令取值有：
+1. accelerometer：控制是否允许当前文档通过 Accelerometer接口收集有关设备加速度的信息。
+2. ambient-light-sensor：控制当前文档是否允许通过 AmbientLightSensor 接口收集有关设备周围环境的光量信息。
+3. autoplay：控制是否允许当前文档自动播放媒体。
+4. battery：控制当前文档是否允许通过 Navigator.getBattery() 获取的 BatteryManager 接口收集有关设备电池的信息。
+5. camera：控制是否允许当前文档使用视频输入设备。
+6. display-capture：控制文档是否允许使用Screen Capture API，即getDisplayMedia()来捕获屏幕内容。
+7. document-domain：控制是否允许当前文档设置 document.domain。
+8. encrypted-media：控制是否允许当前文档使用 Encrypted Media Extension API（EME）。
+9. fullscreen：控制是否允许当前文档使用 Element.requestFullScreen()。
+10. execution-while-not-rendered：控制任务是否应该在未渲染的帧中执行（例如，如果 iframe 被隐藏或设置了 display: none）。具体来说，如果定义的策略在未呈现内容时阻止执行任务呈现，则当该条件为真时，该内容将处于Page Lifecycle API 中定义的冻结状态。这会停止执行可冻结任务，例如 JavaScript 计时器（例如 setTimeout()）和 fetch() 回调。
+11. execution-while-out-of-viewport：控制任务在可见视口之外时是否应在帧中执行。具体来说，如果定义的策略在未呈现内容时阻止执行任务呈现，则当该条件为真时，该内容将处于Page Lifecycle API 中定义的冻结状态。这会停止执行可冻结任务，例如 JavaScript 计时器（例如 setTimeout()）和 fetch() 回调。
+12. gamepad：控制当前文档是否允许使用 Gamepad API。
+13. geolocation：控制是否允许当前文档使用 Geolocation 接口。
+14. gyroscope：控制是否允许当前文档通过Gyroscope接口（陀螺仪）收集有关设备方向的信息。
+15. hid：控制是否允许当前文档使用 WebHID API 连接到不常见或奇异的人机界面设备，例如替代键盘或游戏手柄。具体来说，如果定义的策略阻止 WebHID 使用，则 Navigator.hid 属性将不可用。
+16. identity-credentials-get：控制是否允许当前文档使用Federated Credential Management API (FedCM) ，更具体地说是带有身份选项的 navigator.credentials.get() 方法。
+17. idle-detection：控制是否允许当前文档使用Idle Detection API  来检测用户何时与其设备交互，例如报告聊天应用程序中的“可用”/“离开”状态。
+18. local-fonts：控制是否允许当前文档通过 Window.queryLocalFonts() 方法收集有关用户本地安装的字体的数据。
+19. magnetometer：控制是否允许当前文档通过Magnetometer接口（磁力计）收集有关设备方向的信息。
+20. microphone：控制是否允许当前文档使用音频输入设备。
+21. midi：控制是否允许当前文档使用 Web MIDI API 。
+22. otp-credentials：控制是否允许当前文档使用 WebOTP API 从应用程序服务器发送的特殊格式SMS 消息中请求一次性密码 (OTP)，即通过 navigator.credentials.get({otp: ... ，...}）。
+23. payment：控制是否允许当前文档使用 Payment Request API。
+24. picture-in-picture：控制当前文档是否允许以画中画模式播放视频。
+25. publickey-credentials-create：控制是否允许当前文档使用 Web Authentication API 创建新的 WebAuthn 凭据，即通过 navigator.credentials.create({publicKey})。
+26. publickey-credentials-get：控制是否允许当前文档访问 Web Authentication API 以检索公钥凭据，即通过 navigator.credentials.get({publicKey})。
+27. screen-wake-lock：控制当前文档是否允许使用 Screen Wake Lock API 来指示设备不应调暗或关闭屏幕。
+28. serial：控制当前文档是否允许使用 Web Serial API与串行设备进行通信，即通过串行端口直接连接，或通过USB或蓝牙设备模仿串行端口。
+29. speaker-selection：控制当前文档是否允许枚举和选择音频输出设备（扬声器、耳机等）。具体来说，MediaDevices.enumerateDevices() 不会返回音频输出类型的设备。MediaDevices.selectAudioOutput() 不会显示用于选择音频输出的弹出窗口，并且返回的 Promise 将拒绝并返回 NotAllowedError 类型的 DOMException。如果调用音频输出，HTMLMediaElement.setSinkId() 和 AudioContext.setSinkId() 将抛出 NotAllowedError。
+30. storage-access：控制是否允许在第三方上下文中加载的文档（即嵌入 `<iframe>` 中）使用Storage Access API来请求访问未分区的 cookie。默认情况下，用户代理会阻止第三方上下文中加载的站点访问未分区的 cookie，以提高隐私性（例如，防止跟踪）。
+31. usb：控制当前文档是否允许使用WebUSB API。具体来说，如果定义的策略阻止 WebHID 使用，则 Navigator.usb 属性将不可用。
+32. web-share：控制是否允许当前文档使用 Web Share API 的 Navigator.share() 方法将文本、链接、图像和其他内容共享到用户选择的任意目的地。
+33. xr-spatial-tracking：控制是否允许当前文档使用 WebXR Device API。具体来说，devicechange 事件不会在 navigator.xr 对象上触发。navigator.xr.isSessionSupported() 和 navigator.xr.requestSession() 调用将返回一个 Promise，该 Promise 会被拒绝，并出现 SecurityError 类型的 DOMException。
+
+**`<allowlist>` 允许列表**是该特性应该被控制的源列表，可以为所有或特定的源启用一种特性，或者阻止它在所有源中的使用。它包含一个或多个以下值，这些值用空格分隔在括号中，在支持的情况下，可以在权限策略源中包含通配符。这就意味着，无需在allowlist中明确指定多个不同的子域，而是可以在单个源中使用通配符指定所有子域：
+1. *：本文档和所有嵌套浏览上下文（`<iframe>`）都允许使用该功能，无论其来源如何。
+2. ()：空允许列表，表示该功能在顶级和嵌套浏览上下文中被禁用。 `<iframe>` 的allow属性的等效值是“none”。
+3. self：该功能仅在本文档以及同一源的所有嵌套浏览上下文 (`<iframe>`) 中允许。嵌套浏览上下文中的跨源文档不允许使用该功能。self 可以被视为 https://your-site.example.com 的简写。`<iframe>` 的allow属性的等效值是 self。
+4. src：只要加载到该 `<iframe>` 中的文档与其 src 属性中的 URL 来自同一来源，则允许在该 `<iframe>` 中使用该功能。此值仅用于 `<iframe>` allow 属性，也是 `<iframe>` 中的默认 allowlist 值。
+5. `“<origin>”`：特定来源允许使用该功能（例如，“https://a.example.com”）。源应该用空格分隔。请注意，`<iframe>` allow属性中的源不加引号。
+6. 值 * 和 () 只能单独使用，而 self 和 src 可以与一个或多个源结合使用。
+
+## HTTP缓存
+
+HTTP 缓存会存储与请求关联的响应，并将存储的响应复用于后续请求。可复用性的优点：
+1. 由于不需要将请求传递到源服务器，客户端和缓存和缓存越近，响应速度就越快，比如浏览器本身为浏览器请求存储缓存。
+2. 当响应可复用时，源服务器不需要处理请求（解析请求和路由请求、根据 cookie 恢复会话、查询数据库以获取结果或渲染模板引擎），降低了服务器上的负载。
+
+HTTP 缓存分为**私有缓存**和**共享缓存**。
+
+**私有缓存**是绑定到特定客户端的缓存，比如浏览器缓存。由于存储的响应不与其他客户端共享，因此私有缓存（通过设置Cache-Control:private）可以存储该用户的个性化响应（个性化内容通常由 cookie控制，但 cookie 的存在并不能表明它是私有的，也不会使响应成为私有的），从而避免无意的信息泄露。
+
+**共享缓存**位于客户端和服务器之间，可以存储能在用户之间共享的响应，旨在减少到源服务器的流量。因此，**如果多个相同的请求同时到达共享缓存，中间缓存将代表自己将单个请求转发到源，然后源可以将结果重用于所有客户端，这称为请求折叠**。当请求同时到达时会发生请求折叠，因此即使响应中给出了max-age=0 或 no-cache，它也会被重用。如果响应是针对特定用户个性化的，并且不希望它在折叠中共享，则应添加 private 指令。如果响应具有 Authorization 标头，则它不能存储在HTTP 缓存中，除非设置Cache-Control: public，而且也只有在设置了 Authorization 标头时需要存储响应才应使用 public 指令，否则不需要，因为只要给出了 max-age，响应就会存储在共享缓存中。**共享缓存则分为代理缓存和托管缓存**。
+
+![](../public/basics/http/123.png)
+
+1. 代理缓存：由代理实现，目的是减少网络流量，通常不由服务开发人员管理，而必须由恰当的 HTTP 标头等控制，然而过去没有正确理解 HTTP 缓存标准的代理缓存实现经常给开发人员带来问题。Kitchen-sink 标头（即Cache-Control: no-store, no-cache, max-age=0, must-revalidate, proxy-revalidate）用于尝试解决不理解当前 HTTP 缓存规范指令（比如no-store指令）的“已过时且未更新的代理缓存”实现。随着HTTPS的普遍以及客户端-服务器通信加密，在许多情况下，路径中的代理缓存只能传输响应而不能充当缓存，因此无需担心过时的代理缓存实现甚至无法看到响应。此外，如果 TLS 桥接代理通过在 PC 上安装来自组织管理的 CA（证书颁发机构）证书，以中间人方式解密所有通信并执行访问控制等，则可以查看响应的内容并将其缓存。然而，由于CT（证书透明度）的普遍，并且某些浏览器仅允许使用SCT（签名证书时间戳）颁发的证书，因此该方法需要应用企业策略。在这样的受控环境下，无需担心代理缓存“过时且未更新”。
+2. 托管缓存：由服务开发人员明确部署，以降低源服务器负载并有效地交付内容，比如反向代理、CDN以及与缓存 API 结合的service worker。很难长时间的缓存主要资源（通常是 HTML 文档），因为如果仅使用 HTTP 缓存规范中的标准指令，当服务器上的内容更新时，无法主动删除缓存内容。但是，可以通过部署托管缓存（CDN 或 service worker）来实现（允许通过 API 或仪表板操作清除缓存的 CDN 将允许通过存储主要资源并仅在服务器上发生更新时显式清除相关缓存来实现更积极的缓存策略或者 service worker 在服务器上发生更新时删除缓存 API 中的内容）。
+
+![](../public/basics/http/124.png)
+
+缓存的默认行为，即对于没有 Cache-Control 的响应，是根据“启发式缓存”进行隐式缓存，复用的时长则取决于客户端的实现，但规范建议存储后大约 10%。如今，基本上所有响应都建议显式指定 Cache-Control 标头。
+
+存储的 HTTP 响应有两种状态，分别是fresh（表示响应仍然有效，可以重复使用）和stale（表示缓存的响应已经过期）。状态确定的标准是自响应生成以来经过的时间age，由存储响应的缓存进行计算，当响应存储在共享缓存中时，应该使用Age标头将它的age通知到客户端：
+
+![](../public/basics/http/125.png)
+
+stale 响应不能重用，但不会立即被丢弃，HTTP 通过使用包含 If-Modified-Since 或 If-None-Match 请求标头的条件请求询问源服务器资源是否更新将 stale 响应转换为 fresh 响应的机制称为**验证**或**重新验证**。其中If-Modified-Since对应缓存响应的Last-Modified响应标头的值（服务器可以从操作系统的文件系统中获取修改时间，但存在时间格式复杂且难以解析，分布式服务器难以同步文件更新时间的问题），If-None-Match对应缓存响应的 ETag 响应标头的值（服务器生成的任意值。服务器对于生成值没有任何限制，因此服务器可以根据它们选择的任何方式自由设置值，比如主体内容的哈希或版本号）。在缓存重新验证期间，如果 ETag 和 Last-Modified 都存在，则 ETag 优先。因此，如果只考虑缓存，可能会认为 Last-Modified 是不必要的。然而，Last-Modified 不仅仅对缓存有用；相反，它是一个标准的 HTTP 标头，内容管理系统(CMS) 也使用它来显示上次修改时间，用于爬虫调整爬取频率以及其他各种目的。所以考虑到整个 HTTP 生态系统，最好同时提供 ETag 和 Last-Modified。如果资源未改变（服务器为请求的资源确定的 ETag 标头的值与请求中的 If-None-Match 值相同或者服务器为请求的资源确定的Last-Modified与If-Modified-Since不同），服务器将响应 304 Not Modified，没有响应体，传输大小非常小，客户端收到响应后将存储的stale响应恢复为fresh状态。如果已改变（服务器确定请求的资源现在应该具有不同的 ETag 值或者服务器为请求的资源确定的Last-Modified与If-Modified-Since相同），服务器将其改为 200 OK 和资源的最新版本进行响应。
+
+在 HTTP/1.0 中，有效期是通过 Expires 标头来指定的。Expires 标头使用明确的时间指定缓存的生命周期。然而，时间格式难以解析，发现了许多实现错误，并且有可能通过故意移动系统时钟来引发问题；因此，在 HTTP/1.1 中，Cache-Control 采用了Cache-Control的max-age指令用于指定经过的时间。如果 Expires 和 Cache-Control: max-age 都可用，则 max-age 为首选，而且，由于 HTTP/1.1 已被广泛使用，无需特地提供 Expires。
+
+默认情况下响应基于它们的 URL区分，即使是具有相同的 URL的响应的内容并不总是相同的，尤其是在执行内容协商时，来自服务器的响应可能取决于 Accept、Accept-Language 和 Accept-Encoding 请求标头的值。可以通过在 Vary 标头的值中添加内容协商相关的标头，针对它们进行单独缓存响应。但不建议在 Vary 标头的值中添加User-Agent标头来实现基于用户代理提供内容优化（比如，响应式设计），因为User-Agent 请求标头通常具有非常多的变体，这大大降低了缓存被重用的机会，为之代替的应该是基于特征检测来改变行为的方法。对于使用 cookie来防止其他人重复使用缓存的个性化内容的应用程序，应该指定 Cache-Control: private 而不是为 Vary 指定 cookie。
+
+如果不希望重用响应，而是希望始终从服务器获取最新内容，则可以在Cache-Control中添加 no-cache 指令强制客户端在重用任何存储的响应之前发送验证请求。如果服务端不支持条件请求，Cache-Control: no-cache可以强制客户端每次都访问服务端，也就总是得到最新的 200 OK 响应。Cache-Control: max-age=0, must-revalidate 与 Cache-Control:no-cache 具有相同的含义，其中max-age=0 意味着响应立即stale，而 must-revalidate 意味着stale后不得在没有重新验证的情况下重用它。使用max-age=0 是解决 HTTP/1.1 之前的许多实现无法处理 no-cache 指令。no-cache 指令并不会阻止响应的存储，而no-store 指令会阻止存储响应但不会删除相同 URL 的任何已存储响应（即返回 no-store 不会阻止已存储的响应被重用），但不建议随意授予 no-store，因为失去了 HTTP 和浏览器所拥有的许多优势，包括浏览器的后退/前进缓存。
+
+浏览器执行验证即绕过缓存响应的操作有（**正常**）**重新加载**和**强制重新加载**。
+
+1. **（正常）重新加载**可以通过在Fetch API中请求的 cache 模式设置为 no-cache 重现。请求通过 If-None-Match 和 If-Modified-Since 进行验证，出于向后兼容的原因，浏览器在重新加载期间使用max-age=0——因为在 HTTP/1.1 之前的许多过时的实现中不理解 no-cache。浏览器重新加载期间发送的 HTTP 请求的简化如下所示：
+
+![](../public/basics/http/126.png)
+
+2. **强制重新加载**可以通过在Fetch API中请求的cache 模式设置为reload重现。这是带有 Cache-Control: no-cache 的非条件请求，因此可以确定总是会从源服务器获得 200 OK。浏览器强制重新加载期间的 HTTP 请求的简化如下所示：
+
+![](../public/basics/http/127.png)
+
+最适合缓存的资源是静态不可变文件，其内容永远不会改变，应该被赋予一个较长的 max-age，方法是使用缓存破坏，即在请求 URL 中包含版本号、哈希值等，**缓存破坏是一种通过在内容更改时更改 URL 来使响应在很长一段时间内可缓存的机制**，可以应用于所有子资源，例如图像。但是，当用户重新加载时，即使知道内容是不可变的，也会发送重新验证请求，为了防止这种情况，immutable 指令可用于明确指示不需要重新验证，因为内容永远不会改变。请注意，Chrome 没有实现该指令，而是更改了重新加载的实现——仅验证主要资源。对于会变化的资源，通常的最佳实践是每次内容变化时都改变 URL，这样 URL 单元可以被缓存更长的时间。可以使用包含基于版本号或哈希值的更改部分的 URL 来提供 JavaScript 和 CSS，通过这种设计，JavaScript 和 CSS 资源都可以被缓存很长时间。
+
+基本上没有办法删除使用很长的 max-age 存储的响应。一旦响应在服务器上过期，可能希望覆盖该响应，但是一旦存储响应，服务器就无法执行任何操作——因为由于缓存，不再有请求到达服务器。即使使用Clear-Site-Data: cache 标头，也只会影响浏览器缓存，而不会影响中间缓存。因此，除非用户手动执行重新加载、强制重新加载或清除历史操作，否则应该假设任何存储的响应都将保留其 max-age 期间。缓存减少了对服务器的访问，这意味着服务器失去了对该 URL 的控制。如果服务器不想失去对 URL 的控制——比如，在资源会频繁更新的情况下，为始终传输最新版本的资源，应该使Cache-Control 值包含 no-cache，以便服务器始终接收请求并发送预期的响应。
+
+QPACK 是一种用于压缩 HTTP 标头字段的标准，其中定义了常用字段值表。常用的缓存头值有（如果选择其中一个编号选项，则可以在通过 HTTP3 传输时将值压缩为 1 个字节）：
+1. 36 cache-control max-age=0
+2. 37 cache-control max-age=604800：一周
+3. 38 cache-control max-age=2592000：一月
+4. 39 cache-control no-cache
+5. 40 cache-control no-store
+6. 41 cache-control public, max-age=31536000：一年
+
+### HTTP缓存相关标头（Cache）
+
+**Age 响应标头**（`Age: <delta-seconds>`）表示对象在缓存代理服务器中存贮的时长，以秒为单位。Age 的值通常接近于 0。如果是 Age: 0，则可能是从源服务器获取的；其他的值则是表示代理服务器当前的系统时间与HTTP响应中的Date标头的值之差。
+
+**Cache-Control 通用标头**，通过指定指令来实现缓存机制。缓存指令是单向的，这意味着在请求中设置的指令，不一定被包含在响应中。指令的格式不区分大小写但推荐小写，多个指令以逗号相隔。可用的指令有：
+1. public：表明响应可以被任何对象（包括：发送请求的客户端，代理服务器，等等）缓存，即使是通常不可缓存的内容（例如：1.该响应没有max-age指令或Expires消息头；2. 该响应对应的请求方法是 POST）。
+2. private：表明响应只能被单个用户缓存，不能作为共享缓存（即代理服务器不能缓存它）。私有缓存可以缓存响应内容，比如：对应用户的本地浏览器。
+3. no-cache：在发布缓存副本之前，强制要求缓存把请求提交给原始服务器进行验证 (协商缓存验证)。
+4. no-store：缓存不应存储有关客户端请求或服务器响应的任何内容，即不使用任何缓存。
+5. `max-age=<seconds>`：设置缓存存储的最大周期，超过这个时间缓存被认为过期 (单位秒)。与Expires相反，时间是相对于请求的时间。
+6. `s-maxage=<seconds>`：覆盖max-age或者Expires头，但是仅适用于共享缓存 (比如各个代理)，私有缓存会忽略它。
+7. `max-stale[=<seconds>]`：表明客户端愿意接收一个已经过期的资源。可以设置一个可选的秒数，表示响应不能已经过时超过该给定的时间。
+8. `min-fresh=<seconds>`：表示客户端希望获取一个能在指定的秒数内保持其最新状态的响应。
+9. must-revalidate：一旦资源过期（比如已经超过max-age），在成功向原始服务器验证之前，缓存不能用该资源响应后续请求。
+10. proxy-revalidate：与 must-revalidate 作用相同，但它仅适用于共享缓存（例如代理），并被私有缓存忽略。
+11. only-if-cached：表明客户端只接受已缓存的响应，并且不要向原始服务器检查是否有更新的拷贝。
+12. no-transform：不得对资源进行转换或转变。Content-Encoding、Content-Range、Content-Type等 HTTP 头不能由代理修改。
+13. immutable：表示响应正文不会随时间而改变。资源（如果未过期）在服务器上不发生改变，因此客户端不应发送重新验证请求头（例如If-None-Match或 If-Modified-Since）来检查更新，即使用户显式地刷新页面。
+
+服务器可以在响应中使用的标准 Cache-Control 指令有：
+1. Cache-control: must-revalidate
+2. Cache-control: no-cache
+3. Cache-control: no-store
+4. Cache-control: no-transform
+5. Cache-control: public
+6. Cache-control: private
+7. Cache-control: proxy-revalidate
+8. `Cache-Control: max-age=<seconds>`
+9. `Cache-control: s-maxage=<seconds>`。
+
+客户端可以在 HTTP 请求中使用的标准 Cache-Control 指令有：
+1. `Cache-Control: max-age=<seconds>`
+2. `Cache-Control: max-stale[=<seconds>]`
+3. `Cache-Control: min-fresh=<seconds>`
+4. Cache-control: no-cache
+5. Cache-control: no-store
+6. Cache-control: no-transform
+7. Cache-control: only-if-cached
+
+**Clear-Site-Data 响应标头**表示清除当前请求网站有关的浏览器数据（cookie，存储，缓存）。它让 Web 开发人员对浏览器本地存储的数据有更多控制能力，目前浏览器兼容性不佳（Safari不支持，Chrome61+、Firefox63+、Edge79+支持）。Clear-Site-Data 可以接受一个或多个参数，以逗号分隔，可用的参数有：
+1. "cache"：表示服务端希望删除本 URL 原始响应的本地缓存数据（即：浏览器缓存，请参阅 HTTP 缓存）。根据浏览器的不同，可能还会清除预渲染页面，脚本缓存，WebGL 着色器缓存或地址栏建议等内容。
+2. "cookies"：表示服务端希望删除 URL 响应的所有 cookie。HTTP 身份验证凭据也会被清除。会影响整个主域，包括子域。
+3. "storage"：表示服务端希望删除 URL 原响应的所有 DOM 存储，这包括localStorage、indexDB、sessionStorage。
+4. "*" (通配符)：表示服务端希望清除原请求响应的所有类型的数据。
+5. "executionContexts"：表示服务端希望浏览器重新加载本请求。
+
+**Expires 响应标头**（`Expires: <http-date>`）包含日期/时间，指示响应过期的时刻。如果是无效的日期，比如 0，代表着过去的日期，即该资源已经过期。如果在Cache-Control响应标头设置了 "max-age" 或者 "s-max-age" 指令，那么 Expires 头会被忽略。
+
+**Pragma 通用标头**是在 HTTP/1.0 中规定的，效果依赖于不同的实现，在HTTP/1.1中已被Cache-Control替代，因此只推荐该标头用于向后兼容没有 Cache-Control的HTTP/1.0客户端。唯一指令是no-cache，与 Cache-Control: no-cache 效果一致。
+
+Cookie 默认关闭浏览器后失效，可设置失效时间，大小4k，与服务器通信，更适合用户登录识别场景；localStorage默认永久保存可手动清除，大小10M左右，不与服务器通信，适合页面间传递数据/参数，最新chrome浏览器隐私/无痕模式下关闭浏览器就会被清除（关闭页面不会）；**SessionStorage关闭页面或浏览器即清除**，大小 10M 左右，适合保存**刷新当前页面不应丢失的临时数据**；
+
+**浏览器缓存策略**：分为**强缓存**和**协商缓存**，目的是降低服务器负担、减少冗余数据传输，加快页面加载。
+
+**强缓存（本地缓存）：不会发送请求，利用 HTTP的 Expires（http1.0，过期时刻） 和 Cache-Control（http1.1，相对时间） 控制缓存时间，同时存在优先考虑Cache-Control（因为服务器的时间和浏览器的时间可能并不一致），由服务器进行设置。cache-control：no-cache 是可以缓存的，但每次使用缓存前应该去向服务器验证缓存是否可用。cache-control：no-store 才是不在浏览器缓存内容。**
+
+**协商缓存（弱缓存）**：在强缓存过期情况下，浏览器携带**缓存标识 If-None-Match（资源唯一标识，等于第一次请求服务器返回的 Etag，优先校验 —— “精度高，速度慢”）和If-Modified-Since（资源最后修改时间，等于第一次请求服务器返回的Last-Modified**）发起请求，由服务器根据**缓存标识**判断服务器资源是否被修改来决定是否使用本地缓存的过程。协商缓存没失效，返回304（继续使用本地缓存），反之200（返回新的资源和缓存标识，再存入浏览器缓存中）。**性能上**，Last-Modified优于ETag，Last-Modified记录的是时间点，而Etag需要根据文件的MD5算法生成对应的hash值。**精度上**，ETag优于Last-Modified。ETag按照内容给资源带上标识，能准确感知资源变化。「如果两种方式都支持的话，服务器会优先考虑ETag」。
+
+**Last-Modified在某些场景并不能准确感知变化，比如**：
+1. 编辑了资源文件，但是文件内容并没有更改，这样也会造成缓存失效。
+2. **Last-Modified 能够感知的单位时间是秒**，如果文件在 1 秒内改变了多次，这时候的 Last-Modified 无法体现出修改。
+
+**服务器没有设置任何缓存策略时浏览器会采用启发式的算法**：通常会取响应头中的 Date 减去 Last-Modified 值的 10% 作为缓存时间。
+
+**实际应用**：
+1. 频繁变动的资源设置Cache-Control: no-cache（**不使用强缓存**） + ETag / Last-Modified;
+2. 不经常变动的资源设置Cache-Control: max-age=31536000 + 动态更改文件名(或者路径)中的 hash或版本号等动态字符（比如，webpack打包出来的文件后有hash 或者类库文件存在版本号 jquery.1.11.1.min.js）。
+
+![](../public/basics/http/128.png)
 
 ## 内容安全策略 (CSP)
+
+内容安全策略 (CSP) 是一个额外的安全层，用于检测并削弱某些特定类型的攻击，包括跨站脚本 (XSS) 和数据注入攻击等，这些攻击作为数据盗取、网站内容污染以及恶意软件分发的主要手段。CSP 的主要目标是减少和报告 XSS 攻击。
+
+CSP 完全向后兼容（除 CSP2 在向后兼容有明确提及的不一致）。不支持 CSP 的浏览器也能与实现了 CSP 的服务器正常工作，反之亦然：不支持 CSP 的浏览器只会忽略它并正常运行，默认为网页内容使用标准的同源策略。如果网站不提供 CSP 标头，浏览器也使用标准的同源策略。
+
+CSP 是一种由开发者定义的安全性政策性申明，通过 CSP 所约束的规则指定可信的内容来源（这里的内容可以指脚本、图片、iframe、font、style 等等可能的远程的资源）。CSP 策略在默认的情况下是不允许使用 data URIs 资源、inline script 和 eval 类型函数（包括 eval、setInterval、setTimeout 和 new Function()）也是不被执行的。
+
+为降低部署成本，CSP 可以部署为仅报告（report-only）模式。在此模式下，CSP 策略不是强制性的，但是任何违规行为将会报告给一个指定的 URI 地址。如果 Content-Security-Policy-Report-Only 标头和 Content-Security-Policy 同时出现在一个响应中，两个策略均有效。在 Content-Security-Policy 标头中指定的策略有强制性，而 Content-Security-Policy-Report-Only 中的策略仅产生报告而不具有强制性。如果策略里包含一个有效的report-uri (en-US) 指令，支持 CSP 的浏览器将始终对于每个企图违反所建立的策略都发送违规报告。
+
+Content-Security-Policy中可以设置report-uri 用来告诉浏览器，应该把注入行为使用POST方法报告给该网址：
+
+```json
+{
+    "csp-report": {
+        "document-uri": "http://example.org/page.html",
+        "referrer": "http://evil.example.com/",
+        "blocked-uri": "http://evil.example.com/evil.js",
+        "violated-directive": "script-src 'self' https://apis.google.com",
+        "original-policy": "script-src 'self' https://apis.google.com; report-uri http://example.org/my_amazing_csp_report_parser"
+    }
+}
+```
+
+**开启 CSP 可用**：
+
+网络服务器返回 Content-Security-Policy HTTP 头部，或者：
+```html
+<meta http-equiv="Content-Security-Policy" />
+```
+
+### HTTP 安全相关标头（Security）
+
+**Cross-Origin-Embedder-Policy (COEP) 响应标头**（Cross-Origin-Embedder-Policy: unsafe-none | require-corp）可防止文档加载未明确授予文档权限 (通过 CORP 或者 CORS) 的任何跨域资源。unsafe-none 是默认值，表示允许文档获取跨源资源，而无需通过 CORS 协议或 Cross-Origin-Resource-Policy 头。require-corp表示文档只能从相同的源加载资源，或显式标记为可从另一个源加载的资源。如果跨源资源支持 CORS，则必选使用crossorigin 属性或 Cross-Origin-Resource-Policy 标头来加载该资源，而不会被 COEP 阻止。
+
+**Cross-Origin-Opener-Policy (COOP) 响应标头**可以确保顶级文档不与跨源文档共享浏览上下文组。COOP 将对文档进行进程隔离，潜在的攻击者即使在弹出窗口中打开文档，也无法访问全局对象，从而防止XS-Leaks 跨源攻击。如果在新窗口中打开具有 COOP 的跨源文档，则打开的文档将不会引用它，并且新窗口的 window.opener 属性将为 null。与 rel=noopener 相比，这可以更好地控制对窗口的引用，rel=noopener 只影响外向导航。可能取值有：
+1. unsafe-none默认值，允许将文档添加到其打开程序的浏览上下文组中，除非打开程序本身的 COOP 为 same-origin 或 same-origin-allow-popups。
+2. same-origin-allow-popups表示保留对新打开的窗口或标签页的引用，这些窗口或标签页要么未设置 COOP，要么通过将 COOP 设置为 unsafe-none 来退出隔离。
+3. same-origin表示将浏览上下文完全隔离为同源文档。跨源文件不会在同一浏览上下文中加载。
+
+**Cross-Origin-Resource-Policy 响应标头**（Cross-Origin-Resource-Policy: same-site | same-origin | cross-origin）会指示浏览器阻止对指定资源的no-cors跨域/跨站点请求。
+Content-Security-Policy 响应标头（`Content-Security-Policy: <policy-directive>; <policy-directive>`, 其中 `<policy-directive>` 的形式为 `<directive> <source>` 且source>可能是多个）允许站点管理者控制用户代理能够为指定的页面加载哪些资源。除了少数例外情况，设置的政策主要涉及指定服务器的源和脚本端点。这有助于防范跨站脚本攻击（XSS，Cross-site_scripting）。Workers 一般来说不被创建他的文档（或者父级 Worker）的 CSP 策略管理。如果要为 Worker 指定 CSP 策略，可以为 Worker 脚本的请求的响应的头部设置 CSP 策略。例外的情况是：如果 Worker 脚本的来源是一个全局唯一 ID（比如，它的 URL 是一个结构化的数据或者 BLOB），这个 Worker 会继承它所属的文档或者创建它的 Worker 的 CSP 策略。CSP 允许在一个资源中指定多个策略，包括通过 Content-Security-Policy 头（可以调用多次），以及 Content-Security-Policy-Report-Only 头，和 `<meta>` 组件。可能的指令 `<directive>` 有：
+1. 获取指令（Fetch directives）：控制某些可能被加载的确切的资源类型的位置。
+    1. child-src：为 Web Workers 和其他内嵌浏览器内容（例如用 `<frame>` 和 `<iframe>` 加载到页面的内容）定义合法的源地址。可以设置一个或多个源值 `<source>`。如果该指令不存在，用户代理将查找 default-src 指令。如果开发者希望管控内嵌浏览器内容和 web worker 应分别使用 frame-src 和 worker-src 指令，来取代 child-src。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    2. connect-src：限制能通过脚本接口加载的 URL。可以设置一个或多个源值` <source>`。如果该指令不存在，用户代理将查找 default-src 指令。受限制的API包括 `<a>` 的ping属性、fetch()、XMLHttpRequest、WebSocket、EventSource、Navigator.sendBeacon()。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    3. default-src：为其他获取指令提供备选项。可以设置一个或多个源值 `<source>`。如果child-src、connect-src、font-src、frame-src 、img-src、manifest-src 、media-src、object-src、script-src、style-src 、worker-src指令不存在，那么用户代理会查找并应用 default-src 指令的值。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    4. font-src：设置允许通过 @font-face 加载的字体源地址。可以设置一个或多个源值 `<source>`。如果该指令不存在，用户代理将查找 default-src 指令。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    5. frame-src：设置允许通过类似 `<frame>` 和 `<iframe>` 标签加载的内嵌内容的源地址。如果该指令不存在，则用户代理将查找 child-src 指令。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    6. img-src：限制图片和图标的源地址。`<source>` 可以是 CSP 源值中列出的任何一个值。如果该指令不存在，用户代理将查找default-src指令。
+    7. manifest-src：限制应用声明文件的源地址。`<source>` 可以是 CSP 源值中列出的任何一个值。如果该指令不存在，用户代理将查找default-src指令。
+    8. media-src：限制通过 `<audio>`、`<video>` 或 `<track>` 标签加载的媒体文件的源地址。`<source>` 可以是 CSP 源值中列出的任何一个值。如果该指令不存在，用户代理将查找default-src指令。
+    9. object-src：限制 `<object>` 或 `<embed> `标签的源地址。被 object-src 控制的元素可能碰巧被当作遗留 HTML 元素，导致不支持新标准中的功能（例如 `<iframe>` 中的安全属性 sandbox 和 allow）。因此建议限制该指令的使用（比如，如果可行，将 object-src 显式设置为 'none'）。`<source>` 可以是 CSP 源值中列出的任何一个值。如果该指令不存在，用户代理将查找default-src指令。要设置 `<object>` 和 `<embed>` 允许的类型，请使用 plugin-types 指令。
+    10. prefetch-src：指定预加载或预渲染的允许源地址。
+    11. script-src：规定了 JavaScript 的有效来源。这不仅包括直接加载到 `<script>` 元素中的 URL，还包括内联脚本事件处理程序（onclick）和 XSLT 样式表等可触发脚本执行的内容。`<source>` 可以是 CSP 源值中列出的任何一个值。如果该指令不存在，用户代理将查找default-src指令。
+    12. script-src-attr：指定 JavaScript 内联事件处理程序的有效源。该指令仅指定内联脚本事件处理程序（如 onclick）的有效源。它不适用于可以触发脚本执行的其他 JavaScript 源，例如直接加载到 `<script>` 元素和 XSLT 样式表中的 URL。（可以使用 script-src 为所有 JavaScript 脚本源指定有效源，或者使用 script-src-elem 仅为 `<script>` 元素指定有效源）。如果该指令不存在，用户代理将查找 script-src 指令。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    13. scrip-src-elm：指定 JavaScript `<script>` 元素的有效源。该指令只指定 `<script>` 元素（包括脚本请求和块）中的有效源。它不适用于其他可触发脚本执行的 JavaScript 源，例如内联脚本事件处理程序（onclick）、通过 "unsafe-eval "检查设置的脚本执行方法以及 XSLT 样式表。（可使用 script-src 为所有 JavaScript 脚本源指定有效源，或使用 script-src-attr 仅为内联脚本处理程序指定有效源）。如果该指令不存在，用户代理将查找 script-src 指令。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    14. style-src：指定样式表的合法源。`<source>` 可以是 CSP 源值中列出的任何一个值。如果该指令不存在，用户代理将查找default-src指令。
+    15. style-src-attr：指定应用于各个 DOM 元素的内联样式的有效源。如果该指令不存在，用户代理将查找 style-src 指令。该指令不会为 `<style>` 元素和带有 rel="stylesheet" 的 `<link>` 元素设置有效源（这些是使用 style-src-elem 设置的）。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    16. style-src-elem：指定样式表 `<style>` 元素和带有 rel="stylesheet" 的 `<link>` 元素的有效源。该指令没有为内联样式属性设置有效的源（这些是使用 style-src-attr 设置的）。如果该指令不存在，用户代理将查找 style-src 指令。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    17. webrtc-src：指定WebRTC连接的合法源地址。
+    18. worker-src：指定 Worker、SharedWorker 或 ServiceWorker 脚本的有效源。`<source>` 可以是 CSP 源值中列出的任何一个值。如果没有该指令，用户代理在管理 Worker 执行时将首先查找child-src指令，然后是script-src指令，最后是default-src指令。
+2. 文档指令（Document directives）：管理文档属性或者 worker 环境应用的策略。
+    1. base-uri：限制可以应用于文档的 `<base>` 元素的 URL，可以设置一个或多个源值`<source>`，某些源值对 base-uri 没有意义，例如关键字 'unsafe-inline' 和 'strict-dynamic'。如果指令值为空，那么任何 URL 都是允许的。如果指令不存在，那么用户代理会使用 `<base>` 元素中的值。
+    2. plugin-types：通过限制可以加载的资源类型来限制哪些插件可以被嵌入到文档中。
+    3. sandbox：类似 `<iframe>` sandbox 属性，为请求的资源启用沙盒。它对页面的操作施加限制，包括防止弹出窗口、防止执行插件和脚本，以及执行同源策略。`<meta> `元素或 Content-Security-policy-Report-Only 标头字段不支持此指令。`Content-Security-Policy: sandbox <value>;` 其中 `<value>` 的可能取值有：
+        1. allow-forms：允许嵌入式浏览上下文提交表单。如果未使用此关键字，则不允许此操作。
+        2. allow-modals：允许嵌入式浏览上下文打开模态窗口。
+        3. allow-orientation-lock：允许嵌入式浏览上下文禁用锁定屏幕方向的功能。
+        4. allow-pointer-lock：允许嵌入式浏览上下文使用Pointer Lock API。
+        5. allow-popups：允许弹出窗口（像window.open，target="_blank"，showModalDialog）。如果未使用此关键字，则该功能将无提示失败。
+        6. allow-popups-to-escape-sandbox：允许沙盒文档打开新窗口而不强制沙盒标记。例如，这将允许安全地沙箱化第三方广告，而不会对登陆页面施加相同的限制。
+        7. allow-presentation：允许嵌入器控制 iframe 是否可以启动演示会话。
+        8. allow-same-origin：允许将内容视为来自其正常来源。如果未使用此关键字，则嵌入的内容将被视为来自唯一来源。
+        9. allow-scripts：允许嵌入式浏览上下文运行脚本（但不创建弹出窗口）。如果未使用此关键字，则不允许此操作。
+        10. allow-top-navigation：允许嵌入式浏览上下文将内容导航（加载）到顶级浏览上下文。如果未使用此关键字，则不允许此操作。
+3. 导航指令（Navigation directives）：管理用户能打开的链接或者表单可提交的链接。
+    1. form-action：能够限定当前页面中表单的提交地址（即限制 form 的 action 属性的链接地址）。未设定时允许任何值。可以设置一个或多个源值`<source>`。在表单提交之后， form-action 指令是否应该阻止重定向，各个浏览器实现不同，Chrome 63 会阻止重定向，而 Firefox 57 则不会。`<source>` 可以是 CSP 源值中列出的任何一个值。
+    2. frame-ancestors：指定了可以包含 `<frame>`、`<iframe>`、`<object>` 或 `<embed>` 等元素的有效父级。如未设置则允许所有可能值。当该指令设置为 'none' 时，其作用类似于 X-Frame-Options: DENY。该指令不支持通过 `<meta>` 元素或通过 Content-Security-policy-Report-Only 头域所指定。源值中不允许 'unsafe-eval' 或'unsafe-inline'。
+    3. navigation-to：限制文档可以通过以下任何方式访问 URL，包括 `<form>`（如果未指定 form-action）、`<a>`、window.location、window.open 等。
+4. 报告指令（Report directives）：控制 CSP 违规的报告过程。
+    1. report-to：指示客户端存储特定域名的报告端点。该指令本身没有任何作用，只有与其他指令结合使用才有意义。会触发 SecurityPolicyViolationEvent。`<meta>` 元素中不支持该指令。该指令的值不是`<source>`，而是Report-to标头值里的groupname。尽管report-to指令旨在取代已弃用的report-uri指令，但大多数浏览器尚不支持report-to。因此，为了与当前浏览器兼容，同时在浏览器获得report-to支持时添加向前兼容性，可以同时指定report-uri和report-to，即Content-Security-Policy: …; report-uri https://endpoint.example.com; report-to groupname
+5. 其他指令（Other directives）：
+    1. block-all-mixed-content：当使用 HTTPS 加载页面时阻止使用 HTTP 加载任何资源。该指令存在即可（Content-Security-Policy: block-all-mixed-content;）。已弃用。
+    2. require-sri-for：需要使用 SRI 作用于页面上的脚本或样式。
+    3. upgrade-insecure-requests：让浏览器把一个网站所有的不安全 URL（通过 HTTP 访问）当做已经被安全的 URL 链接（通过 HTTPS 访问）替代。该指令存在即可（Content-Security-Policy: upgrade-insecure-requests;）。该指令适用于具有大量需要重写的不安全旧版 URL 的网站。该指令在 block-all-mixed-content 指令之前进行评估，如果设置了该指令，则后者实际上是无操作。建议设置其中一个指令，但不要同时设置两者，除非想在旧版浏览器上强制使用 HTTPS，而这些浏览器在重定向到 HTTP 后不会强制使用 HTTPS。该指令不会确保通过第三方网站上的链接访问网站的用户将升级到 HTTPS 进行顶级导航，因此不会替换Strict-Transport-Security (HSTS) 标头，该标头仍应使用适当的设置max-age 确保用户不会受到 SSL 剥离攻击
+    4. require-trusted-types-for：指示用户代理控制传递给 DOM XSS 接收器函数的数据，例如 Element.innerHTML setter。唯一值是 'script'。使用时，这些函数只接受由可信类型策略创建的不可欺骗的类型值，而拒绝字符串。与可保护可信类型策略创建的 trusted-types 指令一起使用时，作者可以定义保护向 DOM 写入值的规则，从而将 DOM XSS 攻击面缩小到网络应用程序代码库中的小块孤立部分，便于监控和代码审查。唯一值是 'script'。
+    5. trusted-types：指示用户代理限制可信类型策略的创建 - 构建不可欺骗的类型化值的函数，这些值旨在代替字符串传递到 DOM XSS 接收器。该指令与 require-trusted-types-for 指令一起，允许作者定义规则，保护向 DOM 中写入值，从而将 DOM XSS 攻击面缩小到网络应用程序代码库中的小块孤立部分，方便其监控和代码审查。该指令声明了一个允许列表，其中包含通过Trusted Types API 中的 trustedTypes.createPolicy 创建的可信类型策略名称。可能取值有：
+        1. 'none'：不允许创建任何受信任类型策略（与不指定任何 `<policyName>` 相同）。
+        2. 'allow-duplicates'：允许使用已使用的名称创建策略。
+        3. `<policyName>`：有效的策略名称仅包含字母数字字符或“-#=_/@.%”之一。星号 (*) 作为策略名称指示用户代理允许任何唯一的策略名称（'allow-duplicates'可以进一步放宽限制）。
+
+可选的`<source>`有：
+1. `<host-source>`：按名称或 IP 地址显示的 Internet 主机。URL 方案、端口号和路径为可选项。子域、主机地址和端口号可用通配符（'*'），表示对应的所有合法值都有效。匹配方案时，允许安全升级（例如，指定 http://example.com 将匹配 https://example.com）。
+2. `<scheme-source>`：方案，http: 或 https:、data:、mediastream:、blob:、filesystem:。冒号为必填项。如果缺少方案源，则使用文档源的方案。允许安全升级，因此如果使用 https: 加载文档，则 example.com 将匹配 https://example.com，但不匹配 http://example.com。
+3. 'self'：指提供受保护文档的源，包括相同的 URL 方案和端口号。必须包含单引号。某些浏览器专门从源指令中排除 blob 和filesystem。需要允许这些内容类型的站点可以使用数据属性来指定它们。
+4. 'unsafe-eval'：允许使用 eval() 和其他不安全的方法从字符串创建代码。必须包含单引号。
+5. 'wasm-unsafe-eval'：允许加载和执行 WebAssembly 模块，而无需允许通过“unsafe-eval”执行不安全的 JavaScript。需要使用单引号。
+6. 'unsafe-hashes'：允许启用特定的内联事件处理程序。如果只需要允许内联事件处理程序，而不需要内联 `<script>` 元素或 javascript： URLs 时，这是一种比使用不安全内联表达式更安全的方法。
+7. 'unsafe-inline'：允许使用内联资源，例如内联 `<script>` 元素、javascript: URL、内联事件处理程序和内联 `<style>` 元素。需要使用单引号。
+8. 'none'：指空集，即没有 URL 匹配。必须使用单引号。
+9. `'nonce-<base64-value>'`：使用加密随机数（使用一次的数字）的特定内联脚本的允许列表。服务器每次传输策略时都必须生成唯一的随机数值。提供不可猜测的随机数至关重要，因为否则绕过资源的策略是微不足道的。指定随机数会使现代浏览器忽略'unsafe-inline'，在没有随机数支持的情况下，仍可以为旧版浏览器设置该'unsafe-inline'。CSP nonce 源只能应用于 nonceable 元素（例如，由于 `<img>` 元素没有 nonce 属性，因此无法将其与此 CSP 源关联）。
+10. `'<hash-algorithm>-<base64-value>'`：脚本或样式的 sha256、sha384 或 sha512 哈希值。脚本或样式的 sha256、sha384 或 sha512 哈希值。该值由用于创建哈希值的算法、连字符和脚本或样式的 base64 编码哈希值组成。生成哈希值时，请排除 `<script>` 或 `<style>` 标记，并注意大小写和空白的重要性，包括前导空白或尾部空白。在 CSP 2.0 中，哈希源可应用于内联脚本和样式。CSP 3.0 允许在 script-src 指令中对外部脚本使用哈希源表达式。
+11. 'strict-dynamic'：指定显式给予标记中存在的脚本的信任（通过附带随机数或散列）应传播到该根脚本加载的所有脚本。同时，任何allowlist或source表达式（例如“self”或“unsafe-inline”）都会被忽略。
+12. 'report-sample'：要求在违规报告中包含违规代码示例。
+
+**Content-Security-Policy-Report-Only 响应标头**（`Content-Security-Policy-Report-Only: <policy-directive>; <policy-directive>`）允许 Web 开发人员通过监视（但不强制执行）其效果来试验策略。这些违规报告包含通过 POST 请求发送到指定 URI 的 JSON 文档。`<meta>` 元素内部不支持此标头。Content-Security-Policy 标头的指令也可以应用于 Content-Security-Policy-Report-Only，但sandbox指令除外，该指令与 Content-Security-Policy-Report-Only 一起使用时会被忽略。
+
+**Strict-Transport-Security（HSTS）响应标头**（`Strict-Transport-Security: max-age=<expire-time>[; includeSubDomains[; preload]]`）用来通知浏览器应该只通过 HTTPS 访问该站点，并且以后使用 HTTP 访问该站点的所有尝试都应自动重定向到 HTTPS。 这比在服务器上简单地配置 HTTP 到 HTTPS（301）重定向要安全，因为初始的 HTTP 连接仍然易受到中间人攻击。如果只使用 HTTP 访问网站，浏览器会忽略 Strict-Transport-Security 标头。网站第一次通过 HTTPS 请求且证书没有错误，服务器响应 Strict-Transport-Security 标头，浏览器记录下这些信息，然后后面尝试访问这个网站的请求都会自动把 HTTP 替换为 HTTPS。浏览器这样做是因为攻击者可能会拦截到网站的 HTTP 连接，并注入或移除标头。包含的指令有：
+1. `max-age=<expire-time>` 是浏览器应该记住的只能使用 HTTPS 访问站点的最大时间量（以秒为单位）。将 max-age 设置为 0（通过 https 连接）将立即使 Strict-Transport-Security 标头失效，从而可以通过 http 访问。
+2. includeSubDomains 是可选的，说明此规则也适用于该网站的所有子域名。
+3. preload是可选的，当使用 preload，max-age 指令必须至少是 31536000（一年），并且必须存在 includeSubDomains 指令，谷歌维护着一个 HSTS 预加载服务。按照如下指示成功提交你的域名后，浏览器将会永不使用非安全的方式连接到你的域名。虽然该服务是由谷歌提供的，但所有浏览器都在使用这个预加载列表。但是，这不是 HSTS 标准的一部分，也不该被当作正式的内容。
+
+**Upgrade-Insecure-Requests 请求标头**（Upgrade-Insecure-Requests: 1）用来向服务器端发送信号，表示客户端优先选择加密及带有身份验证的响应，并且它可以成功处理 upgrade-insecure-requests CSP 指令。
+
+**X-Content-Type-Options HTTP 响应标头**（X-Content-Type-Options: nosniff 如果请求目标是 style 类型且 MIME 类型不是 text/css，或者是 script 类型且 MIME 类型不是 JavaScript MIME 类型，则阻止请求）相当于一个提示标志，被服务器用来提示客户端一定要遵循在 Content-Type 首部中对 MIME 类型 的设定，而不能对其进行修改。这就禁用了客户端的 MIME 类型嗅探行为，即意味着网站管理员确定自己的设置没有问题。该消息头最初是由微软在 IE 8 浏览器中引入的，提供给网站管理员用作禁用内容嗅探的手段，内容嗅探技术可能会把不可执行的 MIME 类型转变为可执行的 MIME 类型。在此之后，其他浏览器也相继引入了这个消息头，尽管它们的 MIME 嗅探算法没有那么有侵略性。
+
+**X-Frame-Options HTTP 响应标头**可用于指示是否允许浏览器在 `<frame>`、`<iframe>`、`<embed>` 或 `<object>` 中呈现页面，网站可以使用它来避免点击劫持攻击，确保自己的内容不会嵌入到其他网站中。使用 `<meta>` 标签来设置 X-Frame-Options 是无效的，需要在服务器配置中添加X-Frame-Options HTTP响应头。可能的取值：
+1. DENY 表示该页面不允许在 frame 中展示，即便是在相同域名的页面中嵌套也不允许。
+2. SAMEORIGIN 表示该页面可以在相同域名页面的 frame 中展示。

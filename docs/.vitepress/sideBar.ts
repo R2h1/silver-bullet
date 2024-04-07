@@ -40,6 +40,11 @@ export const sidebar: DefaultTheme.SidebarItem[] = [
       {
         text: 'css',
         link: '/front-end/basics/css/index',
+        collapsed: true,
+        items: [
+          { text: '布局', link: '/front-end/basics/css/layout' },
+          { text: '几何图形绘制', link: '/front-end/basics/css/geometric-draw' },
+        ]
       },
       {
         text: 'javascript',

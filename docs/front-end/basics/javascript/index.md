@@ -20,7 +20,7 @@ JavaScript® 是 Oracle 在美国和其他国家的商标或注册商标。
 
 V8 的执行过程：
 
-![](../../../public/front-end/basics/javascript/1.png)
+![](/front-end/basics/javascript/1.png)
 
 源代码经过 Parser 解析器，经过词法分析和语法分析生成 AST；AST经过 Ignition 解释器生成字节码并执行；在执行过程中，如果发现热点代码，将热点代码交给 TurboFan 编译器生成机器码并执行；如果热点代码不再满足要求，进行去优化处理即还原成字节码并把执行权交还给 Ignition 解释器。
 
@@ -68,7 +68,7 @@ fun1();
     1. 如果是函数执行上下文，会**复制**函数`[[scope]]`属性到函数执行上下文的 Scopes 属性来初始化作用域链。
     2. 然后创建变量对象：全局执行上下文的变量对象初始化是全局对象。函数执行上下文的变量对象初始化是只包含 Arguments 对象的对象。如果是函数执行上下文则首先给当前执行上下文的变量对象添加形参及初始值，否则先添加函数声明（函数表达式属于后面的变量声明）及初始值，再添加变量声明（带声明var/let/const关键字的）及初始值，完成后被激活为**活动对象（Activation Object，AO）**；因此，变量提升（Hosting）是JavaScript执行上下文工作方式，意味着变量和函数的声明在编译阶段即执行阶段之前被放入内存中，就好像声明处在作用域最前面。由执行上下文的两个处理阶段可知，函数声明提升（非函数表达式）优先于变量声明提升（var、let、const）；
 
-    ![](../../../public/front-end/basics/javascript/2.png)
+    ![](/front-end/basics/javascript/2.png)
 
     3. **如果是函数执行上下文，会将活动对象压入**函数执行上下文的Scopes属性即**作用域链顶端**。
 
@@ -130,7 +130,7 @@ bar();
 3. **函数作用域**：由函数创建的作用域。函数作用域指属于这个函数的全部变量都可以在整个函数的范围内访问。
 使用 let（ES6）、const（ES6）声明的变量和Function 构造函数声明的函数属于额外的**块级作用域**（被限制在定义它的代码块内——块由一对大括号界定）。
 
-![](../../../public/front-end/basics/javascript/3.png)
+![](/front-end/basics/javascript/3.png)
 
 
 ## this
@@ -209,9 +209,9 @@ delete family.mother.husband;
 let family = null;
 ```
 
-![](../../../public/front-end/basics/javascript/4.png)
+![](/front-end/basics/javascript/4.png)
 
-![](../../../public/front-end/basics/javascript/5.png)
+![](/front-end/basics/javascript/5.png)
 
 **栈内存**，ESP 指针下移（即上下文切换），栈顶的空间会自动被回收。
 
@@ -219,7 +219,7 @@ let family = null;
 
 **堆内存**，分为**新生代内存**（临时分配的内存，存活时间短）和**老生代内存**（常驻内存，存活时间长）。
 
-![](../../../public/front-end/basics/javascript/6.png)
+![](/front-end/basics/javascript/6.png)
 
 **新生代**的内存在 64 位和 32 位系统下默认限制分别为 32MB 和 16MB（存活时间短，操作更频繁，所以设置小）。
 
@@ -229,13 +229,13 @@ let family = null;
 
 **新生代内存空间分为 From（正在使用的内存）和 To （目前闲置的内存）**。垃圾回收时使用 **Scavenge 算法**：检查From内存，将存活对象**从头放置的方式复制**到 To 内存（按理说复制的同时，From空间内存活对象的占用的内存应该释放掉），回收非存活对象，直到From内存空，From内存空间和To内存空间角色对调。由于**新生代**存储的是生命周期短的对象，对象较少，因此时间性能优秀，**算法缺点是新生代内存使用率不超过新生代内存的一半**。**为何不直接将非存活对象回收？一个对象的堆内存分配是连续的，直接回收非存活对象会容易产生不够后续对象使用的内存碎片，内存利用率低。**
 
-![](../../../public/front-end/basics/javascript/7.png)
+![](/front-end/basics/javascript/7.png)
 
 **老生代内存**，被晋升（1. 已经经历过一次 Scavenge 回收 2. 回收后To（闲置）空间的内存占用超过25%）的对象会被放入到老生代内存中。老生代垃圾回收（不使用 Scavenge 算法，老生代空间大，考虑内存利用率和复制耗时），采用标记清除算法：
 1. **标记-清除**，遍历老生代中所有对象并**做上标记**，仅**使用的变量**以及**被强引用**的变量**取消标记**。标记结束后**清除回收具有标记**的变量对象。其中标记采用**增量标记**（为避免垃圾回收耗时阻塞时间过长，即将标记任务分为很多小的部分，小部分完成就暂停一下，直到标记阶段完成，如此，阻塞时间减少到原来的1/6）；
 2. **整理内存碎片**，清除阶段结束后把存活的对象全部往一端靠拢（移动对象，全过程最耗时操作）。
 
-![](../../../public/front-end/basics/javascript/8.png)
+![](/front-end/basics/javascript/8.png)
 
 #### 内存泄漏
 
@@ -376,15 +376,15 @@ setTimeout(function repeatMe() {
 4. 如果宏任务队列为空，则休眠直到出现宏任务。
 5. 转到步骤1。
 
-![](../../../public/front-end/basics/javascript/9.png)
+![](/front-end/basics/javascript/9.png)
 
 **Node.js事件循环算法**：
 
-![](../../../public/front-end/basics/javascript/10.png)
+![](/front-end/basics/javascript/10.png)
 
 每个阶段都会有一个 callback queue 与之相对应。Event Loop会遍历这个 callback queue，执行里面的每一个callback。直到 callback queue 为空或者当前callback的执行数量超过了某个阈值为止，Event Loop才会移步到下一个阶段。事件循环示意图：
 
-![](../../../public/front-end/basics/javascript/11.png)
+![](/front-end/basics/javascript/11.png)
 
 > nodejs 事件循环涉及的队列:
 > timer callback queue
@@ -440,7 +440,7 @@ Event 接口表示在 DOM 中出现的事件。触发方式有
 
 Event() 构造函数：
 
-![](../../../public/front-end/basics/javascript/51.png)
+![](/front-end/basics/javascript/51.png)
 
 最开始，使用**事件处理程序 HTML 属性（内联事件处理程序）**，会混用 HTML 和 JavaScript，而且没有直接移除事件的方式，不推荐使用，因为这样文档很难解析且不好维护。
 
@@ -450,7 +450,7 @@ DOM 2级事件可以使用addEventListener添加事件处理程序，而且如�
 
 过去 Netscape（网景）只使用事件捕获，而 Internet Explorer 只使用事件冒泡。DOM 2级事件规定的事件流（也叫事件传播）包括三个阶段，Event.eventPhase表示事件流当前处于哪一个阶段：
 
-![](../../../public/front-end/basics/javascript/52.png)
+![](/front-end/basics/javascript/52.png)
 
 1. **事件捕获阶段（Capture Phase）**：事件对象，从Window开始，然后Document, 然后是HTMLHtmlElement，直到目标元素的父元素，这个过程中通过addEventListener 注册为捕获模式（第三个参数为true）的事件处理程序会被调用。Event.eventPhase 为 1。
 2. **处于目标阶段（Target Phase）**：执行顺序会按照 addEventListener 的添加顺序决定，现添加先执行。Event.eventPhase为2。如果该事件只读属性的Event.bubbles为false，则不会进入冒泡阶段。如果多个事件监听器被附加到相同元素的相同事件类型上，会按其被添加的顺序被调用，如果如果在其中一个事件处理函数中执行Event. stopImmediatePropagation ，那么剩下的事件监听器都不会被调用。
@@ -472,13 +472,27 @@ JavaScript中关于继承只有一种结构，即对象，每个实例对象（o
 
 **属性修改机制**：对象上直接修改属性只会修改或添加实例对象本身的属性，如果需要修改原型的属性时，则可以用: 构造函数.prototype.attribute = 2；但是这样会造成所有继承于该对象的实例的属性发生改变。
 
-![](../../../public/front-end/basics/javascript/124.png)
+![](/front-end/basics/javascript/124.png)
 
-![](../../../public/front-end/basics/javascript/125.png)
+![](/front-end/basics/javascript/125.png)
 
 ES6 的 class语法糖可以使用extends很容易实现继承，而ES5可以利用Object.create()将子构造函数的prototype的__proto__设置为父构造函数的prototype，并且设置子构造函数的prototype的constructor属性为子构造函数，最后在子构造函数中调用父构造函数Parent.call(this)，即**寄生组合继承的方式（推荐使用）**：
 
-![](../../../public/front-end/basics/javascript/126.png)
+```javascript
+function Parent(name) {
+  this.name = name;
+}
+
+function Child(name, age) {
+  Parent.call(this); // 调用父类的构造函数
+  this.age = age;
+}
+
+// 子类继承父类
+Child.prototype = Object.create(Parent.prototype);
+// 为了避免 Child.prototype.constructor 指向 Parent 的 prototype.constructor，需要设置 Child.prototype.constructor 为 Child
+Child.prototype.constructor = Child;
+```
 
 基于原型的编程是一种面向对象的编程风格，在这种风格中，类没有明确的定义，而是通过将属性和方法添加到另一个类的实例中，或者少数情况下将它们添加到一个空对象中来派生。简单地说：这种类型的风格允许创建一个对象，而不首先定义它的类。
 
@@ -520,9 +534,23 @@ constructor方法是用于创建和初始化class创建的对象的特殊方法�
 
 extends关键字（class ChildClass extends ParentClass { ... }）用于类声明或者类表达式中创建一个派生类。任何可以用new调用的构造函数都可以作为ParentClass，ParentClass的prototype属性必须是 Object 或 null。extends 将分别设置ChildClass 和 ChildClass.prototype 的原型为ParentClass和ParentClass.prototype，分别使得**静态方法与属性**和**原型方法与属性**分别可以被继承。extends 的右侧不必是标识符，可以使用任何计算结果为可被new调用的构造函数的表达式。
 
-由于extends右侧只能有一个单基类，因此直接多重继承是不可能的。定义一个以基类作为输入和一个继承该基类的派生类作为输出的函数可以用于在 ECMAScript 中实现Mix-ins或抽象子类。
+由于extends右侧只能有一个单基类，因此直接多重继承是不可能的。定义一个以基类作为输入和一个继承该基类的派生类作为输出的函数可以用于在 ECMAScript 中实现 Mix-ins 或抽象子类。
 
-![](../../../public/front-end/basics/javascript/127.png)
+```javascript
+// 抽象子类 1 或 min-ins 1
+const calculatorMixin = (Base) => class extends Base {
+  calc() { };
+};
+
+// 抽象子类 1 或 min-ins 1
+const randomizerMixin = (Base) => class extends Base {
+  randomize() { };
+};
+
+// 多重继承抽象子类1 或 mix-ins 1 与 抽象子类 2 或 mix-ins 2
+class Foo { };
+class Bar extends calculatorMixin(randomizerMixin(Foo)) { };
+```
 
 ### super
 
@@ -583,7 +611,7 @@ JavaScript 的严格模式（strict mode）是使用受限制的 JavaScript 的�
 
 BOM 即浏览器对象模型，提供除处理DOM外所有内容的属性与方法。**BOM、DOM以及Javascript Object 构成浏览器主机环境的所有操作，都是根对象window子属性。**
 
-![](../../../public/front-end/basics/javascript/137.png)
+![](/front-end/basics/javascript/137.png)
 
 **navigator 对象**提供了有关浏览器和操作系统的背景信息，其中属性navigator.platform — 关于平台（可以帮助区分 Windows/Linux/Mac 等）。
 1. navigator.userAgent — 关于当前浏览器。
@@ -642,11 +670,11 @@ DOM 即文档对象模型（document，属性 nodeType=9），提供更改或创
 
 DOM节点的原型链（注意这些都是构造函数，原型链上是指他们的prototype对象）：DOM节点对象=> HTMLSpecificElement（提供特定于具体类别元素的属性，Specific比如是Input/Body/Anchor） => HTMLElement（提供了通用（common）的 HTML 元素方法（以及 getter 和 setter）） => Element（提供通用（generic）元素方法） => Node （提供通用 DOM 节点属性）=> EventTarget（为事件（包括事件本身）提供支持） => Object。 console.log(element) 显示元素的 DOM 树。 console.dir(element) 将元素显示为 DOM 对象，非常适合探索其属性。
 
-![](../../../public/front-end/basics/javascript/138.png)
+![](/front-end/basics/javascript/138.png)
 
 文本节点即DOM树的叶子，document即DOM树的根（声明 + `<html>`）。`<html> = document.documentElement`。`<head> </head>`之前的空格和换行符均被忽略，`<body></body>`后的文本内容（包括空格和换行符均会被移到其内末尾）。`<table></table>`标签即使没写`<tbody></tbody>`也有`<tbody></tbody>`，因为浏览器会自动创建。
 
-![](../../../public/front-end/basics/javascript/139.png)
+![](/front-end/basics/javascript/139.png)
 
 **注意**：脚本若是在 `<head>` 中，那么脚本是访问不到 document.body 元素的（返回null）
 **常用节点**：文档节点、元素节点、属性节点、文本节点、注释节点
@@ -697,7 +725,7 @@ element.previousElementSibling，nextElementSibling ：兄弟元素节点。
 
 element.parentElement：返回父元素节点
 
-![](../../../public/front-end/basics/javascript/140.png)
+![](/front-end/basics/javascript/140.png)
 
 node.nodeName 或者 element.tagName 属性中读取它的标签名（返回值都是全大写），后者只能用于元素节点。
 
@@ -759,7 +787,7 @@ element.insertAdjacentHTML(where, html):将html作为HTML字符串插入到where
 
 element.insertAdjacentElement(where, element)和它语法一样，只是前者作为	文本插入，后者插入元素。参数 where 必须是其中之一：
 
-![](../../../public/front-end/basics/javascript/141.png)
+![](/front-end/basics/javascript/141.png)
 
 **DOM节点移除方法**：
 
@@ -780,9 +808,45 @@ Element.compositionupdate当在由文本合成系统（例如输入法编辑器�
 
 Element.compositionend当文本合成系统（例如输入法编辑器）完成或取消当前合成会话（拼音输入）时，将触发该事件。
 
-其中Chrome浏览器的触发顺序为 compositionstart ->input ->compositionend，其他浏览器为compositionstart ->compositionend ->input。
+其中 Chrome 浏览器的触发顺序为 compositionstart ->input ->compositionend，其他浏览器为compositionstart ->compositionend ->input。
 
-![](../../../public/front-end/basics/javascript/142.png)
+```tsx
+import React from 'react';
+
+// eslint-disable-next-line max-len
+type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+/**
+ * 封装支持合成输入的文本 input
+ */
+const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  const [composing, setComposing] = React.useState(false);
+  return (
+    <input
+      ref={ref}
+      onChange={(e) => {
+        if (!composing) {
+          // eslint-disable-next-line react/prop-types
+          props.onChange?.(e);
+        }
+      }}
+      onCompositionStart={() => {
+        setComposing(true);
+      }}
+      onCompositionEnd={(e) => {
+        if (composing) {
+          setComposing(false);
+          const inputEvent = new Event('input', { bubbles: true, cancelable: false });
+          e.target.dispatchEvent(inputEvent);
+        }
+      }}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+    />
+  );
+});
+
+export default Input;
+```
 
 **元素滚动相关**
 
@@ -803,23 +867,23 @@ HTMLCollection 接口表示一个包含了元素（元素顺序为文档流中�
 
 **Element.scrollHeight /Element.scrollWidth只读属性**是元素内容**高度/宽度**的度量，包括由于溢出导致的视图中不可见内容，包括元素的padding、伪元素的高度/宽度但不包括border、margin和**水平/垂直**滚动条。如果元素不需要**垂直/水平**滚动条就可以容纳，则**Element.scrollHeight / Element.scrollWidth等于Element.clientHeight / Element.clientWidth**。该属性将会对值round(四舍五入)取整，如果需要小数值，使用 Element.getBoundingClientRect()。
 
-![](../../../public/front-end/basics/javascript/143.png)
+![](/front-end/basics/javascript/143.png)
 
 **Element.scrollLeft / Element.scrollTop 属性获取或设置**元素内容从其左/上边缘即水平/垂直滚动的像素数，默认是整数，然而在使用显示比例缩放的系统上，scrollLeft/scrollTop可能会是一个小数。如果元素不能滚动（比如：元素没有溢出或有"non-scrollable"属性），那么scrollLeft 的值是 0。如果给scrollLeft / scrollTop设置的值小于 0，那么scrollLeft / scrollTop 的值将变为 0。如果给scrollLeft / scrollTop设置的值大于元素内容最大宽度，那么scrollLeft / scrollTop的值将被设为元素最大宽度。当在根元素（`<html>`元素）上使用scrollTop时，将返回窗口的scrollY。如果元素的内容排列方向（direction）是rtl (right-to-left) ，那么滚动条会位于最右侧（内容开始处），并且scrollLeft值为 0。此时，当从右到左拖动滚动条时，scrollLeft 会从 0 变为负数。
 
 **Element.clientWidth / Element.clientHeight只读属性**是元素内部的宽度（以像素为单位），不包括由于溢出导致的视图中不可见内容。对于内联元素以及没有 CSS 样式的元素为 0。该属性包括内边距（padding），但不包括边框（border）、外边距（margin）和垂直/水平滚动条（如果存在）。在根元素（`<html>` 元素）或怪异模式下的 `<body>` 元素上使用 clientWidth 时，该属性将返回视口宽度（不包含任何滚动条）。**Element.clientWidth** = CSS width + CSS padding - 垂直滚动条宽度；**Element.clientHeight** = CSS height + CSS padding - 水平滚动条高度。该属性将会对值round(四舍五入)取整，如果需要小数值，使用 Element.getBoundingClientRect()。
 
-![](../../../public/front-end/basics/javascript/144.png)
+![](/front-end/basics/javascript/144.png)
 
 **Element.clientLeft / Element.clientTop只读属性**表示元素的左/上边框的宽度（以像素为单位），不包括左/上外边距和左/上内边距。如果元素的文本方向是从右向左（RTL, right-to-left），并且由于内容溢出导致左边出现垂直滚动条，则该属性包括滚动条的宽度。
 
 **HTMLElement.offsetWidth / HTMLElement.offsetHeight只读属性**，返回元素的布局宽度。典型的（各浏览器的 offsetWidth / offsetHeight可能有所不同）offsetWidth / offsetHeight 是测量包含元素的边框 (border)、水平/垂直线上的内边距 (padding)、竖直/水平方向滚动条 (scrollbar)（如果存在的话）、以及 **CSS 设置的宽度/高度 (width/height) 的值**，但不包含:before 或:after 等伪类元素的宽度/高度。如果元素被隐藏（display：none），则返回0。该属性将会对值round(四舍五入)取整，如果需要小数值，使用 Element.getBoundingClientRect()。
 
-![](../../../public/front-end/basics/javascript/145.png)
+![](/front-end/basics/javascript/145.png)
 
 **Element.getBoundingClientRect()方法**返回一个 DOMRect 对象，是考虑transform后的包含整个元素的最小矩形（包括 padding 和 border-width）。该对象使用以像素为单位的只读属性的 left、top、right、bottom、x、y（IE 浏览器不支持x、y）、width 和 height 描述整个矩形的位置和大小。除了 width 和 height 以外的属性是相对于视图窗口的左上角来计算的。width 和 height 属性是包含了 padding 和 border-width 的，而不仅仅是内容部分的宽度和高度。在标准盒子模型中，这两个属性值分别与元素的 width/height + padding + border-width 相等。而如果是 box-sizing: border-box，两个属性则直接与元素的 width 或 height 相等。
 
-![](../../../public/front-end/basics/javascript/146.png)
+![](/front-end/basics/javascript/146.png)
 
 ## JSON
 
@@ -831,7 +895,7 @@ JSON（JavaScript Object Notation）是一种语法，用来序列化对象、�
 3. **字符串（JSONString）**：只有有限的一些字符可能会被转义；禁止某些控制字符；Unicode 行分隔符（U+2028）和段分隔符（U+2029）被允许，JavaScript中则不允许; 字符串必须用双引号。
 4. **JSON 仅支持的空白字符**：制表符（U+0009），回车（U+000D），换行（U+000A）以及空格（U+0020），这些可以出现在JSONNumber之外。
 
-![](../../../public/front-end/basics/javascript/162.png)
+![](/front-end/basics/javascript/162.png)
 
 **JSON对象，继承自Object，包含两个方法**：
 1. **用于解析 JSON字符串的 JSON.parse(text[, reviver])**：
@@ -865,7 +929,62 @@ window.requestAnimationFrame(callback) 告诉浏览器希望执行一个动画�
 
 **基于 requestAnimationFrame 的通用动画函数**：
 
-![](../../../public/front-end/basics/javascript/163.png)
+```typescript
+/**
+ * animation 函数接受 3 个描述动画的基本参数：
+ *      timing: 时间函数，传入一个已过去的时间与总时间之比的小数（0 代表开始，1 代表结束），返回动画完成度（0 代表开始，1 代表结束）
+ *      draw: 绘制函数，传入动画完成度（0 代表开始，1 代表结束），并绘制
+ *      duration: 动画总时间
+ *      isInfinite: 是否无限动画
+ *      delay: 动画提前执行，取值负数或0，如果为负数说明动画已经执行了多少
+ */
+function animation({
+  timing,
+  draw,
+  duration,
+  isInfinite = false,
+  delay = 0,
+}: {
+  timing: (pass: number) => number;
+  draw: (progress: number) => void;
+  duration: number;
+  isInfinite: boolean;
+  delay: number;
+}) {
+  let start = performance.now();
+  window.requestAnimationFrame(function animate(time) {
+    // 动画提前时间 
+    const advanceTime = delay < 0 ? -delay * duration : 0;
+    let timeFraction;
+    if (isInfinite) {
+      // timeFraction 从 0 增加到 1
+      timeFraction = ((time + advanceTime - start) % duration) / duration;
+    } else {
+      // timeFraction 从 0 增加到 1，可能大于1
+      timeFraction = (time + advanceTime - start) / duration;
+    };
+    // 有限动画且已过去时间超过总时间
+    if (!isInfinite && timeFraction > 1) {
+      timeFraction = 1;
+    };
+    // 计算当前动画状态
+    const progress = timing(timeFraction);
+
+    draw(progress); // 绘制
+
+    if (isInfinite) {
+      // 无限动画
+      window.requestAnimationFrame(animate);
+    } else if (timeFraction < 1) {
+      // 有限动画
+      window.requestAnimationFrame(animate);
+    };
+  });
+}
+
+export default animation;
+
+```
 
 **Flip 动画**，是 First、Last、Invert和 Play四个步骤的缩写：
 1. First，记录元素的初始状态；
@@ -893,7 +1012,7 @@ for.. in 循环中的变量应该使用let/const等关键字等限定作用域�
 
 JavaScript 没有 goto 语句。**label标记语句**可以且只能和 break 或 continue 语句一起使用，来指示程序是否中断循环或继续执行。标记就是在一条语句前面加个可以引用的标识符（identifier）。
 
-![](../../../public/front-end/basics/javascript/172.png)
+![](/front-end/basics/javascript/172.png)
 
 label是任何不属于保留关键字的 JavaScript 标识符。在严格模式中，你不能使用“let”作为label名称。它会抛出一个 SyntaxError（因为 let 是一个保留的标识符）。
 statement是JavaScript 语句。break 可用于任何标记语句，而 continue 可用于循环标记语句。在严格模式中，标记函数声明会抛出 SyntaxError（SyntaxError: functions cannot be labelled）。无论是否处于严格模式下，生成器函数都不能被标记。
