@@ -478,7 +478,21 @@ JavaScript中关于继承只有一种结构，即对象，每个实例对象（o
 
 ES6 的 class语法糖可以使用extends很容易实现继承，而ES5可以利用Object.create()将子构造函数的prototype的__proto__设置为父构造函数的prototype，并且设置子构造函数的prototype的constructor属性为子构造函数，最后在子构造函数中调用父构造函数Parent.call(this)，即**寄生组合继承的方式（推荐使用）**：
 
-![](/front-end/basics/javascript/126.png)
+```javascript
+function Parent(name) {
+  this.name = name;
+}
+
+function Child(name, age) {
+  Parent.call(this); // 调用父类的构造函数
+  this.age = age;
+}
+
+// 子类继承父类
+Child.prototype = Object.create(Parent.prototype);
+// 为了避免 Child.prototype.constructor 指向 Parent 的 prototype.constructor，需要设置 Child.prototype.constructor 为 Child
+Child.prototype.constructor = Child;
+```
 
 基于原型的编程是一种面向对象的编程风格，在这种风格中，类没有明确的定义，而是通过将属性和方法添加到另一个类的实例中，或者少数情况下将它们添加到一个空对象中来派生。简单地说：这种类型的风格允许创建一个对象，而不首先定义它的类。
 
@@ -520,9 +534,23 @@ constructor方法是用于创建和初始化class创建的对象的特殊方法�
 
 extends关键字（class ChildClass extends ParentClass { ... }）用于类声明或者类表达式中创建一个派生类。任何可以用new调用的构造函数都可以作为ParentClass，ParentClass的prototype属性必须是 Object 或 null。extends 将分别设置ChildClass 和 ChildClass.prototype 的原型为ParentClass和ParentClass.prototype，分别使得**静态方法与属性**和**原型方法与属性**分别可以被继承。extends 的右侧不必是标识符，可以使用任何计算结果为可被new调用的构造函数的表达式。
 
-由于extends右侧只能有一个单基类，因此直接多重继承是不可能的。定义一个以基类作为输入和一个继承该基类的派生类作为输出的函数可以用于在 ECMAScript 中实现Mix-ins或抽象子类。
+由于extends右侧只能有一个单基类，因此直接多重继承是不可能的。定义一个以基类作为输入和一个继承该基类的派生类作为输出的函数可以用于在 ECMAScript 中实现 Mix-ins 或抽象子类。
 
-![](/front-end/basics/javascript/127.png)
+```javascript
+// 抽象子类 1 或 min-ins 1
+const calculatorMixin = (Base) => class extends Base {
+  calc() { };
+};
+
+// 抽象子类 1 或 min-ins 1
+const randomizerMixin = (Base) => class extends Base {
+  randomize() { };
+};
+
+// 多重继承抽象子类1 或 mix-ins 1 与 抽象子类 2 或 mix-ins 2
+class Foo { };
+class Bar extends calculatorMixin(randomizerMixin(Foo)) { };
+```
 
 ### super
 
@@ -780,9 +808,45 @@ Element.compositionupdate当在由文本合成系统（例如输入法编辑器�
 
 Element.compositionend当文本合成系统（例如输入法编辑器）完成或取消当前合成会话（拼音输入）时，将触发该事件。
 
-其中Chrome浏览器的触发顺序为 compositionstart ->input ->compositionend，其他浏览器为compositionstart ->compositionend ->input。
+其中 Chrome 浏览器的触发顺序为 compositionstart ->input ->compositionend，其他浏览器为compositionstart ->compositionend ->input。
 
-![](/front-end/basics/javascript/142.png)
+```tsx
+import React from 'react';
+
+// eslint-disable-next-line max-len
+type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+/**
+ * 封装支持合成输入的文本 input
+ */
+const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+  const [composing, setComposing] = React.useState(false);
+  return (
+    <input
+      ref={ref}
+      onChange={(e) => {
+        if (!composing) {
+          // eslint-disable-next-line react/prop-types
+          props.onChange?.(e);
+        }
+      }}
+      onCompositionStart={() => {
+        setComposing(true);
+      }}
+      onCompositionEnd={(e) => {
+        if (composing) {
+          setComposing(false);
+          const inputEvent = new Event('input', { bubbles: true, cancelable: false });
+          e.target.dispatchEvent(inputEvent);
+        }
+      }}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+    />
+  );
+});
+
+export default Input;
+```
 
 **元素滚动相关**
 
@@ -865,7 +929,62 @@ window.requestAnimationFrame(callback) 告诉浏览器希望执行一个动画�
 
 **基于 requestAnimationFrame 的通用动画函数**：
 
-![](/front-end/basics/javascript/163.png)
+```typescript
+/**
+ * animation 函数接受 3 个描述动画的基本参数：
+ *      timing: 时间函数，传入一个已过去的时间与总时间之比的小数（0 代表开始，1 代表结束），返回动画完成度（0 代表开始，1 代表结束）
+ *      draw: 绘制函数，传入动画完成度（0 代表开始，1 代表结束），并绘制
+ *      duration: 动画总时间
+ *      isInfinite: 是否无限动画
+ *      delay: 动画提前执行，取值负数或0，如果为负数说明动画已经执行了多少
+ */
+function animation({
+  timing,
+  draw,
+  duration,
+  isInfinite = false,
+  delay = 0,
+}: {
+  timing: (pass: number) => number;
+  draw: (progress: number) => void;
+  duration: number;
+  isInfinite: boolean;
+  delay: number;
+}) {
+  let start = performance.now();
+  window.requestAnimationFrame(function animate(time) {
+    // 动画提前时间 
+    const advanceTime = delay < 0 ? -delay * duration : 0;
+    let timeFraction;
+    if (isInfinite) {
+      // timeFraction 从 0 增加到 1
+      timeFraction = ((time + advanceTime - start) % duration) / duration;
+    } else {
+      // timeFraction 从 0 增加到 1，可能大于1
+      timeFraction = (time + advanceTime - start) / duration;
+    };
+    // 有限动画且已过去时间超过总时间
+    if (!isInfinite && timeFraction > 1) {
+      timeFraction = 1;
+    };
+    // 计算当前动画状态
+    const progress = timing(timeFraction);
+
+    draw(progress); // 绘制
+
+    if (isInfinite) {
+      // 无限动画
+      window.requestAnimationFrame(animate);
+    } else if (timeFraction < 1) {
+      // 有限动画
+      window.requestAnimationFrame(animate);
+    };
+  });
+}
+
+export default animation;
+
+```
 
 **Flip 动画**，是 First、Last、Invert和 Play四个步骤的缩写：
 1. First，记录元素的初始状态；
