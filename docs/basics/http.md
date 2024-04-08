@@ -53,7 +53,7 @@ HTTP 响应状态码用来表明特定 HTTP 请求是否成功完成。响应被
 
 1. **100 Continue**。表示目前为止一切正常，客户端应该继续请求，如果已完成请求则忽略。如果要让服务器检查请求头，客户端必须在初始请求中发送 Expect: 100-continue 作为标头，并发送带 body 的实际请求之前接收 100 Continue。
 2. **101 Switching Protocols**。表示服务器同意升级协议，协议由客户端在 Upgrade 请求头中降序列举，由服务器在 Upgrade 响应头中确认。只能切换到更高级的协议，例如，HTTP 升级为 WebSocket。
-3. <font color="gray">102 Processing 正在处理。向客户端指示已收到完整请求并且服务器正在处理该请求。仅当服务器预计请求需要很长时间时才发送，它告诉客户端请求尚未终止。已弃用，不应再发送，客户可能仍接受它，但会忽略。</font>
+3. `<font color="gray">`102 Processing 正在处理。向客户端指示已收到完整请求并且服务器正在处理该请求。仅当服务器预计请求需要很长时间时才发送，它告诉客户端请求尚未终止。已弃用，不应再发送，客户可能仍接受它，但会忽略。`</font>`
 4. **103 Early Hints 早期提示**。由服务器仍在准备响应时发送，并提示客户端服务器期望最终响应将链接的资源。这允许浏览器甚至在服务器准备并发送最终响应之前就开始预加载资源。主要与指示要加载的资源的 Link 标头一起使用，也还可能包含处理早期提示时强制执行的 Content-Security-Policy 标头（比如，早期响应通过将 CSP 设置为”self”限制为与请求相同的源才预加载资源。虽然最终响应可能会将 CSP 设置为无，即资源已被预加载，但不会被使用）。服务器可能会在重定向后发送多个 103 响应。浏览器只处理第一个早期提示响应，如果请求导致跨源重定向，则必须丢弃该响应。来自早期提示的预加载资源会有效地预加载到文档的 head 元素中，然后才是最终响应中加载的资源。出于兼容性考虑（Chrome103+/Firefox102+且需要用户主动启用，Edge103+且支持范围限制在 HTTP/2 或更高版本），除非已知客户端能正确处理该响应，建议只通过 HTTP/2 或更高版本发送早期提示响应。
 
 ### 2. 成功响应 (200–299)
@@ -358,7 +358,7 @@ Google Chrome 要求对 notBefore 日期晚于 2018 年 4 月 30 日签发的证
 
 ### HTTP 下载相关标头（Downloads）
 
-**Content-Disposition 通用标头**在常规的 HTTP 应答中，指示回复的消息体该以何种形式展示，是以内联的形式（即第一个参数为inline，网页或者页面的一部分），还是以附件的形式下载并保存到本地（即第一个参数为attachment，大多数浏览器会呈现一个“保存为”的对话框，将指令 filename 的值预填为下载后的文件名）。在同源 URL情况下，Chrome 和 Firefox 82 以及更高的版本会优先使用 HTML 的 `<a>` 元素的 download 属性而不是 Content-Disposition: inline 参数来处理下载。而 Firefox 的早期版本则优先使用标头信息并内联显示内容。当使用 multipart/form-data 格式提交表单数据时，每个子部分（例如每个表单字段和任何与字段数据相关的文件）都需要提供一个 Content-Disposition 标头，以提供相关信息。标头的第一个指令始终为 form-data，并且还必须包含一个 name 参数来标识相关字段。额外的指令不区分大小写，并使用带引号的字符串语法在 = 号后面指定参数。多个参数之间使用分号（;）分隔。指令filename 和 filename* 同时出现时，应优先采用 filename*。
+**Content-Disposition 通用标头**在常规的 HTTP 应答中，指示回复的消息体该以何种形式展示，是以内联的形式（即第一个参数为inline，网页或者页面的一部分），还是以附件的形式下载并保存到本地（即第一个参数为attachment，大多数浏览器会呈现一个“保存为”的对话框，将指令 filename 的值预填为下载后的文件名）。在同源 URL情况下，Chrome 和 Firefox 82 以及更高的版本会优先使用 HTML 的 `<a>` 元素的 download 属性而不是 Content-Disposition: inline 参数来处理下载。而 Firefox 的早期版本则优先使用标头信息并内联显示内容。当使用 multipart/form-data 格式提交表单数据时，每个子部分（例如每个表单字段和任何与字段数据相关的文件）都需要提供一个 Content-Disposition 标头，以提供相关信息。标头的第一个指令始终为 form-data，并且还必须包含一个 name 参数来标识相关字段。额外的指令不区分大小写，并使用带引号的字符串语法在 = 号后面指定参数。多个参数之间使用分号（;）分隔。指令filename 和 `filename*` 同时出现时，应优先采用 `filename*`。
 
 ### HTTP 代理相关标头（Proxies）
 
@@ -387,7 +387,7 @@ Google Chrome 要求对 notBefore 日期晚于 2018 年 4 月 30 日签发的证
 
 **Referrer-Policy响应标头**控制请求中应包含哪些访问来源信息（通过 Referer 标头发送）。可取的取值有：
 1. no-referrer：整个 Referer 首部会被移除。访问来源信息不随着请求一起发送。
-2. no-referrer-when-downgrade：默认值，在同等安全级别的情况下，引用页面的地址会被发送 (HTTPS->HTTPS)，但是在降级的情况下不会被发送 (HTTPS->HTTP)。
+2. no-referrer-when-downgrade：默认值，在同等安全级别的情况下，引用页面的地址会被发送 (`HTTPS->HTTPS`)，但是在降级的情况下不会被发送 (`HTTPS->HTTP`)。
 3. origin：在任何情况下，仅发送文件的源作为引用地址。例如 https://example.com/page.html 会将 https://example.com/ 作为引用地址。
 4. origin-when-cross-origin：对于同源的请求，会发送完整的 URL 作为引用地址，但是对于非同源请求仅发送文件的源。
 5. same-origin：对于同源的请求会发送引用地址，但是对于非同源请求则不发送引用地址信息。
@@ -405,7 +405,7 @@ Google Chrome 要求对 notBefore 日期晚于 2018 年 4 月 30 日签发的证
     4. Gecko/geckotrail 表示该浏览器基于 Gecko 渲染引擎。在桌面浏览器中，geckotrail 是固定的字符串 "20100101" 。
 (5)Firefox/firefoxversion 表示该浏览器是 Firefox，并且提供了版本号信息（例如 "17.0"）。
 2. Chrome（或 Chromium/blink-based engines）用户代理字符串与 Firefox 的格式类似。为了兼容性，它添加了 "KHTML, like Gecko" 和 "Safari"：Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36
-3. Opera 也是一款基于 blink 引擎的浏览器，它的 UA 和 Chrome 的几乎一样，不过，它添加了一个 "OPR/<version>"：Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41。
+3. Opera 也是一款基于 blink 引擎的浏览器，它的 UA 和 Chrome 的几乎一样，不过，它添加了一个 `"OPR/<version>"：Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41`。
 4. Safari的用户代理字符串：Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1。
 5. IE的用户代理字符串：Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0)。
 6. 爬虫和机器人的 UA 字符串：Googlebot/2.1 (+http://www.google.com/bot.html)。
@@ -480,7 +480,7 @@ Google Chrome 要求对 notBefore 日期晚于 2018 年 4 月 30 日签发的证
 
 **Date 通用首部**（`Date: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`）包含了报文创建的日期时间。
 
-**Link 实体报头**（Link: < uri-reference >; param1=value1; param2="value2" < uri-reference >必须要用 < 和 >来关闭。以 ; 分隔的参数与 HTML 元素 `<link>` 的属性一致供了一种在 HTTP 标头中序列化一个或多个链接（以逗号分隔）的方法。它在语义上与 HTML 元素 `<link>` 相等。
+**Link 实体报头**（`Link: < uri-reference >; param1=value1; param2="value2" < uri-reference >`必须要用 < 和 >来关闭。以 ; 分隔的参数与 HTML 元素 `<link>` 的属性一致供了一种在 HTTP 标头中序列化一个或多个链接（以逗号分隔）的方法。它在语义上与 HTML 元素 `<link>` 相等。
 
 **Retry-After 响应首部**表示用户代理需要等待多长时间之后才能继续发送请求。主要应用场景：
 1. 当与 503 Service Unavailable 响应一起发送的时候，表示服务下线的预期时长。
@@ -548,7 +548,6 @@ cookie和session均可用于存储用户信息。
 
 ![](../public/basics/http/100.png)
 
-<!-- ![](../public/basics/http/101.png) -->
 服务端可以设置 Cookie 的所有选项：Expires、Domain、Path、Secure、HttpOnly，一个 Set-Cookie 字段只能设置一个 Cookie, 当需要设置多个 Cookie 时，需要添加同样多的 Set-Cookie 字段。
 
 客户端可以设置 Cookie 的选项：Expires、Domain、Path、Secure(有条件：只有在 HTTP 协议的网页中，客户端设置 Secure 类型的 Cookie 才能成功)，但无法设置 HttpOnly 选项。
