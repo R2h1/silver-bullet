@@ -56,7 +56,7 @@ decodeURIComponent(encodeURI) 函数是全局对象的函数属性，用于解�
 
 ### Fetch API
 
-![](../../../public/front-end/basics/javascript/147.png)
+![](/front-end/basics/javascript/147.png)
 
 Fetch API 提供了一个获取资源的接口（包括跨网络通信）。Fetch 的核心在于对 HTTP 接口的抽象，包括 Request，Response，Headers，Body，以及用于初始化异步请求的全局的fetch方法。Fetch 利用到了请求的异步特性——它是基于 Promise 的。此特性在 Web Worker 中可用，Service Workers就是大量使用Fetch的 API。
 
@@ -101,7 +101,7 @@ Fetch API 的 Response 接口呈现了对一次请求的响应数据。Response�
 
 想实现真正的取消请求，就要用到 AbortController API，AbortController 接口表示一个控制器对象，允许根据需要中止一个或多个fetch请求。当调用AbortController API的abort()时，如果请求还没有结束，promise 会被 reject 掉，触发一个名为 AbortError 的 DOMException。
 
-![](../../../public/front-end/basics/javascript/148.png)
+![](/front-end/basics/javascript/148.png)
 
 ### MouseEvent
 
@@ -383,13 +383,13 @@ Web Storage 继承自Window 对象，包括localStorage（默认永久存储）�
 
 Storage 功能支持和可用检测，由于各浏览器提供了禁用 localStorage 的设置，因此不能简单的对属性localStorage和sessionStorage进行断言来判断是否可用（不包括分配的内存用完）：
 
-![](../../../public/front-end/basics/javascript/149.png)
+![](/front-end/basics/javascript/149.png)
 
 ### Ajax
 
 Ajax 是异步的 JavaScript 和 XML，就是使用XMLHTTPRequest对象与服务器通信。最大的优点是可以在**不重载页面的情况下与服务器通信并更新部分页面内容**。
 
-![](../../../public/front-end/basics/javascript/150.png)
+![](/front-end/basics/javascript/150.png)
 
 #### XMLHttpRequest
 
@@ -425,7 +425,7 @@ XMLHttpRequest 继承了XMLHttpRequestEventTarget 和 EventTarget 的属性�
 
 **setRequestHeader(name,value)**：向请求设置HTTP头。name头名称，value对应值；可设置响应的MIME类型（表示文档、文件或字节流的性质和格式的媒体类型）；可以调用多次。xhr不允许更改Referer 和 Host字段；调用设置后不能撤销，其他同 name 调用会向 header 中添加value，但不会覆盖它；
 
-![](../../../public/front-end/basics/javascript/151.png)
+![](/front-end/basics/javascript/151.png)
 
 必须在open 与 send 之间调用，否则会抛出DOMException “InvalidStateError” 异常。参数name和value必须对应于HTTP请求头，否则会抛出 DOMException “SynataxError” 异常。**所有浏览器基本默认会发送的头部字段**：
 1. Accept ：浏览器能够处理的内容类型。
@@ -468,7 +468,7 @@ Content-Type
 
 **应用示例——获取最后需修改日期并处理**：
 
-![](../../../public/front-end/basics/javascript/152.png)
+![](/front-end/basics/javascript/152.png)
 
 **原型事件**：
 
@@ -492,11 +492,11 @@ onreadystatechange，事件字符串readstatechange，当readyState属性发生�
 2. loaded，是一个 unsigned long 类型数据，表示底层进程已经执行的工作总量。可以用这个属性和 ProgressEvent.total 计算工作完成比例。当使用 HTTP 下载资源，它只表示内容本身的部分，不包括首部和其它开销。
 3. total，是一个 unsigned long类型数据，表示正在执行的底层进程的工作总量。当使用 HTTP 下载资源，它只表示内容本身的部分，不包括首部和其它开销。
 
-![](../../../public/front-end/basics/javascript/153.png)
+![](/front-end/basics/javascript/153.png)
 
 如果需要支持 Internet Explorer 6 和更老的浏览器：
 
-![](../../../public/front-end/basics/javascript/154.png)
+![](/front-end/basics/javascript/154.png)
 
 #### FormData
 
@@ -518,15 +518,15 @@ Comet即服务器向页面推送数据。比如应用于**体育比赛的分数�
 
 实现方式：**长轮询**和**流**两种。
 
-![](../../../public/front-end/basics/javascript/155.png)
+![](/front-end/basics/javascript/155.png)
 
 **短轮询（定时轮询）**：**浏览器定时向服务器发送请求，看有没有更新的数据**。由于需要不断的建立 HTTP 连接，严重浪费了服务器端和客户端的资源。客户端数越多，对服务器压力越大，因此短轮询不适用于那些同时在线用户数量比较大，并且很注重性能的 Web 应用。
 
-![](../../../public/front-end/basics/javascript/156.png)
+![](/front-end/basics/javascript/156.png)
 
 **长轮询**：**浏览器发送请求到服务器，服务器一直处于连接状态，直到服务器有数据发送给浏览器，浏览器接收完数据后随即发送新请求连接**。明显减少了很多不必要的 http 请求次数，相比之下节约了资源，缺点在于，连接挂起也会导致服务器资源的浪费。客户端长时间收不到响应会导致超时，从而主动断开和服务器的连接（可以通过判断如果请求时因为超时而结束时，立即重新发起请求到服务器）。
 
-![](../../../public/front-end/basics/javascript/157.png)
+![](/front-end/basics/javascript/157.png)
 
 **长轮询与短轮询共同特点是浏览器都要在接收数据之前，先发起对服务器的请求连接（被动型服务器 的体现：服务器不会主动推送信息）**。**区别在于**：
 1. 长轮询浏览器是接收完数据后才随即发起新请求，短轮询浏览器定时发起新请求。
@@ -535,7 +535,7 @@ Comet即服务器向页面推送数据。比如应用于**体育比赛的分数�
 
 **流**：浏览器仅向服务器发送一个请求（一个HTTP连接），而服务器保持连接打开，然后周期性地向浏览器发送数据。周期性的readyState变为3，客户端从上一次取出数据的末尾开始取出数据。
 
-![](../../../public/front-end/basics/javascript/158.png)
+![](/front-end/basics/javascript/158.png)
 
 #### SSE（服务器发送事件）
 
@@ -562,12 +562,12 @@ const source = new EventSource(url)：参数url规定发送更新数据的同源
 
 实现Ajax：
 
-![](../../../public/front-end/basics/javascript/159.png)
+![](/front-end/basics/javascript/159.png)
 
 实现promise版的Ajax：
 
-![](../../../public/front-end/basics/javascript/160.png)
+![](/front-end/basics/javascript/160.png)
 
 实现简易版的Promise版的Ajax：
 
-![](../../../public/front-end/basics/javascript/161.png)
+![](/front-end/basics/javascript/161.png)

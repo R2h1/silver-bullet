@@ -80,11 +80,11 @@ expr1, expr2, expr3/* , … */，逗号运算符对它的每个操作数或表�
 
 for...in 和 for...of 循环中的循环变量、函数参数、catch 绑定变量等语法中也可以使用解构模式。
 
-![](../../../public/front-end/basics/javascript/128.png)
+![](/front-end/basics/javascript/128.png)
 
 **利用数组解构交换两个变量的值**：
 
-![](../../../public/front-end/basics/javascript/129.png)
+![](/front-end/basics/javascript/129.png)
 
 ### 逻辑运算符
 
@@ -100,7 +100,7 @@ for...in 和 for...of 循环中的循环变量、函数参数、catch 绑定变�
 
 **条件（三元）运算符**，condition ? exprIfTrue : exprIfFalse是 JavaScript 唯一使用三个操作数的运算符，如果条件condition为真值，则执行 exprIfTrue表达式；若条件为假值，则执行exprIfFalse表达式。条件运算符的结果是执行对应表达式的结果。条件运算符可以形成条件运算符链：
 
-![](../../../public/front-end/basics/javascript/130.png)
+![](/front-end/basics/javascript/130.png)
 
 ### 算数运算符
 
@@ -153,7 +153,7 @@ x ** y，幂（**）运算符返回第一个操作数取第二个操作数的幂
 
 `比较运算符（<, > , <=, >=, ===, ==, !==, !=）`表达式由于始终返回boolean，因此可以简化以下赋值：
 
-![](../../../public/front-end/basics/javascript/131.png)
+![](/front-end/basics/javascript/131.png)
 
 ### for...in 和 for...of
 
@@ -163,12 +163,12 @@ for...in 语句以任意顺序迭代一个对象的除Symbol以外的可枚举�
 
 运算符的优先级决定了表达式中运算执行的先后顺序。优先级高的运算符会作为优先级低的运算符的操作数。
 
-![](../../../public/front-end/basics/javascript/132.png)
+![](/front-end/basics/javascript/132.png)
 
-![](../../../public/front-end/basics/javascript/133.png)
+![](/front-end/basics/javascript/133.png)
 
-![](../../../public/front-end/basics/javascript/134.png)
+![](/front-end/basics/javascript/134.png)
 
-![](../../../public/front-end/basics/javascript/135.png)
+![](/front-end/basics/javascript/135.png)
 
-![](../../../public/front-end/basics/javascript/136.png)
+![](/front-end/basics/javascript/136.png)

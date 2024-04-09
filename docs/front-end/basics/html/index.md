@@ -165,7 +165,7 @@ manifest 文件的建议的文件扩展名是：".appcache"。并且在 web 服�
 
 离线：浏览器就直接使用离线存储的资源。.appcache文件示例：
 
-![](../../../public/front-end/basics/html/1.png)
+![](/front-end/basics/html/1.png)
 
 其中，CACHRE MANIFEST表示需缓存的资源（必须有）；ETWORK表示永远不会被缓存的资源（可选）；FALLBACK表示页面无法访问时的回退页面（可选/html5/ 目录中的所有文件回退为"offline.html"）。
 
@@ -232,7 +232,7 @@ Chrome 66 中针对audio和video元素推出了自动播放策略，可有效阻
 
 据此，Chrome 会计算出媒体参与度得分，该得分在定期播放媒体的网站上最高。当它足够高时，允许媒体仅在桌面上自动播放。用户的 MEI 可在about://media-engagement内部页面获取。
 
-![](../../../public/front-end/basics/html/2.png)
+![](/front-end/basics/html/2.png)
 
 对于开发者而言，可以通过以下手段在本地更改 Chrome 自动播放政策行为，以测试网站的不同级别的用户参与度：
 1. 可以使用命令行标志：chrome.exe --autoplay-policy=no-user-gesture-required 完全禁用自动播放策略。这就好像用户与网站强烈互动一样，而始终允许自动播放。
@@ -316,7 +316,7 @@ HTML 元素通过“标签”（tag）将文本从文档中引出，标签由在
     1. 透明内容模型（Transparent content model）：如果元素（`<del>` 和 `<ins>` ）拥有透明内容模型（Transparent content model），即使将透明内容移除并使用子元素取代，其内容也必须由合法的 HTML5 元素组成。
     2. 支持脚本的元素（Script-supporting elements）：（`<script>`和`<template>`）不会直接渲染输出在页面文档中。相反，它们的作用是支持脚本，或者直接包含或指定脚本代码，或者指定将被脚本使用的数据。
 
-![](../../../public/front-end/basics/html/3.png)
+![](/front-end/basics/html/3.png)
 
 ### 属性分类
 
@@ -502,7 +502,7 @@ table 元素表示表格数据 -- 即通过二维数据表表示的信息。
 
 `<del>This paragraph has been deleted.</del >`
 
-![](../../../public/front-end/basics/html/4.png)
+![](/front-end/basics/html/4.png)
 
 #### ins元素
 
@@ -510,7 +510,7 @@ table 元素表示表格数据 -- 即通过二维数据表表示的信息。
 
 `<ins>这一段文本是新插入至文档的。</ins>`
 
-![](../../../public/front-end/basics/html/5.png)
+![](/front-end/basics/html/5.png)
 
 
 ### 文档元数据元素
@@ -588,7 +588,7 @@ table 元素表示表格数据 -- 即通过二维数据表表示的信息。
    www.somedomain.com</a>
 </address>
 ```
-![](../../../public/front-end/basics/html/6.png)
+![](/front-end/basics/html/6.png)
 
 ### 文本内容元素
 

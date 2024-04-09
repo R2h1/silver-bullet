@@ -12,13 +12,13 @@
 
 全局模式是把将不同的功能封装成不同的全局函数，容易命名冲突，造成全局变量污染。
 
-![](../../../public/front-end/basics/javascript/164.png)
+![](/front-end/basics/javascript/164.png)
 
 #### 单例模式
 
 单例模式是简单对象封装，数据和方法都是对象的属性，不安全，可以直接修改模块内部的数据。
 
-![](../../../public/front-end/basics/javascript/165.png)
+![](/front-end/basics/javascript/165.png)
 
 #### IIFE 模式增强
 
@@ -28,7 +28,7 @@ IIFE模式增强即利用立即执行函数表达式和闭包，支持引入依�
 3. 无法直接看出模块间的依赖关系；
 4. 如果内部依赖关系混乱就会难以维护。
 
-![](../../../public/front-end/basics/javascript/166.png)
+![](/front-end/basics/javascript/166.png)
 
 ### 现代模块化方案
 
@@ -43,7 +43,7 @@ CommonJS 是服务器端模块的规范，Node.js 采用，但提前编译打包
 
     暴露模块使用exports或module.exports，exports是对module.exports的引用，在编写模块时，可以使用exports.a =’xxx’, exports.b = function(){} 或module.exports = { a:’xxx’, b: function() {} }添加属性或方法，本质上它也添加在 module.exports 所指向的对象身上。但不能直接 对exports赋值，这就将 exports 重新指向新值，和 module.exports 就不是指向同一个对象，而引入模块时引入的时module.exports对象。exports和module.exports的内部实现如下：
 
-    ![](../../../public/front-end/basics/javascript/167.png)
+    ![](/front-end/basics/javascript/167.png)
 
 CommonJS 规范加载模块是同步的，只有加载完成，才能执行后面的操作。由于 NodeJS 主要用于服务器编程，模块文件一般都已经存在于本地硬盘，加载起来比较快，所以同步加载没有问题。但是如果是浏览器端，同步加载很容易阻塞。
 
@@ -51,13 +51,13 @@ CommonJS 规范加载模块是同步的，只有加载完成，才能执行后�
 
 **AMD（异步模块定义）**是异步加载依赖的模块，有缓存，允许指定回调函数，可在不转换代码的情况下直接在浏览器运行，可以并行加载多个模块，也可运行在 Node 环境。AMD主要是在浏览器使用的。require.js 遵循的是 AMD（异步模块定义）规范。
 
-![](../../../public/front-end/basics/javascript/168.png)
+![](/front-end/basics/javascript/168.png)
 
 #### CMD
 
 CMD（通用模块定义）是根据 CommonJS 和 AMD 基础上提出的，异步加载依赖的模块，有缓存，sea.js 遵循的是 CMD （通用模块定义）规范。和 require.js 一样主要在浏览器中使用。但其实这两个一般都很少使用，实际上使用的更多的是CommonJs和ES Module。
 
-![](../../../public/front-end/basics/javascript/169.png)
+![](/front-end/basics/javascript/169.png)
 
 #### ES6 Module
 
@@ -90,7 +90,7 @@ ES6 Module旨在成为浏览器和服务器通用的模块解决方案，主要�
 
 导入并转发导出的写法：
 
-![](../../../public/front-end/basics/javascript/170.png)
+![](/front-end/basics/javascript/170.png)
 
 ### 模块化与组件化
 
@@ -98,7 +98,7 @@ ES6 Module旨在成为浏览器和服务器通用的模块解决方案，主要�
 
 JS 模块是独立算法和数据单元，CSS 模块是独立的功能性样式单元，页面是应用中某个界面状态，是 UI 组件的容器，应用是整个项目或整个站点，由多个页面组成。一个应用由多个页面组成。一个页面由多个组件组合，组件由子组件组合，组件中可依赖模块，模块之间可互相依赖。
 
-![](../../../public/front-end/basics/javascript/171.png)
+![](/front-end/basics/javascript/171.png)
 
 非组件化开发模式存在的问题：
 1. 页面作为开发单元过大；

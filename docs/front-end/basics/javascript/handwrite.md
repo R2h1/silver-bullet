@@ -8,7 +8,7 @@
 3. 不能序列化函数即无法拷贝函数 
 4. 不能解决循环引用的对象 5.无法拷贝特殊对象RegExp, Date, Set, Map）。
 
-![](../../../public/front-end/basics/javascript/173.png)
+![](/front-end/basics/javascript/173.png)
 
 ### 数组扁平化（flatten）
 
@@ -16,25 +16,25 @@
 
 **扁平化二维数组**：
 
-![](../../../public/front-end/basics/javascript/174.png)
+![](/front-end/basics/javascript/174.png)
 
 **扁平化更高维度数组**：
 
-![](../../../public/front-end/basics/javascript/175.png)
+![](/front-end/basics/javascript/175.png)
 
 ### 数组去重
 
-![](../../../public/front-end/basics/javascript/176.png)
+![](/front-end/basics/javascript/176.png)
 
 ### 循环打印红黄绿
 
 红灯 3s 亮一次，绿灯 1s 亮一次，黄灯 2s 亮一次；如何让三个灯不断交替重复亮灯？
 
-![](../../../public/front-end/basics/javascript/177.png)
+![](/front-end/basics/javascript/177.png)
 
 ### 每隔一秒打印 0，1，2，3，4
 
-![](../../../public/front-end/basics/javascript/178.png)
+![](/front-end/basics/javascript/178.png)
 
 ### 实现图片懒加载
 
@@ -135,32 +135,32 @@ elements.forEach((element) => {
 
 `比较两个应用版本的大小，如果v1 > v2返回1；如果v1 < v2返回0；如果 v1 = v2返回0。比如，1.2.4 < 1.3.0.alpha.1 < 1.3.0.alpha.2 < 1.3.0.beta.1 < 1.3.0.rc.1 < 1.3.0`；
 
-![](../../../public/front-end/basics/javascript/179.png)
+![](/front-end/basics/javascript/179.png)
 
 ### 生成指定长度随机字符串
 
-![](../../../public/front-end/basics/javascript/180.png)
+![](/front-end/basics/javascript/180.png)
 
 ### 使用 setTimeout 实现 setInterval
 
-![](../../../public/front-end/basics/javascript/181.png)
+![](/front-end/basics/javascript/181.png)
 
 ### 实现 range 函数
 
-![](../../../public/front-end/basics/javascript/182.png)
+![](/front-end/basics/javascript/182.png)
 
 ### 实现 lodash 的 countBy 函数
 
-![](../../../public/front-end/basics/javascript/183.png)
+![](/front-end/basics/javascript/183.png)
 
 ### 实现 canvas 简易版手写签名
 
-![](../../../public/front-end/basics/javascript/184.png)
+![](/front-end/basics/javascript/184.png)
 
 ### 实现 add(1)(2)(3)(4)()
 
-![](../../../public/front-end/basics/javascript/185.png)
+![](/front-end/basics/javascript/185.png)
 
 ### 实现远程调用加法
 
-![](../../../public/front-end/basics/javascript/186.png)
+![](/front-end/basics/javascript/186.png)
