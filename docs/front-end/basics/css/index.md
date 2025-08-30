@@ -2067,4 +2067,16 @@ aspect-ratio属性为盒子规定了首选纵横比，该纵横比可以用于�
 Houdini 是一组底层 API，它们公开了 CSS 引擎的各个部分，从而使开发人员能够通过加入浏览器渲染引擎的样式和布局过程来扩展 CSS。Houdini 是一组 API，它们使开发人员可以直接访问CSS 对象模型 （CSSOM），使开发人员可以编写浏览器可以解析为 CSS 的代码，从而创建新的 CSS 功能，而无需等待它们在浏览器中本地实现。
 
 ### CSS 属性和值 API
-CSS 属性和值 API允许开发者显式地定义它们的 **CSS 自定义属性**（值使用var() 函数访问），允许设置属性类型检查、默认值以及是否可继承其值。
+CSS 属性和值 API 允许开发者显式地定义它们的 **CSS 自定义属性**（值使用var() 函数访问），允许设置属性类型检查、默认值以及是否可继承其值。
+
+
+## CSS Functions
+
+### clamp()
+
+clamp(MIN, VAL, MAX)，它接收三个参数：最小值MIN、首选值 VAL、最大值 MAX，等同于 max(MIN, min(VAL, MAX))：
+ 1. 当首选值比最小值要小时，则 clamp(MIN, VAL, MAX) 等于最小值 MIN。
+ 2. 当首选值介于最小值和最大值之间时，clamp(MIN, VAL, MAX) 等于首选值 VAL。
+ 3. 当首选值比最大值要大时，则 clamp(MIN, VAL, MAX) 等于最大值 MAX。
+
+允许在 `<length>`、`<frequency>`、`<angle>`、`<time>`、`<percentage>`、`<number>`、`<integer>` 中使用。
