@@ -20,17 +20,17 @@
   </div>
   
   <div class="tool-card">
-  <div class="tool-icon">🔄</div>
-  <h3>JSON 格式化工具</h3>
-  <p>格式化、压缩和验证 JSON 数据，支持语法高亮和错误检测。</p>
-  <a class="tool-link" href="./json-formatter">立即使用 →</a>
-</div>
+    <div class="tool-icon">🔄</div>
+    <h3>JSON 格式化工具</h3>
+    <p>格式化、压缩和验证 JSON 数据，支持语法高亮和错误检测。</p>
+    <a class="tool-link" href="./json-formatter">立即使用 →</a>
+  </div>
   
-  <div class="tool-card coming-soon">
-    <div class="tool-icon">❓</div>
-    <h3>更多工具即将到来</h3>
-    <p>每天都会添加新的实用工具，敬请期待！</p>
-    <span class="tool-link">开发中...</span>
+ <div class="tool-card">
+    <div class="tool-icon">🎨</div>
+    <h3>颜色选择与转换工具</h3>
+    <p>选择、转换和分析颜色，支持多种格式和调色板生成。</p>
+    <a class="tool-link" href="./color-converter">立即使用 →</a>
   </div>
 </div>
 
