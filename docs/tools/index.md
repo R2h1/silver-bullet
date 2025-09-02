@@ -32,6 +32,13 @@
     <p>选择、转换和分析颜色，支持多种格式和调色板生成。</p>
     <a class="tool-link" href="./color-converter">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">⏰</div>
+    <h3>时间戳转换工具</h3>
+    <p>转换时间戳与日期时间，支持多种格式和时区，包含常用时间戳参考。</p>
+    <a class="tool-link" href="./timestamp-converter">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
