@@ -39,6 +39,13 @@
     <p>转换时间戳与日期时间，支持多种格式和时区，包含常用时间戳参考。</p>
     <a class="tool-link" href="./timestamp-converter">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🔤</div>
+    <h3>文本处理工具集</h3>
+    <p>提供多种文本处理功能，包括大小写转换、编码解码、格式化等。</p>
+    <a class="tool-link" href="./text-processor">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
