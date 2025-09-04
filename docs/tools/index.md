@@ -46,6 +46,13 @@
     <p>提供多种文本处理功能，包括大小写转换、编码解码、格式化等。</p>
     <a class="tool-link" href="./text-processor">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">📏</div>
+    <h3>单位转换器</h3>
+    <p>转换各种度量单位，包括长度、重量、温度、时间、速度等。</p>
+    <a class="tool-link" href="./unit-converter">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
