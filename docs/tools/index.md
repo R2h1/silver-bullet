@@ -53,6 +53,13 @@
     <p>转换各种度量单位，包括长度、重量、温度、时间、速度等。</p>
     <a class="tool-link" href="./unit-converter">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">.*</div>
+    <h3>正则表达式测试工具</h3>
+    <p>测试和验证正则表达式，提供实时匹配结果和详细解释。</p>
+    <a class="tool-link" href="./regex-tester">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
