@@ -60,6 +60,13 @@
     <p>测试和验证正则表达式，提供实时匹配结果和详细解释。</p>
     <a class="tool-link" href="./regex-tester">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🔳</div>
+    <h3>二维码生成器</h3>
+    <p>将文本或URL转换为二维码图片，支持自定义颜色和尺寸。</p>
+    <a class="tool-link" href="./qr-generator">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
