@@ -67,6 +67,13 @@
     <p>将文本或URL转换为二维码图片，支持自定义颜色和尺寸。</p>
     <a class="tool-link" href="./qr-generator">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🔤</div>
+    <h3>Base64 编码/解码工具</h3>
+    <p>快速将文本与Base64格式相互转换，支持编码和解码功能。</p>
+    <a class="tool-link" href="./base64-converter">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
