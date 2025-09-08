@@ -74,6 +74,13 @@
     <p>快速将文本与Base64格式相互转换，支持编码和解码功能。</p>
     <a class="tool-link" href="./base64-converter">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🎲</div>
+    <h3>随机数生成器</h3>
+    <p>生成各种类型的随机数，支持自定义范围和多种格式。</p>
+    <a class="tool-link" href="./random-generator">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
