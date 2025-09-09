@@ -81,6 +81,13 @@
     <p>生成各种类型的随机数，支持自定义范围和多种格式。</p>
     <a class="tool-link" href="./random-generator">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">⚖️</div>
+    <h3>BMI计算器</h3>
+    <p>计算您的身体质量指数(BMI)，了解您的体重健康状况。</p>
+    <a class="tool-link" href="./bmi-calculator">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态

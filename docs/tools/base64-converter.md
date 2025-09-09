@@ -105,6 +105,12 @@ Base64编码: VGVzdCBTdHJpbmc=
 解码结果: Test String
 ```
 
+### 常用编码对照
+|字符|ASCII|Base64|
+|--|--|--|
+|A|65|QQ==|
+|AB|65 66|QUI=|
+|ABC|65 66 67|QUJD|
 
 ### 技术实现
 
