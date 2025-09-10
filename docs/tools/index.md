@@ -88,6 +88,13 @@
     <p>计算您的身体质量指数(BMI)，了解您的体重健康状况。</p>
     <a class="tool-link" href="./bmi-calculator">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">💬</div>
+    <h3>随机名言生成器</h3>
+    <p>发现智慧的话语，激发灵感，丰富思想。</p>
+    <a class="tool-link" href="./quote-generator">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
