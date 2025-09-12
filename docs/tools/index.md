@@ -95,6 +95,20 @@
     <p>发现智慧的话语，激发灵感，丰富思想。</p>
     <a class="tool-link" href="./quote-generator">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">📜</div>
+    <h3>诗词生成器</h3>
+    <p>探索中华诗词之美，生成古典与现代交融的诗句。</p>
+    <a class="tool-link" href="./poem-generator">立即使用 →</a>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🎁</div>
+    <h3>抽奖/转盘工具</h3>
+    <p>创建自定义抽奖活动，支持转盘和抽奖箱两种模式。</p>
+    <a class="tool-link" href="./lottery-wheel">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
