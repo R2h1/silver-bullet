@@ -109,6 +109,13 @@
     <p>创建自定义抽奖活动，支持转盘和抽奖箱两种模式。</p>
     <a class="tool-link" href="./lottery-wheel">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🔍</div>
+    <h3>文本差异比较工具</h3>
+    <p>快速比较两个文本内容之间的差异，支持多种视图模式和差异高亮显示。</p>
+    <a class="tool-link" href="./text-diff">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
