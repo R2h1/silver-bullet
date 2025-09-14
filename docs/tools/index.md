@@ -95,6 +95,14 @@
     <p>发现智慧的话语，激发灵感，丰富思想。</p>
     <a class="tool-link" href="./quote-generator">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🧮</div>
+    <h3>数学计算器</h3>
+    <p>功能强大的科学计算器，支持基本运算、科学函数和计算历史记录。</p>
+    <a class="tool-link" href="./math-calculator">立即使用 →</a>
+  </div>
+  
 </div>
 
 ## 最新动态
