@@ -103,6 +103,12 @@
     <a class="tool-link" href="./math-calculator">立即使用 →</a>
   </div>
   
+  <div class="tool-card">
+    <div class="tool-icon">🎲</div>
+    <h3>随机选择器</h3>
+    <p>从多个选项中随机选择，解决选择困难症，支持多种选择模式。</p>
+    <a class="tool-link" href="./random-selector">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
