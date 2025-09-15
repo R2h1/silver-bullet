@@ -108,6 +108,24 @@
     <h3>随机选择器</h3>
     <p>从多个选项中随机选择，解决选择困难症，支持多种选择模式。</p>
     <a class="tool-link" href="./random-selector">立即使用 →</a>
+    <div class="tool-icon">📜</div>
+    <h3>诗词生成器</h3>
+    <p>探索中华诗词之美，生成古典与现代交融的诗句。</p>
+    <a class="tool-link" href="./poem-generator">立即使用 →</a>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🎁</div>
+    <h3>抽奖/转盘工具</h3>
+    <p>创建自定义抽奖活动，支持转盘和抽奖箱两种模式。</p>
+    <a class="tool-link" href="./lottery-wheel">立即使用 →</a>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🔍</div>
+    <h3>文本差异比较工具</h3>
+    <p>快速比较两个文本内容之间的差异，支持多种视图模式和差异高亮显示。</p>
+    <a class="tool-link" href="./text-diff">立即使用 →</a>
   </div>
 </div>
 
