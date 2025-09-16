@@ -127,6 +127,13 @@
     <p>快速比较两个文本内容之间的差异，支持多种视图模式和差异高亮显示。</p>
     <a class="tool-link" href="./text-diff">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🎮</div>
+    <h3>多人小游戏合集</h3>
+    <p>经典本地多人游戏，包含井字棋、五子棋和数字炸弹，支持同一设备游玩。</p>
+    <a class="tool-link" href="./multiplayer-games">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
