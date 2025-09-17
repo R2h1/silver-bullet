@@ -134,6 +134,13 @@
     <p>经典本地多人游戏，包含井字棋、五子棋和数字炸弹，支持同一设备游玩。</p>
     <a class="tool-link" href="./multiplayer-games">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🎵</div>
+    <h3>简易音乐播放器</h3>
+    <p>优雅的音乐播放器，支持本地音乐播放和播放列表管理，提供纯粹的音乐体验。</p>
+    <a class="tool-link" href="./music-player">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
