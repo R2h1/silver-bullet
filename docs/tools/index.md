@@ -141,6 +141,13 @@
     <p>优雅的音乐播放器，支持本地音乐播放和播放列表管理，提供纯粹的音乐体验。</p>
     <a class="tool-link" href="./music-player">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">🔮</div>
+    <h3>今日运势</h3>
+    <p>获取个性化每日运势预测，包含感情、事业、财富和健康全方位解读。</p>
+    <a class="tool-link" href="./daily-fortune">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
