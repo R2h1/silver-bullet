@@ -148,6 +148,13 @@
     <p>获取个性化每日运势预测，包含感情、事业、财富和健康全方位解读。</p>
     <a class="tool-link" href="./daily-fortune">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">💧</div>
+    <h3>喝水提醒器</h3>
+    <p>帮助您保持充足的水分摄入，培养健康的饮水习惯，避免脱水影响健康。</p>
+    <a class="tool-link" href="./water-reminder">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
