@@ -155,6 +155,13 @@
     <p>帮助您保持充足的水分摄入，培养健康的饮水习惯，避免脱水影响健康。</p>
     <a class="tool-link" href="./water-reminder">立即使用 →</a>
   </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">📊</div>
+    <h3>日常记账本</h3>
+    <p>轻松记录和管理日常收支，分析消费习惯，实现个人财务健康管理。</p>
+    <a class="tool-link" href="./daily-expense-tracker">立即使用 →</a>
+  </div>
 </div>
 
 ## 最新动态
