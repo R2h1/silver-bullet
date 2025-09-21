@@ -108,6 +108,9 @@
     <h3>随机选择器</h3>
     <p>从多个选项中随机选择，解决选择困难症，支持多种选择模式。</p>
     <a class="tool-link" href="./random-selector">立即使用 →</a>
+  </div>
+  
+  <div class="tool-card">
     <div class="tool-icon">📜</div>
     <h3>诗词生成器</h3>
     <p>探索中华诗词之美，生成古典与现代交融的诗句。</p>
@@ -161,6 +164,13 @@
     <h3>日常记账本</h3>
     <p>轻松记录和管理日常收支，分析消费习惯，实现个人财务健康管理。</p>
     <a class="tool-link" href="./daily-expense-tracker">立即使用 →</a>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-icon">♻️</div>
+    <h3>垃圾分类指导助手</h3>
+    <p>快速查询物品分类，学习垃圾分类知识，共建环保家园。</p>
+    <a class="tool-link" href="./recycling-guide">立即使用 →</a>
   </div>
 </div>
 
